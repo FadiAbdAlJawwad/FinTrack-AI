@@ -7,7 +7,17 @@ import {
   assertSucceeds,
   initializeTestEnvironment,
 } from '@firebase/rules-unit-testing';
-import { doc, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  serverTimestamp,
+  setDoc,
+  Timestamp,
+  updateDoc,
+} from 'firebase/firestore';
 
 const PROJECT_ID = 'demo-fintrack-rules-test';
 let env;
@@ -28,6 +38,13 @@ const validWallet = (id = 'cash') => ({
   name: 'Cash',
   icon: 'payments',
   isDefault: true,
+});
+
+const validUserDoc = (uid = 'alice') => ({
+  fullName: 'Alice',
+  email: 'alice@example.com',
+  createdAt: serverTimestamp(),
+  uid,
 });
 
 const asAlice = () => env.authenticatedContext('alice').firestore();
@@ -75,7 +92,6 @@ describe('transactions', () => {
       await setDoc(txRef(ctx.firestore()), validTx());
     });
     const bob = env.authenticatedContext('bob').firestore();
-    const { getDoc } = await import('firebase/firestore');
     await assertFails(getDoc(txRef(bob)));
   });
 
@@ -136,8 +152,36 @@ describe('transactions', () => {
   test('owner can delete', async () => {
     const db = asAlice();
     await assertSucceeds(setDoc(txRef(db), validTx()));
-    const { deleteDoc } = await import('firebase/firestore');
     await assertSucceeds(deleteDoc(txRef(db)));
+  });
+
+  test("alice cannot delete bob's transaction", async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(txRef(ctx.firestore(), 'tx1', 'bob'), validTx('tx1'));
+    });
+    await assertFails(deleteDoc(txRef(asAlice(), 'tx1', 'bob')));
+  });
+
+  test("alice list query of bob's transactions is denied", async () => {
+    await assertFails(getDocs(collection(asAlice(), 'users/bob/transactions')));
+  });
+
+  test('transaction update changing type to invalid value is denied', async () => {
+    const db = asAlice();
+    await assertSucceeds(setDoc(txRef(db), validTx()));
+    await assertFails(updateDoc(txRef(db), { type: 'invalid' }));
+  });
+
+  test('transaction create with non-string title is denied', async () => {
+    await assertFails(
+      setDoc(txRef(asAlice()), { ...validTx(), title: 12345 }),
+    );
+  });
+
+  test('transaction create with non-string date is denied', async () => {
+    await assertFails(
+      setDoc(txRef(asAlice()), { ...validTx(), date: 20261003 }),
+    );
   });
 });
 
@@ -167,21 +211,111 @@ describe('wallets', () => {
   test('wallet id different from the document id is denied', async () => {
     await assertFails(setDoc(walletRef(asAlice(), 'cash'), validWallet('bank')));
   });
+
+  test("alice cannot read bob's wallet", async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), 'users/bob/wallets/cash'), validWallet('cash'));
+    });
+    await assertFails(getDoc(doc(asAlice(), 'users/bob/wallets/cash')));
+  });
+
+  test("alice cannot write bob's wallet", async () => {
+    await assertFails(
+      setDoc(doc(asAlice(), 'users/bob/wallets/cash'), validWallet('cash')),
+    );
+  });
+
+  test("alice cannot delete bob's wallet", async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), 'users/bob/wallets/cash'), validWallet('cash'));
+    });
+    await assertFails(deleteDoc(doc(asAlice(), 'users/bob/wallets/cash')));
+  });
+
+  test('unauthenticated list of wallets is denied', async () => {
+    const anon = env.unauthenticatedContext().firestore();
+    await assertFails(getDocs(collection(anon, 'users/alice/wallets')));
+  });
+
+  test('wallet name longer than 50 characters is denied', async () => {
+    await assertFails(
+      setDoc(walletRef(asAlice()), { ...validWallet(), name: 'a'.repeat(51) }),
+    );
+  });
+
+  test('wallet icon longer than 40 characters is denied', async () => {
+    await assertFails(
+      setDoc(walletRef(asAlice()), { ...validWallet(), icon: 'a'.repeat(41) }),
+    );
+  });
+
+  test('wallet empty icon is denied', async () => {
+    await assertFails(
+      setDoc(walletRef(asAlice()), { ...validWallet(), icon: '' }),
+    );
+  });
+
+  test('wallet non-string icon is denied', async () => {
+    await assertFails(
+      setDoc(walletRef(asAlice()), { ...validWallet(), icon: 12345 }),
+    );
+  });
+
+  test('wallet update changing id is denied', async () => {
+    const db = asAlice();
+    await assertSucceeds(setDoc(walletRef(db, 'cash'), validWallet('cash')));
+    await assertFails(updateDoc(walletRef(db, 'cash'), { id: 'other' }));
+  });
 });
 
 describe('users', () => {
   const userRef = (db, uid = 'alice') => doc(db, `users/${uid}`);
 
-  test('baseCurrency EUR is denied', async () => {
+  test('unauthenticated user cannot read user doc', async () => {
+    const anon = env.unauthenticatedContext().firestore();
+    await assertFails(getDoc(userRef(anon, 'alice')));
+  });
+
+  test("alice cannot read bob's user doc", async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(userRef(ctx.firestore(), 'bob'), validUserDoc('bob'));
+    });
+    await assertFails(getDoc(userRef(asAlice(), 'bob')));
+  });
+
+  test("alice cannot write bob's user doc", async () => {
     await assertFails(
-      setDoc(userRef(asAlice()), { baseCurrency: 'EUR' }, { merge: true }),
+      setDoc(userRef(asAlice(), 'bob'), validUserDoc('bob')),
     );
   });
 
-  test('baseCurrency USD is allowed (merge write, like the app)', async () => {
-    await assertSucceeds(
-      setDoc(userRef(asAlice()), { baseCurrency: 'USD' }, { merge: true }),
+  test('user create with an extra field is denied', async () => {
+    await assertFails(
+      setDoc(userRef(asAlice()), { ...validUserDoc('alice'), extraField: true }),
     );
+  });
+
+  test('user create with uid != userId is denied', async () => {
+    await assertFails(
+      setDoc(userRef(asAlice()), validUserDoc('bob')),
+    );
+  });
+
+  test('user create with fullName longer than 100 is denied', async () => {
+    await assertFails(
+      setDoc(userRef(asAlice()), { ...validUserDoc('alice'), fullName: 'a'.repeat(101) }),
+    );
+  });
+
+  test('user create with non-string fullName is denied', async () => {
+    await assertFails(
+      setDoc(userRef(asAlice()), { ...validUserDoc('alice'), fullName: 12345 }),
+    );
+  });
+
+  test('user create missing createdAt is denied', async () => {
+    const { createdAt, ...withoutCreatedAt } = validUserDoc('alice');
+    await assertFails(setDoc(userRef(asAlice()), withoutCreatedAt));
   });
 
   test('email sign-up document (no baseCurrency) is allowed', async () => {
@@ -208,15 +342,68 @@ describe('users', () => {
     );
   });
 
+  test('valid Google-shaped create with null email and photoUrl is allowed', async () => {
+    await assertSucceeds(
+      setDoc(userRef(asAlice()), {
+        fullName: 'Alice',
+        email: null,
+        createdAt: serverTimestamp(),
+        photoUrl: null,
+        uid: 'alice',
+        baseCurrency: 'USD',
+      }),
+    );
+  });
+
+  test('merge-style update of baseCurrency to JOD is allowed', async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(userRef(ctx.firestore()), validUserDoc('alice'));
+    });
+    await assertSucceeds(
+      setDoc(userRef(asAlice()), { baseCurrency: 'JOD' }, { merge: true }),
+    );
+  });
+
+  test('baseCurrency USD is allowed (merge write, like the app)', async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(userRef(ctx.firestore()), validUserDoc('alice'));
+    });
+    await assertSucceeds(
+      setDoc(userRef(asAlice()), { baseCurrency: 'USD' }, { merge: true }),
+    );
+  });
+
+  test('user update changing createdAt is denied', async () => {
+    const initialTime = Timestamp.fromDate(new Date('2026-01-01T00:00:00Z'));
+    const newTime = Timestamp.fromDate(new Date('2026-02-01T00:00:00Z'));
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(userRef(ctx.firestore()), {
+        ...validUserDoc('alice'),
+        createdAt: initialTime,
+      });
+    });
+    await assertFails(
+      updateDoc(userRef(asAlice()), { createdAt: newTime }),
+    );
+  });
+
+  test('baseCurrency EUR is denied', async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(userRef(ctx.firestore()), validUserDoc('alice'));
+    });
+    await assertFails(
+      setDoc(userRef(asAlice()), { baseCurrency: 'EUR' }, { merge: true }),
+    );
+  });
+
   test('another user cannot write the user document', async () => {
     const bob = env.authenticatedContext('bob').firestore();
-    await assertFails(setDoc(userRef(bob, 'alice'), { baseCurrency: 'USD' }));
+    await assertFails(setDoc(userRef(bob, 'alice'), validUserDoc('alice')));
   });
 
   test('client delete of the user document is denied', async () => {
     const db = asAlice();
-    await assertSucceeds(setDoc(userRef(db), { baseCurrency: 'USD' }));
-    const { deleteDoc } = await import('firebase/firestore');
+    await assertSucceeds(setDoc(userRef(db), validUserDoc('alice')));
     await assertFails(deleteDoc(userRef(db)));
   });
 });
