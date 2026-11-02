@@ -17,10 +17,23 @@ service cloud.firestore {
         || data.baseCurrency in ['USD', 'JOD', 'ILS'];
     }
 
+    function validUser(data, userId) {
+      return data.keys().hasOnly(['fullName','email','createdAt','photoUrl','uid','baseCurrency'])
+        && data.keys().hasAll(['fullName','email','createdAt','uid'])
+        && data.uid == userId
+        && data.fullName is string && data.fullName.size() <= 100
+        && (data.email == null || (data.email is string && data.email.size() <= 320))
+        && data.createdAt is timestamp
+        && (!('photoUrl' in data) || data.photoUrl == null
+            || (data.photoUrl is string && data.photoUrl.size() <= 2048))
+        && validBaseCurrency(data);
+    }
+
     match /users/{userId} {
       allow read: if isOwner(userId);
-      allow create, update: if isOwner(userId)
-        && validBaseCurrency(request.resource.data);
+      allow create: if isOwner(userId) && validUser(request.resource.data, userId);
+      allow update: if isOwner(userId) && validUser(request.resource.data, userId)
+                    && request.resource.data.createdAt == resource.data.createdAt;
       // No client deletes of the user document: the app never deletes it.
 
       // ---- users/{userId}/transactions/{txId} ---------------------------
@@ -59,6 +72,7 @@ service cloud.firestore {
           && data.name is string
           && data.name.size() >= 1 && data.name.size() <= 50
           && data.icon is string
+          && data.icon.size() >= 1 && data.icon.size() <= 40
           && data.isDefault is bool;
       }
 
