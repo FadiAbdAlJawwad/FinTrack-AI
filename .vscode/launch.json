@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "fin_track_ai (dev)",
+      "request": "launch",
+      "type": "dart",
+      "args": [
+        "--dart-define-from-file=config/dev.local.json"
+      ]
+    }
+  ]
+}

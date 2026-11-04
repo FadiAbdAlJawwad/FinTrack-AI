@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -104,6 +105,11 @@ class _VoiceEntryScreenState extends ConsumerState<VoiceEntryScreen>
         speechState.setStatus(VoiceEntryStatus.error);
         errorMessage.value = e.getLocalizedMessage(context);
       } catch (e) {
+        if (kDebugMode) {
+          final msg = e.toString().replaceAll('\n', ' ');
+          final truncated = msg.length > 120 ? msg.substring(0, 120) : msg;
+          debugPrint('[VoiceEntry] unexpected ${e.runtimeType}: $truncated');
+        }
         if (!context.mounted) return;
         speechState.setStatus(VoiceEntryStatus.error);
         errorMessage.value = context.loc.aiUnknown;
