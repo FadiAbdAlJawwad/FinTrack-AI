@@ -407,3 +407,22 @@ For bug reports, feature requests, or questions:
 - [Firebase Documentation](https://firebase.google.com/docs)
 - [Google Gemini API](https://ai.google.dev)
 - Open-source community contributors
+
+---
+
+## Local Setup
+
+To run the app locally with AI features enabled:
+
+1. Copy `config/dev.example.json` to `config/dev.local.json`:
+   ```bash
+   cp config/dev.example.json config/dev.local.json
+   ```
+2. Open `config/dev.local.json` and replace the placeholder values (`REPLACE_ME`) with your actual configuration secrets (`APPS_SCRIPT_PROXY_URL` and `APP_SHARED_SECRET`).
+3. Press **Run** in Android Studio (selecting the `fin_track_ai (dev)` configuration) or VS Code (selecting `fin_track_ai (dev)`). Alternatively, run from CLI:
+   ```bash
+   flutter run --dart-define-from-file=config/dev.local.json
+   ```
+
+> **Note:** `config/dev.local.json` is git-ignored and will never be committed to version control.
+

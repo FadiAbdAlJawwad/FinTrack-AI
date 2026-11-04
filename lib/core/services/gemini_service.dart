@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 
@@ -25,6 +26,12 @@ final geminiServiceProvider = Provider<GeminiService>((ref) {
   );
 });
 
+String _truncate120(String? msg) {
+  if (msg == null || msg.isEmpty) return '';
+  final singleLine = msg.replaceAll('\n', ' ');
+  return singleLine.length > 120 ? singleLine.substring(0, 120) : singleLine;
+}
+
 class GeminiService {
   final String proxyUrl;
   final String sharedSecret;
@@ -39,21 +46,31 @@ class GeminiService {
   }) : _client = client ?? http.Client();
 
   Future<Map<String, dynamic>> parseTransactionText(String input) async {
-    if (!AppEnv.isAiConfigValid(proxyUrl: proxyUrl, secret: sharedSecret)) {
-      throw AiParsingException(AiParsingErrorType.notConfigured);
-    }
-
     try {
+      final configured =
+          AppEnv.isAiConfigValid(proxyUrl: proxyUrl, secret: sharedSecret);
+      if (kDebugMode) {
+        debugPrint('[Gemini] stage=config configured=$configured');
+      }
+      if (!configured) {
+        throw AiParsingException(AiParsingErrorType.notConfigured);
+      }
+
       final idToken = await idTokenProvider();
-      if (idToken == null || idToken.isEmpty) {
+      final tokenPresent = idToken != null && idToken.isNotEmpty;
+      if (kDebugMode) {
+        debugPrint('[Gemini] stage=token present=$tokenPresent');
+      }
+      if (!tokenPresent) {
         throw AiParsingException(AiParsingErrorType.unauthorized);
       }
 
       // The secret and the ID token travel in the body only; the URL carries
       // no query string, so neither can end up in URL logs.
+      final postUri = Uri.parse(proxyUrl);
       final response = await _client
           .post(
-            Uri.parse(proxyUrl),
+            postUri,
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'input': input,
@@ -63,6 +80,12 @@ class GeminiService {
           )
           .timeout(const Duration(seconds: 20));
 
+      if (kDebugMode) {
+        debugPrint(
+          '[Gemini] stage=post host=${postUri.host} status=${response.statusCode}',
+        );
+      }
+
       var finalStatusCode = response.statusCode;
       var finalResponseBody = response.body;
 
@@ -70,6 +93,11 @@ class GeminiService {
         final location =
             response.headers['location'] ?? response.headers['Location'];
         if (location == null || location.isEmpty) {
+          if (kDebugMode) {
+            debugPrint(
+              '[Gemini] stage=redirect followed=false status=${response.statusCode}',
+            );
+          }
           throw AiParsingException(
             AiParsingErrorType.unknown,
             message: 'Redirect with no location header',
@@ -82,6 +110,12 @@ class GeminiService {
 
         finalStatusCode = followUpResponse.statusCode;
         finalResponseBody = followUpResponse.body;
+
+        if (kDebugMode) {
+          debugPrint(
+            '[Gemini] stage=redirect followed=true status=$finalStatusCode',
+          );
+        }
       }
 
       switch (finalStatusCode) {
@@ -89,6 +123,13 @@ class GeminiService {
           try {
             final decoded = jsonDecode(finalResponseBody);
             if (decoded is Map<String, dynamic>) {
+              final errorField = decoded.containsKey('error')
+                  ? decoded['error'].toString()
+                  : 'none';
+              if (kDebugMode) {
+                debugPrint('[Gemini] stage=body error=$errorField');
+              }
+
               if (decoded.containsKey('error')) {
                 final errorMsg = decoded['error'].toString();
                 switch (errorMsg) {
@@ -141,27 +182,52 @@ class GeminiService {
             message: finalResponseBody,
           );
       }
-    } on AiParsingException {
+    } on AiParsingException catch (e) {
+      if (kDebugMode) {
+        debugPrint(
+          '[Gemini] failed type=${e.type} exception=${e.runtimeType} message=${_truncate120(e.message)}',
+        );
+      }
       rethrow;
-    } on TimeoutException {
+    } on TimeoutException catch (e) {
+      const type = AiParsingErrorType.networkError;
+      const msg = 'Request timed out after 20s';
+      if (kDebugMode) {
+        debugPrint(
+          '[Gemini] failed type=$type exception=${e.runtimeType} message=${_truncate120(msg)}',
+        );
+      }
       throw AiParsingException(
-        AiParsingErrorType.networkError,
-        message: 'Request timed out after 20s',
+        type,
+        message: msg,
       );
     } on SocketException catch (e) {
+      const type = AiParsingErrorType.networkError;
+      if (kDebugMode) {
+        debugPrint(
+          '[Gemini] failed type=$type exception=${e.runtimeType} message=${_truncate120(e.message)}',
+        );
+      }
       throw AiParsingException(
-        AiParsingErrorType.networkError,
+        type,
         message: e.message,
       );
     } catch (e) {
+      const type = AiParsingErrorType.networkError;
+      final msg = e is http.ClientException ? e.message : e.toString();
+      if (kDebugMode) {
+        debugPrint(
+          '[Gemini] failed type=$type exception=${e.runtimeType} message=${_truncate120(msg)}',
+        );
+      }
       if (e is http.ClientException) {
         throw AiParsingException(
-          AiParsingErrorType.networkError,
+          type,
           message: e.message,
         );
       }
       throw AiParsingException(
-        AiParsingErrorType.networkError,
+        type,
         message: e.toString(),
       );
     }
