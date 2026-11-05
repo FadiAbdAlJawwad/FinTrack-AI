@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../../../../core/error/currency_exception.dart';
+import '../../../../core/error/currency_write_exception.dart';
 import '../../../../core/error/transaction_exception.dart';
 import '../../../../core/error/wallet_exception.dart';
 import '../../../../core/extension/app_sizes.dart';
@@ -10,6 +11,18 @@ import '../../../../core/extension/app_sizes.dart';
 /// Never exposes `error.toString()` or SDK messages to the user.
 String errorMessage(BuildContext context, Object error) {
   final loc = context.loc;
+  if (error is CurrencyException) {
+    switch (error.type) {
+      case CurrencyErrorType.networkError:
+        return loc.networkRequestFailed;
+      case CurrencyErrorType.permissionDenied:
+        return loc.databaseError;
+      case CurrencyErrorType.notAuthenticated:
+        return loc.sessionExpired;
+      case CurrencyErrorType.unknown:
+        return loc.unknownError;
+    }
+  }
   if (error is TransactionException) {
     switch (error.type) {
       case TransactionErrorType.networkError:
