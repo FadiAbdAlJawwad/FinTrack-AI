@@ -62,3 +62,4 @@ Portfolio-grade Flutter finance tracker. Quality metric = architectural clarity,
 
 ## Output
 - Summary: files changed + why, analyzer result, test result, open risks.
+- ممنوع كتابة أو حذف أي ملف خارج مجلد المشروع، وممنوع إنهاء عمليات النظام. أي «نجاح» لـflutter analyze أو flutter test يجب أن يرفق مخرجه الفعلي؛ وإن تعذّر تشغيله فيُكتب «NOT RUN» مع السبب.
