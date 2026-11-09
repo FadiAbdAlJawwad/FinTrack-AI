@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
@@ -50,6 +51,11 @@ SpeechRecognitionState useSpeechRecognition({required String languageCode}) {
             status.value = VoiceEntryStatus.error;
             errorReason.value = SpeechErrorReason.platformError;
             rawError.value = error.errorMsg;
+            if (kDebugMode) {
+              final msg = error.errorMsg.replaceAll('\n', ' ');
+              final truncated = msg.length > 120 ? msg.substring(0, 120) : msg;
+              debugPrint('[SpeechRecognition] platform error: $truncated');
+            }
           },
           onStatus: (st) {
             if (st == 'notListening' && status.value == VoiceEntryStatus.listening) {
@@ -101,7 +107,13 @@ SpeechRecognitionState useSpeechRecognition({required String languageCode}) {
     } catch (e) {
       status.value = VoiceEntryStatus.error;
       errorReason.value = SpeechErrorReason.platformError;
-      rawError.value = e.toString();
+      final raw = e.toString();
+      rawError.value = raw;
+      if (kDebugMode) {
+        final msg = raw.replaceAll('\n', ' ');
+        final truncated = msg.length > 120 ? msg.substring(0, 120) : msg;
+        debugPrint('[SpeechRecognition] platform error: $truncated');
+      }
     }
   }, [speechToText, languageCode]);
 

@@ -60,7 +60,7 @@ class _VoiceEntryScreenState extends ConsumerState<VoiceEntryScreen>
             errorMessage.value = context.loc.speechTimeout;
             break;
           case SpeechErrorReason.platformError:
-            errorMessage.value = speechState.rawError ?? context.loc.aiUnknown;
+            errorMessage.value = context.loc.aiUnknown;
             break;
           default:
             break;

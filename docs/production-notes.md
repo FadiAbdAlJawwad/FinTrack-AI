@@ -72,14 +72,27 @@ Run `tools/rules-test` against the emulator before every rules deploy.
 
 ## Known open items
 
-- Wallet writes and the seeding still await server acknowledgement: offline,
-  they hang like transactions did before the write timeout.
+- Wallet and base-currency writes (including wallet seeding in `WalletMigrationService` via `FirestoreWalletRepository.upsertWallet`) now use `awaitWriteAck` with a 3 s timeout, preventing offline hangs.
 - The listener window does not advance while the app stays open across a
   month boundary.
 - Transactions older than the window are invisible in the app; there is no
   "load older" action yet.
-- Firestore rules cap `title` at 500 characters, but the client does not
-  limit the notes field: a longer title would be accepted locally and later
-  rolled back by the server (see "Late server rejection").
 - `WalletRepository.addWallet` still creates auto-id wallets; nothing in the
   UI calls it today.
+
+## Security model and accepted risks
+
+| ID | Topic | Status | Production approach |
+|---|---|---|---|
+| S1 | Firestore rules | Schema validation for users, wallets, transactions; negative rules tests in `tools/rules-test` run on the emulator (56 tests); not yet in CI | Run rules tests in CI pipeline. |
+| S2 | Biometric lock | In-session lock with 30 s background timeout (`AppLockNotifier`), unlocked after sign-in | Enforce on device unlock & app restart. |
+| S3 | App Check not enabled | Spark plan, no Play Integrity attestation here | Enable App Check (Play Integrity / App Attest) and enforce on Firestore. |
+| S4 | Offline persistence | Offline persistence is not cleared on sign-out | Clear persistence via `clearPersistence` on shared devices. |
+| S5 | Android backup | Disabled (`allowBackup=false`) | Keep `allowBackup=false` or configure explicit backup rules. |
+| S6 | Logs | Debug-only, no uid, tokens or secrets | Retain debug-only logging with strict sanitization. |
+| S7 | Apps Script proxy | `APP_SHARED_SECRET` is embedded in the client (extractable); real protection is Firebase ID token verified via Identity Toolkit `accounts:lookup` plus per-uid rate limit (20 requests per 6 h, `CacheService`, best-effort) | Cloud Functions/Cloud Run with Admin SDK token verification and App Check. |
+| S8 | Firebase API keys | Firebase API keys in `firebase_options.dart` are client identifiers, restricted by rules, not secrets | Restrict API keys by package name and SHA-1 fingerprint in Google Cloud Console. |
+
+### Local setup and secrets
+
+`config/dev.local.json` (git-ignored) supplies `APPS_SCRIPT_PROXY_URL` and `APP_SHARED_SECRET` via `--dart-define-from-file`; `config/dev.example.json` is the template.

@@ -28,10 +28,12 @@ void main() {
     BootstrapApp(
       bootstrap: runBootstrap,
       appBuilder: (prefs) {
-        if (!AppEnv.isAiConfigured && kDebugMode) {
-          debugPrint(
-            'Warning: AI config is missing or invalid. Voice entry will be disabled.',
-          );
+        if (!AppEnv.isAiConfigured) {
+          if (kDebugMode) {
+            debugPrint(
+              'Warning: AI config is missing or invalid. Voice entry will be disabled.',
+            );
+          }
         }
         
         final isBiometricEnabled = prefs.getBool(SharedPrefsKeys.isBiometricEnabledKey) ?? false;

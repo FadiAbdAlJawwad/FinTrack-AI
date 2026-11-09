@@ -156,10 +156,12 @@ class FirestoreTransactionRepository implements TransactionRepository {
 
   List<TransactionModel> _decodeCapped(List<Map<String, dynamic>> docs) {
     if (docs.length >= maxDocuments) {
-      debugPrint(
-        '[TransactionRepository] listener hit the document cap '
-        '($maxDocuments); older transactions are not included',
-      );
+      if (kDebugMode) {
+        debugPrint(
+          '[TransactionRepository] listener hit the document cap '
+          '($maxDocuments); older transactions are not included',
+        );
+      }
     }
     return _decodeAll(docs);
   }
@@ -172,10 +174,12 @@ class FirestoreTransactionRepository implements TransactionRepository {
       try {
         models.add(TransactionDto.fromMap(doc).toModel());
       } on FormatException catch (e) {
-        debugPrint(
-          '[TransactionRepository] skipped malformed transaction '
-          '${doc['id'] ?? '<no id>'}: ${e.message}',
-        );
+        if (kDebugMode) {
+          debugPrint(
+            '[TransactionRepository] skipped malformed transaction '
+            '${doc['id'] ?? '<no id>'}: ${e.message}',
+          );
+        }
       }
     }
     return models;

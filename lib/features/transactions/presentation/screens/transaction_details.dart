@@ -41,7 +41,7 @@ class TransactionDetails extends HookConsumerWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(SnackBar(content: Text('Error sharing receipt: $e')));
+          ).showSnackBar(SnackBar(content: Text(context.loc.unknownError)));
         }
       } finally {
         if (context.mounted) isSharing.value = false;

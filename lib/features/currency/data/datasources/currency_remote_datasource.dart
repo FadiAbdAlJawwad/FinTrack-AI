@@ -35,10 +35,11 @@ class CurrencyRemoteDataSource {
       _firestore.collection('users').doc(_userId);
 
   Stream<String> watchBaseCurrency() {
-    debugPrint(
-      '[CurrencyDataSource] watchBaseCurrency: '
-      'attaching listener to users/$_userId',
-    );
+    if (kDebugMode) {
+      debugPrint(
+        '[CurrencyDataSource] watchBaseCurrency: attaching listener',
+      );
+    }
     final baseCurrency = _userDoc.snapshots().map(
       (snap) => (snap.data()?['baseCurrency'] as String?) ?? 'USD',
     );
@@ -48,12 +49,12 @@ class CurrencyRemoteDataSource {
     return baseCurrency.transform(
       StreamTransformer<String, String>.fromHandlers(
         handleError: (error, stackTrace, sink) {
-          debugPrint(
-            '[CurrencyDataSource] watchBaseCurrency: '
-            'listener error on users/$_userId '
-            'code=${error is FirebaseException ? error.code : 'n/a'} '
-            'error=$error',
-          );
+          if (kDebugMode) {
+            debugPrint(
+              '[CurrencyDataSource] watchBaseCurrency: listener error '
+              'code=${error is FirebaseException ? error.code : 'n/a'}',
+            );
+          }
           sink.addError(error, stackTrace);
         },
       ),
@@ -61,10 +62,9 @@ class CurrencyRemoteDataSource {
   }
 
   Future<void> setBaseCurrency(String currency) {
-    debugPrint(
-      '[CurrencyDataSource] setBaseCurrency: '
-      'writing baseCurrency=$currency to path users/$_userId',
-    );
+    if (kDebugMode) {
+      debugPrint('[CurrencyDataSource] setBaseCurrency: writing baseCurrency');
+    }
     return _userDoc.set({'baseCurrency': currency}, SetOptions(merge: true));
   }
 }

@@ -18,9 +18,11 @@ Future<void> awaitWriteAck(
     await write().timeout(
       timeout,
       onTimeout: () {
-        debugPrint(
-          '[$logTag] write not acknowledged within ${timeout.inSeconds}s; queued locally',
-        );
+        if (kDebugMode) {
+          debugPrint(
+            '[$logTag] write not acknowledged within ${timeout.inSeconds}s; queued locally',
+          );
+        }
       },
     );
   } catch (e, st) {
