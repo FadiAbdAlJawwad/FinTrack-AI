@@ -514,6 +514,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get addWalletTitle => 'إضافة محفظة';
 
   @override
+  String get openingBalanceLabel => 'الرصيد الافتتاحي (اختياري)';
+
+  @override
   String get editWalletTitle => 'تعديل المحفظة';
 
   @override
@@ -579,4 +582,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get walletTypeEWallet => 'محفظة إلكترونية';
+
+  @override
+  String get invalidAmount => 'مبلغ غير صالح';
 }

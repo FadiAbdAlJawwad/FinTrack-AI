@@ -1070,6 +1070,12 @@ abstract class AppLocalizations {
   /// **'Add Wallet'**
   String get addWalletTitle;
 
+  /// No description provided for @openingBalanceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'OPENING BALANCE (OPTIONAL)'**
+  String get openingBalanceLabel;
+
   /// No description provided for @editWalletTitle.
   ///
   /// In en, this message translates to:
@@ -1195,6 +1201,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'E-Wallet'**
   String get walletTypeEWallet;
+
+  /// No description provided for @invalidAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid amount'**
+  String get invalidAmount;
 }
 
 class _AppLocalizationsDelegate

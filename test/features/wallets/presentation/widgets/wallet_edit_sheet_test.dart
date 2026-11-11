@@ -94,7 +94,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Edit Wallet'), findsOneWidget);
-      final textField = tester.widget<TextField>(find.byType(TextField));
+      final textField = tester.widget<TextField>(find.byType(TextField).first);
       expect(textField.controller?.text, 'My Wallet');
 
       final selectedIcon = tester.widget<Container>(
@@ -115,7 +115,7 @@ void main() {
       await tester.tap(find.text('Open Sheet'));
       await tester.pumpAndSettle();
 
-      final textField = tester.widget<TextField>(find.byType(TextField));
+      final textField = tester.widget<TextField>(find.byType(TextField).first);
       expect(textField.controller?.text, 'نقدي'); // Arabic for Cash
 
       // Change icon
@@ -142,7 +142,7 @@ void main() {
       await tester.tap(find.text('Open Sheet'));
       await tester.pumpAndSettle();
 
-      await tester.enterText(find.byType(TextField), ' New Name ');
+      await tester.enterText(find.byType(TextField).first, ' New Name ');
       await tester.pumpAndSettle();
 
       await tester.tap(find.widgetWithText(ElevatedButton, 'Save Changes'));
@@ -161,13 +161,13 @@ void main() {
       await tester.pumpAndSettle();
 
       // Test with own name (should be valid)
-      await tester.enterText(find.byType(TextField), 'main wallet');
+      await tester.enterText(find.byType(TextField).first, 'main wallet');
       await tester.pumpAndSettle();
       expect(find.text('A wallet with this name already exists.'), findsNothing);
       expect(tester.widget<ElevatedButton>(find.byType(ElevatedButton).last).onPressed, isNotNull);
 
       // Test with other wallet's name
-      await tester.enterText(find.byType(TextField), ' savings ');
+      await tester.enterText(find.byType(TextField).first, ' savings ');
       await tester.pumpAndSettle();
       expect(find.text('A wallet with this name already exists.'), findsOneWidget);
       expect(tester.widget<ElevatedButton>(find.byType(ElevatedButton).last).onPressed, isNull);
@@ -183,12 +183,12 @@ void main() {
       expect(tester.widget<ElevatedButton>(find.byType(ElevatedButton).last).onPressed, isNull);
 
       // Change name
-      await tester.enterText(find.byType(TextField), 'My Wallet 2');
+      await tester.enterText(find.byType(TextField).first, 'My Wallet 2');
       await tester.pumpAndSettle();
       expect(tester.widget<ElevatedButton>(find.byType(ElevatedButton).last).onPressed, isNotNull);
 
       // Change back
-      await tester.enterText(find.byType(TextField), 'My Wallet');
+      await tester.enterText(find.byType(TextField).first, 'My Wallet');
       await tester.pumpAndSettle();
       expect(tester.widget<ElevatedButton>(find.byType(ElevatedButton).last).onPressed, isNull);
 
@@ -208,7 +208,7 @@ void main() {
       await tester.tap(find.text('Open Sheet'));
       await tester.pumpAndSettle();
 
-      await tester.enterText(find.byType(TextField), 'Updated Wallet');
+      await tester.enterText(find.byType(TextField).first, 'Updated Wallet');
       await tester.tap(find.byKey(const ValueKey('wallet_icon_savings')));
       await tester.pumpAndSettle();
 
@@ -271,7 +271,9 @@ void main() {
       await tester.tap(find.text('Open Sheet'));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.widgetWithText(TextButton, 'Delete Wallet'));
+      final dbBtn = find.widgetWithText(TextButton, 'Delete Wallet');
+      await tester.ensureVisible(dbBtn);
+      await tester.tap(dbBtn);
       await tester.pumpAndSettle();
 
       expect(deleteCalled, isFalse);
@@ -291,7 +293,9 @@ void main() {
       await tester.pumpAndSettle();
 
       // Cancel
-      await tester.tap(find.widgetWithText(TextButton, 'Delete Wallet'));
+      final dbBtn = find.widgetWithText(TextButton, 'Delete Wallet');
+      await tester.ensureVisible(dbBtn);
+      await tester.tap(dbBtn);
       await tester.pumpAndSettle();
       expect(find.byType(AlertDialog), findsOneWidget);
       await tester.tap(find.widgetWithText(TextButton, 'Cancel'));
@@ -300,7 +304,9 @@ void main() {
       expect(find.byType(AddWalletSheet), findsOneWidget);
 
       // Confirm Delete
-      await tester.tap(find.widgetWithText(TextButton, 'Delete Wallet'));
+      final dbBtn2 = find.widgetWithText(TextButton, 'Delete Wallet');
+      await tester.ensureVisible(dbBtn2);
+      await tester.tap(dbBtn2);
       await tester.pumpAndSettle();
       await tester.tap(find.widgetWithText(TextButton, 'Delete'));
       await tester.pumpAndSettle();
@@ -317,7 +323,9 @@ void main() {
       await tester.tap(find.text('Open Sheet'));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.widgetWithText(TextButton, 'Delete Wallet'));
+      final dbBtn = find.widgetWithText(TextButton, 'Delete Wallet');
+      await tester.ensureVisible(dbBtn);
+      await tester.tap(dbBtn);
       await tester.pumpAndSettle();
       await tester.tap(find.widgetWithText(TextButton, 'Delete'));
       await tester.pumpAndSettle();

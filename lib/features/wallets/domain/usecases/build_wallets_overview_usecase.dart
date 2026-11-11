@@ -45,10 +45,20 @@ WalletsOverview buildWalletsOverview({
     return (a.id ?? '').compareTo(b.id ?? '');
   });
 
-  int? getBalanceMinor(List<TransactionModel> txs) {
-    if (txs.isEmpty) return 0;
+  int? getBalanceMinor(List<TransactionModel> txs, {WalletModel? wallet}) {
+    if (txs.isEmpty && (wallet == null || wallet.openingBalanceMinor == null)) return 0;
     
     final calculated = calculateTotals(txs);
+    
+    if (wallet != null && wallet.openingBalanceMinor != null && wallet.openingBalanceCurrency != null) {
+      final currency = wallet.openingBalanceCurrency!;
+      final current = calculated[currency] ?? const CurrencyTotals(incomeMinor: 0, expenseMinor: 0);
+      calculated[currency] = CurrencyTotals(
+        incomeMinor: current.incomeMinor + wallet.openingBalanceMinor!,
+        expenseMinor: current.expenseMinor,
+      );
+    }
+    
     final converted = convertTotals(calculated, target, rateBetween);
     
     if (converted.incomeMinor == null || converted.expenseMinor == null) {
@@ -65,9 +75,9 @@ WalletsOverview buildWalletsOverview({
   for (final wallet in sortedWallets) {
     int? balanceMinor;
     if (wallet.id == null) {
-      balanceMinor = 0;
+      balanceMinor = getBalanceMinor([], wallet: wallet);
     } else {
-      balanceMinor = getBalanceMinor(transactionsByWallet[wallet.id!]!);
+      balanceMinor = getBalanceMinor(transactionsByWallet[wallet.id!]!, wallet: wallet);
     }
     
     walletBalances.add(

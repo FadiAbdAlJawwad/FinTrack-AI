@@ -18,6 +18,10 @@ _WalletModel _$WalletModelFromJson(Map<String, dynamic> json) => _WalletModel(
         unknownValue: WalletType.cash,
       ) ??
       WalletType.cash,
+  openingBalanceMinor: (json['openingBalanceMinor'] as num?)?.toInt(),
+  openingBalanceCurrency: const _AppCurrencyConverter().fromJson(
+    json['openingBalanceCurrency'] as String?,
+  ),
 );
 
 Map<String, dynamic> _$WalletModelToJson(_WalletModel instance) =>
@@ -27,6 +31,10 @@ Map<String, dynamic> _$WalletModelToJson(_WalletModel instance) =>
       'icon': instance.icon,
       'isDefault': instance.isDefault,
       'type': _$WalletTypeEnumMap[instance.type]!,
+      'openingBalanceMinor': ?instance.openingBalanceMinor,
+      'openingBalanceCurrency': ?const _AppCurrencyConverter().toJson(
+        instance.openingBalanceCurrency,
+      ),
     };
 
 const _$WalletTypeEnumMap = {

@@ -4,10 +4,10 @@ import '../../../../core/constant/color_manager.dart';
 import '../../../../core/extension/app_sizes.dart';
 import '../../../../core/extension/text_style_extension.dart';
 import '../../../transactions/domain/transaction_limits.dart';
-import '../../domain/models/wallet_model.dart';
 import '../../domain/models/wallets_overview.dart';
 import '../utils/wallet_display_name.dart';
 import '../utils/wallet_icon.dart';
+import '../utils/wallet_type_label.dart';
 import 'add_wallet_sheet.dart';
 import 'wallet_balance_tile.dart';
 import 'wallets_total_card.dart';
@@ -61,24 +61,15 @@ class WalletsOverviewView extends StatelessWidget {
             ...overview.wallets.map((wb) {
               final name = walletDisplayName(context.loc, wb.wallet);
               final icon = walletIconData(wb.wallet.icon);
-              String typeName = '';
-              switch (wb.wallet.type) {
-                case WalletType.cash:
-                  typeName = context.loc.defaultWalletName;
-                  break;
-                case WalletType.bank:
-                  typeName = context.loc.walletNameBank;
-                  break;
-                case WalletType.eWallet:
-                  typeName = context.loc.walletTypeEWallet;
-                  break;
-              }
+              final typeName = walletTypeLabel(context.loc, wb.wallet.type);
+              final showSubtitle =
+                  name.trim().toLowerCase() != typeName.trim().toLowerCase();
 
               return Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: WalletBalanceTile(
                   title: name,
-                  subtitle: typeName,
+                  subtitle: showSubtitle ? typeName : null,
                   icon: icon,
                   balanceMinor: wb.balanceMinor,
                   currency: overview.currency,

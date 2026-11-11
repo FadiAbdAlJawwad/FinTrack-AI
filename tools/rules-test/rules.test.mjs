@@ -286,6 +286,52 @@ describe('wallets', () => {
     await assertSucceeds(setDoc(walletRef(db, 'cash'), validWallet('cash')));
     await assertFails(updateDoc(walletRef(db, 'cash'), { id: 'other' }));
   });
+
+  test('valid wallet with opening balance is allowed', async () => {
+    await assertSucceeds(setDoc(walletRef(asAlice(), 'w1'), {
+      ...validWallet('w1'),
+      openingBalanceMinor: 1000,
+      openingBalanceCurrency: 'USD',
+    }));
+  });
+
+  test('wallet opening balance amount without currency is denied', async () => {
+    await assertFails(setDoc(walletRef(asAlice(), 'w2'), {
+      ...validWallet('w2'),
+      openingBalanceMinor: 1000,
+    }));
+  });
+
+  test('wallet opening balance currency without amount is denied', async () => {
+    await assertFails(setDoc(walletRef(asAlice(), 'w3'), {
+      ...validWallet('w3'),
+      openingBalanceCurrency: 'USD',
+    }));
+  });
+
+  test('wallet opening balance zero is denied', async () => {
+    await assertFails(setDoc(walletRef(asAlice(), 'w4'), {
+      ...validWallet('w4'),
+      openingBalanceMinor: 0,
+      openingBalanceCurrency: 'USD',
+    }));
+  });
+
+  test('wallet opening balance double amount is denied', async () => {
+    await assertFails(setDoc(walletRef(asAlice(), 'w5'), {
+      ...validWallet('w5'),
+      openingBalanceMinor: 12.5,
+      openingBalanceCurrency: 'USD',
+    }));
+  });
+
+  test('wallet opening balance EUR currency is denied', async () => {
+    await assertFails(setDoc(walletRef(asAlice(), 'w6'), {
+      ...validWallet('w6'),
+      openingBalanceMinor: 1000,
+      openingBalanceCurrency: 'EUR',
+    }));
+  });
 });
 
 describe('users', () => {

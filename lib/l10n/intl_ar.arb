@@ -161,6 +161,7 @@
   "walletsUnassigned": "معاملات بلا محفظة",
   "walletsEmpty": "لا توجد محافظ بعد. اضغط + لإضافة محفظة.",
   "addWalletTitle": "إضافة محفظة",
+  "openingBalanceLabel": "الرصيد الافتتاحي (اختياري)",
   "editWalletTitle": "تعديل المحفظة",
   "saveWallet": "حفظ التغييرات",
   "deleteWallet": "حذف المحفظة",
@@ -183,5 +184,6 @@
   "bootErrorTitle": "فشل التهيئة",
   "bootErrorMessage": "تعذّر تهيئة التطبيق. تحقق من اتصالك وحاول مرة أخرى.",
   "walletTypeLabel": "نوع المحفظة",
-  "walletTypeEWallet": "محفظة إلكترونية"
+  "walletTypeEWallet": "محفظة إلكترونية",
+  "invalidAmount": "مبلغ غير صالح"
 }

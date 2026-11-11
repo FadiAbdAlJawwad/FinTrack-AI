@@ -78,7 +78,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Edit Wallet'), findsOneWidget);
-      final textField = tester.widget<TextField>(find.byType(TextField));
+      final textField = tester.widget<TextField>(find.byType(TextField).first);
       expect(textField.controller?.text, equals('Main Checking'));
     });
 
@@ -128,7 +128,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Edit Wallet'), findsOneWidget);
-      final textField = tester.widget<TextField>(find.byType(TextField));
+      final textField = tester.widget<TextField>(find.byType(TextField).first);
       expect(textField.controller?.text, equals('Wallet Two'));
     });
   });
