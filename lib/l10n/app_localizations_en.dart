@@ -588,4 +588,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get invalidAmount => 'Invalid amount';
+
+  @override
+  String get insufficientBalance => 'Insufficient balance';
 }

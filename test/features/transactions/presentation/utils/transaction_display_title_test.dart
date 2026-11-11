@@ -1,11 +1,15 @@
+import 'package:fin_track_ai/features/currency/data/services/exchange_rate_service.dart';
 import 'package:fin_track_ai/features/currency/domain/models/app_currency.dart';
+import 'package:fin_track_ai/features/currency/presentation/state/currency_controller.dart';
 import 'package:fin_track_ai/features/transactions/domain/models/transaction_model.dart';
 import 'package:fin_track_ai/features/transactions/presentation/state/transaction_controller.dart';
 import 'package:fin_track_ai/features/transactions/presentation/utils/transaction_display_title.dart';
 import 'package:fin_track_ai/features/transactions/presentation/widgets/add_transaction_bottom_sheet.dart';
 import 'package:fin_track_ai/features/transactions/presentation/widgets/transaction_list_tile.dart';
 import 'package:fin_track_ai/features/wallets/domain/models/wallet_model.dart';
+import 'package:fin_track_ai/features/wallets/domain/models/wallets_overview.dart';
 import 'package:fin_track_ai/features/wallets/presentation/state/wallet_controller.dart';
+import 'package:fin_track_ai/features/wallets/presentation/state/wallets_overview_provider.dart';
 import 'package:fin_track_ai/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -19,13 +23,39 @@ class TestWalletController extends WalletController {
   Stream<List<WalletModel>> build() => Stream.value(wallets);
 }
 
+class FakeCurrencyController extends CurrencyController {
+  @override
+  Stream<String> build() => Stream.value('USD');
+}
+
+class FakeRateService extends Fake implements ExchangeRateService {
+  @override
+  double rateBetween(String from, String to) => 1.0;
+}
+
 Widget createTestApp({
   required Widget child,
   Locale locale = const Locale('en'),
   List<Override> overrides = const [],
 }) {
   return ProviderScope(
-    overrides: overrides,
+    overrides: [
+      currencyControllerProvider.overrideWith(FakeCurrencyController.new),
+      exchangeRatesBootstrapProvider.overrideWith((ref) async {}),
+      exchangeRateServiceProvider.overrideWithValue(FakeRateService()),
+      walletsOverviewProvider.overrideWithValue(
+        const AsyncData(
+          WalletsOverview(
+            currency: AppCurrency.usd,
+            wallets: [],
+            unassignedMinor: null,
+            hasUnassigned: false,
+            totalMinor: null,
+          ),
+        ),
+      ),
+      ...overrides,
+    ],
     child: MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,

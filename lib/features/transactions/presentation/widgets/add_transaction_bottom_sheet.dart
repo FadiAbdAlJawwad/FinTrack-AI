@@ -9,10 +9,13 @@ import '../../../../core/widgets/loading_overlay.dart';
 import '../../../../core/widgets/bottom_sheet_drag_handle.dart';
 import '../../domain/models/transaction_model.dart';
 import '../../domain/transaction_limits.dart';
+import '../../../currency/data/services/exchange_rate_service.dart';
 import '../../../currency/domain/models/app_currency.dart';
 import '../../../currency/domain/usecases/money.dart';
 import '../../../currency/presentation/state/currency_controller.dart';
+import '../../../wallets/domain/usecases/check_sufficient_balance_usecase.dart';
 import '../../../wallets/presentation/state/wallet_controller.dart';
+import '../../../wallets/presentation/state/wallets_overview_provider.dart';
 import '../state/transaction_controller.dart';
 import '../utils/transaction_display_title.dart';
 import '../utils/error_message.dart';
@@ -60,6 +63,7 @@ class AddTransactionBottomSheet extends HookConsumerWidget {
 
     final walletsAsync = ref.watch(walletControllerProvider);
     final wallets = walletsAsync.valueOrNull ?? [];
+    ref.watch(walletsOverviewProvider);
 
     final appCurrencyCode =
         ref.watch(currencyControllerProvider).valueOrNull ?? 'USD';
@@ -111,6 +115,77 @@ class AddTransactionBottomSheet extends HookConsumerWidget {
 
       isLoading.value = true;
       try {
+        if (selectedType.value == TransactionType.expense) {
+          final rateService = ref.read(exchangeRateServiceProvider);
+          double rateBetween(AppCurrency from, AppCurrency to) =>
+              rateService.rateBetween(from.code, to.code);
+
+          final walletsOverview =
+              ref.read(walletsOverviewProvider).valueOrNull;
+
+          int? walletBalanceMinor;
+          AppCurrency baseCurrency = appCurrencyFromCode(appCurrencyCode);
+
+          if (walletsOverview != null) {
+            baseCurrency = walletsOverview.currency;
+            final walletBalance = walletsOverview.wallets
+                .where((wb) => wb.wallet.id == selectedWalletId.value)
+                .firstOrNull;
+            walletBalanceMinor = walletBalance?.balanceMinor;
+          }
+
+          int? replacedAmountMinorInBase;
+          if (existingTransaction != null &&
+              existingTransaction!.type == TransactionType.expense &&
+              existingTransaction!.walletId == selectedWalletId.value) {
+            try {
+              final rate =
+                  rateBetween(existingTransaction!.currency, baseCurrency);
+              replacedAmountMinorInBase = convertMinorUnits(
+                existingTransaction!.amountMinor,
+                existingTransaction!.currency,
+                baseCurrency,
+                rate,
+              );
+            } catch (_) {
+              replacedAmountMinorInBase = null;
+            }
+          }
+
+          final selectedWallet = wallets
+              .where((w) => w.id == selectedWalletId.value)
+              .firstOrNull;
+          final transactions =
+              ref.read(transactionControllerProvider).valueOrNull ?? [];
+          final hasIncome = transactions.any(
+            (t) =>
+                t.walletId == selectedWalletId.value &&
+                t.type == TransactionType.income,
+          );
+          final walletHasHistory =
+              (selectedWallet?.openingBalanceMinor != null) || hasIncome;
+
+          final hasBalance = hasSufficientBalance(
+            walletBalanceMinor: walletBalanceMinor,
+            baseCurrency: baseCurrency,
+            amountMinor: amountMinor,
+            amountCurrency: selectedInputCurrency.value,
+            type: selectedType.value,
+            replacedAmountMinorInBase: replacedAmountMinorInBase,
+            rateBetween: rateBetween,
+            walletHasHistory: walletHasHistory,
+          );
+
+          if (!hasBalance) {
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(context.loc.insufficientBalance)),
+              );
+            }
+            return;
+          }
+        }
+
         final transaction = _buildTransactionFromForm(
           existingTransaction: existingTransaction,
           amountMinor: amountMinor,

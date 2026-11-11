@@ -585,4 +585,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get invalidAmount => 'مبلغ غير صالح';
+
+  @override
+  String get insufficientBalance => 'الرصيد غير كافٍ';
 }

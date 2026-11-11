@@ -409,5 +409,46 @@ void main() {
       expect(updatedWallet!.openingBalanceMinor, 2000);
       expect(updatedWallet!.openingBalanceCurrency, AppCurrency.usd);
     });
+
+    testWidgets(
+        'in edit mode with an existing opening balance, clearing the balance field and saving yields openingBalanceMinor == null and openingBalanceCurrency == null',
+        (tester) async {
+      const existingWallet = WalletModel(
+        id: '1',
+        name: 'Bank',
+        icon: 'account_balance',
+        isDefault: false,
+        type: WalletType.bank,
+        openingBalanceMinor: 1000,
+        openingBalanceCurrency: AppCurrency.usd,
+      );
+
+      WalletModel? updatedWallet;
+      await tester.pumpWidget(
+        createTestApp(
+          wallets: [existingWallet],
+          walletToEdit: existingWallet,
+          onAddWallet: (wallet) async {
+            updatedWallet = wallet;
+          },
+        ),
+      );
+
+      await tester.tap(find.text('Open Sheet'));
+      await tester.pumpAndSettle();
+
+      final saveButtonFinder = find.widgetWithText(ElevatedButton, 'Save Changes');
+
+      await tester.enterText(find.byType(TextField).at(1), '');
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(saveButtonFinder);
+      await tester.tap(saveButtonFinder);
+      await tester.pumpAndSettle();
+
+      expect(updatedWallet, isNotNull);
+      expect(updatedWallet!.openingBalanceMinor, isNull);
+      expect(updatedWallet!.openingBalanceCurrency, isNull);
+    });
   });
 }

@@ -213,5 +213,6 @@
   "analyticsEmpty": "No transactions in this period.",
   "walletTypeLabel": "WALLET TYPE",
   "walletTypeEWallet": "E-Wallet",
-  "invalidAmount": "Invalid amount"
+  "invalidAmount": "Invalid amount",
+  "insufficientBalance": "Insufficient balance"
 }

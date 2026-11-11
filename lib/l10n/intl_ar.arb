@@ -185,5 +185,6 @@
   "bootErrorMessage": "تعذّر تهيئة التطبيق. تحقق من اتصالك وحاول مرة أخرى.",
   "walletTypeLabel": "نوع المحفظة",
   "walletTypeEWallet": "محفظة إلكترونية",
-  "invalidAmount": "مبلغ غير صالح"
+  "invalidAmount": "مبلغ غير صالح",
+  "insufficientBalance": "الرصيد غير كافٍ"
 }

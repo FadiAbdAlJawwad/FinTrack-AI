@@ -1207,6 +1207,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Invalid amount'**
   String get invalidAmount;
+
+  /// No description provided for @insufficientBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Insufficient balance'**
+  String get insufficientBalance;
 }
 
 class _AppLocalizationsDelegate
