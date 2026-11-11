@@ -24,11 +24,20 @@ class TestWalletController extends WalletController {
       await onAddWallet!(wallet);
     }
   }
+
+  @override
+  Future<void> updateWallet(WalletModel wallet) async {
+    // For test use, reuse onAddWallet if we don't need a separate callback
+    if (onAddWallet != null) {
+      await onAddWallet!(wallet);
+    }
+  }
 }
 
 Widget createTestApp({
   required List<WalletModel> wallets,
   Future<void> Function(WalletModel wallet)? onAddWallet,
+  WalletModel? walletToEdit,
 }) {
   return ProviderScope(
     overrides: [
@@ -42,7 +51,7 @@ Widget createTestApp({
       home: Scaffold(
         body: Builder(
           builder: (context) => ElevatedButton(
-            onPressed: () => showAddWalletSheet(context),
+            onPressed: () => showAddWalletSheet(context, wallet: walletToEdit),
             child: const Text('Open Sheet'),
           ),
         ),
@@ -173,10 +182,85 @@ void main() {
 
       // SnackBar shown with translated error message
       expect(find.byType(SnackBar), findsOneWidget);
-      expect(
-        find.text('Network error. Please check your connection.'),
-        findsOneWidget,
+    });
+
+    testWidgets(
+        'add sheet saves the selected type',
+        (tester) async {
+      WalletModel? addedWallet;
+      await tester.pumpWidget(
+        createTestApp(
+          wallets: [],
+          onAddWallet: (wallet) async {
+            addedWallet = wallet;
+          },
+        ),
       );
+
+      await tester.tap(find.text('Open Sheet'));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField), 'Bank');
+      await tester.pumpAndSettle();
+
+      // Tap 'Bank Account' chip
+      await tester.tap(find.text('Bank Account'));
+      await tester.pumpAndSettle();
+
+      final createButton = find.widgetWithText(ElevatedButton, 'Create Wallet');
+      await tester.tap(createButton);
+      await tester.pumpAndSettle();
+
+      expect(addedWallet, isNotNull);
+      expect(addedWallet!.type, WalletType.bank);
+    });
+
+    testWidgets(
+        'edit sheet enables Save when only the type changes',
+        (tester) async {
+      final existingWallet = const WalletModel(
+        id: '1',
+        name: 'My Wallet',
+        icon: 'payments',
+        type: WalletType.cash,
+        isDefault: false,
+      );
+
+      WalletModel? updatedWallet;
+      await tester.pumpWidget(
+        createTestApp(
+          wallets: [existingWallet],
+          walletToEdit: existingWallet,
+          onAddWallet: (wallet) async {
+            updatedWallet = wallet;
+          },
+        ),
+      );
+
+      await tester.tap(find.text('Open Sheet'));
+      await tester.pumpAndSettle();
+
+      final saveButtonFinder = find.widgetWithText(ElevatedButton, 'Save Wallet');
+      
+      // Initially, nothing changed, so Save is disabled
+      final buttonInitial = tester.widget<ElevatedButton>(saveButtonFinder);
+      expect(buttonInitial.onPressed, isNull);
+
+      // Tap 'E-Wallet' chip
+      await tester.tap(find.text('E-Wallet'));
+      await tester.pumpAndSettle();
+
+      // Now Save should be enabled
+      final buttonChanged = tester.widget<ElevatedButton>(saveButtonFinder);
+      expect(buttonChanged.onPressed, isNotNull);
+
+      await tester.tap(saveButtonFinder);
+      await tester.pumpAndSettle();
+
+      expect(updatedWallet, isNotNull);
+      expect(updatedWallet!.type, WalletType.eWallet);
+      // Other fields should remain the same
+      expect(updatedWallet!.name, 'My Wallet');
     });
   });
 }

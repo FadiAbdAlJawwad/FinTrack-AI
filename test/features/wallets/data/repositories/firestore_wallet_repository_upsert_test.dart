@@ -28,7 +28,8 @@ void main() {
     expect(data['name'], 'Cash');
     expect(data['icon'], 'payments');
     expect(data['isDefault'], isTrue);
-    expect(data.keys.toSet(), {'id', 'name', 'icon', 'isDefault'});
+    expect(data['type'], 'cash');
+    expect(data.keys.toSet(), {'id', 'name', 'icon', 'isDefault', 'type'});
   });
 
   test('upsertWallet maps Firebase errors to WalletException', () async {

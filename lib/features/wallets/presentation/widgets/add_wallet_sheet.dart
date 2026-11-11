@@ -5,6 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../../core/constant/color_manager.dart';
 import '../../../../core/extension/app_sizes.dart';
 import '../../../../core/extension/text_style_extension.dart';
+import '../../../../core/widgets/app_chip_selector.dart';
 import '../../../../core/widgets/bottom_sheet_drag_handle.dart';
 import '../../../../core/widgets/loading_overlay.dart';
 import '../../../transactions/presentation/utils/error_message.dart';
@@ -38,6 +39,7 @@ class AddWalletSheet extends HookConsumerWidget {
     final nameController = useTextEditingController(text: initialDisplayName);
     useValueListenable(nameController);
     final selectedIcon = useState<String>(wallet?.icon ?? walletIconChoices.first);
+    final selectedType = useState<WalletType>(wallet?.type ?? WalletType.cash);
     final isLoading = useState(false);
 
     final wallets = ref.watch(walletControllerProvider).valueOrNull ?? [];
@@ -56,7 +58,8 @@ class AddWalletSheet extends HookConsumerWidget {
 
     final hasChanged = !isEditMode ||
         trimmedName != initialDisplayName ||
-        selectedIcon.value != wallet!.icon;
+        selectedIcon.value != wallet!.icon ||
+        selectedType.value != wallet!.type;
 
     final isFormValid = trimmedName.isNotEmpty &&
         trimmedName.length <= 50 &&
@@ -72,7 +75,7 @@ class AddWalletSheet extends HookConsumerWidget {
           final nameToStore =
               trimmedName == initialDisplayName ? wallet!.name : trimmedName;
           await ref.read(walletControllerProvider.notifier).updateWallet(
-                wallet!.copyWith(name: nameToStore, icon: selectedIcon.value),
+                wallet!.copyWith(name: nameToStore, icon: selectedIcon.value, type: selectedType.value),
               );
         } else {
           await ref.read(walletControllerProvider.notifier).addWallet(
@@ -80,6 +83,7 @@ class AddWalletSheet extends HookConsumerWidget {
                   name: trimmedName,
                   icon: selectedIcon.value,
                   isDefault: false,
+                  type: selectedType.value,
                 ),
               );
         }
@@ -202,6 +206,30 @@ class AddWalletSheet extends HookConsumerWidget {
                     ),
                     errorText: isDuplicate ? context.loc.walletNameExists : null,
                   ),
+                ),
+                context.addVerticalSpace(16),
+                Text(
+                  context.loc.walletTypeLabel,
+                  style: context.labelSmall.copyWith(
+                    color: ColorManager.secondaryColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                context.addVerticalSpace(12),
+                AppChipSelector<WalletType>(
+                  items: const [WalletType.cash, WalletType.bank, WalletType.eWallet],
+                  isSelected: (type) => type == selectedType.value,
+                  labelBuilder: (type) {
+                    switch (type) {
+                      case WalletType.cash:
+                        return context.loc.defaultWalletName;
+                      case WalletType.bank:
+                        return context.loc.walletNameBank;
+                      case WalletType.eWallet:
+                        return context.loc.walletTypeEWallet;
+                    }
+                  },
+                  onSelect: (type) => selectedType.value = type,
                 ),
                 context.addVerticalSpace(16),
                 Text(

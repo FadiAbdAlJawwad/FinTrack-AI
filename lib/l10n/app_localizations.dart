@@ -1183,6 +1183,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No transactions in this period.'**
   String get analyticsEmpty;
+
+  /// No description provided for @walletTypeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'WALLET TYPE'**
+  String get walletTypeLabel;
+
+  /// No description provided for @walletTypeEWallet.
+  ///
+  /// In en, this message translates to:
+  /// **'E-Wallet'**
+  String get walletTypeEWallet;
 }
 
 class _AppLocalizationsDelegate

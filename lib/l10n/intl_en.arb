@@ -209,5 +209,7 @@
     }
   },
   "analyticsExpensesByCategory": "Expenses by Category",
-  "analyticsEmpty": "No transactions in this period."
+  "analyticsEmpty": "No transactions in this period.",
+  "walletTypeLabel": "WALLET TYPE",
+  "walletTypeEWallet": "E-Wallet"
 }

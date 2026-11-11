@@ -66,14 +66,15 @@ service cloud.firestore {
       // ---- users/{userId}/wallets/{walletId} ----------------------------
       // Mirrors WalletModel.toJson() plus the embedded document id.
       function validWallet(data, walletId) {
-        return data.keys().hasOnly(['id', 'name', 'icon', 'isDefault'])
+        return data.keys().hasOnly(['id', 'name', 'icon', 'isDefault', 'type'])
           && data.keys().hasAll(['id', 'name', 'icon', 'isDefault'])
           && data.id == walletId
           && data.name is string
           && data.name.size() >= 1 && data.name.size() <= 50
           && data.icon is string
           && data.icon.size() >= 1 && data.icon.size() <= 40
-          && data.isDefault is bool;
+          && data.isDefault is bool
+          && (!('type' in data) || data.type in ['cash', 'bank', 'eWallet']);
       }
 
       match /wallets/{walletId} {

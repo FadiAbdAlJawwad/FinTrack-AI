@@ -192,6 +192,26 @@ describe('wallets', () => {
     await assertSucceeds(setDoc(walletRef(asAlice()), validWallet()));
   });
 
+  test('valid wallet with cash type is allowed', async () => {
+    await assertSucceeds(setDoc(walletRef(asAlice(), 'cash_type'), { ...validWallet('cash_type'), type: 'cash' }));
+  });
+
+  test('valid wallet with bank type is allowed', async () => {
+    await assertSucceeds(setDoc(walletRef(asAlice(), 'bank_type'), { ...validWallet('bank_type'), type: 'bank' }));
+  });
+
+  test('valid wallet with eWallet type is allowed', async () => {
+    await assertSucceeds(setDoc(walletRef(asAlice(), 'ewallet_type'), { ...validWallet('ewallet_type'), type: 'eWallet' }));
+  });
+
+  test('wallet with type crypto is denied', async () => {
+    await assertFails(setDoc(walletRef(asAlice(), 'crypto_type'), { ...validWallet('crypto_type'), type: 'crypto' }));
+  });
+
+  test('wallet with non-string type is denied', async () => {
+    await assertFails(setDoc(walletRef(asAlice(), 'non_string_type'), { ...validWallet('non_string_type'), type: 123 }));
+  });
+
   test('wallet with an empty name is denied', async () => {
     await assertFails(setDoc(walletRef(asAlice()), { ...validWallet(), name: '' }));
   });

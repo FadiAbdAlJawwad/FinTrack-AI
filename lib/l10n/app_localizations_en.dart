@@ -576,4 +576,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get analyticsEmpty => 'No transactions in this period.';
+
+  @override
+  String get walletTypeLabel => 'WALLET TYPE';
+
+  @override
+  String get walletTypeEWallet => 'E-Wallet';
 }

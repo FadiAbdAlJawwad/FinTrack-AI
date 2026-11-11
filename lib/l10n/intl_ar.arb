@@ -179,5 +179,9 @@
   "analyticsPeriodMonth": "شهر",
   "analyticsPeriodYear": "{months} شهراً",
   "analyticsExpensesByCategory": "المصاريف حسب الفئة",
-  "analyticsEmpty": "لا توجد معاملات في هذه الفترة."
+  "analyticsEmpty": "لا توجد معاملات في هذه الفترة.",
+  "bootErrorTitle": "فشل التهيئة",
+  "bootErrorMessage": "تعذّر تهيئة التطبيق. تحقق من اتصالك وحاول مرة أخرى.",
+  "walletTypeLabel": "نوع المحفظة",
+  "walletTypeEWallet": "محفظة إلكترونية"
 }

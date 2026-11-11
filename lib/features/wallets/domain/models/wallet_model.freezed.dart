@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$WalletModel {
 
- String? get id; String get name; String get icon; bool get isDefault;
+ String? get id; String get name; String get icon; bool get isDefault;@JsonKey(unknownEnumValue: WalletType.cash) WalletType get type;
 /// Create a copy of WalletModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -30,20 +30,20 @@ $WalletModelCopyWith<WalletModel> get copyWith => _$WalletModelCopyWithImpl<Wall
 @override
 bool operator ==(Object other) {
   final _this = this as WalletModel;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WalletModel&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.icon, _this.icon) || other.icon == _this.icon)&&(identical(other.isDefault, _this.isDefault) || other.isDefault == _this.isDefault));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WalletModel&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.icon, _this.icon) || other.icon == _this.icon)&&(identical(other.isDefault, _this.isDefault) || other.isDefault == _this.isDefault)&&(identical(other.type, _this.type) || other.type == _this.type));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as WalletModel;
-  return Object.hash(runtimeType,_this.id,_this.name,_this.icon,_this.isDefault);
+  return Object.hash(runtimeType,_this.id,_this.name,_this.icon,_this.isDefault,_this.type);
 }
 
 @override
 String toString() {
   final _this = this as WalletModel;
-  return 'WalletModel(id: ${_this.id}, name: ${_this.name}, icon: ${_this.icon}, isDefault: ${_this.isDefault})';
+  return 'WalletModel(id: ${_this.id}, name: ${_this.name}, icon: ${_this.icon}, isDefault: ${_this.isDefault}, type: ${_this.type})';
 }
 
 
@@ -54,7 +54,7 @@ abstract mixin class $WalletModelCopyWith<$Res>  {
   factory $WalletModelCopyWith(WalletModel value, $Res Function(WalletModel) _then) = _$WalletModelCopyWithImpl;
 @useResult
 $Res call({
- String? id, String name, String icon, bool isDefault
+ String? id, String name, String icon, bool isDefault,@JsonKey(unknownEnumValue: WalletType.cash) WalletType type
 });
 
 
@@ -71,13 +71,14 @@ class _$WalletModelCopyWithImpl<$Res>
 
 /// Create a copy of WalletModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? name = null,Object? icon = null,Object? isDefault = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? name = null,Object? icon = null,Object? isDefault = null,Object? type = null,}) {
   return _then(WalletModel(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,icon: null == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
 as String,isDefault: null == isDefault ? _self.isDefault : isDefault // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
+as WalletType,
   ));
 }
 
@@ -162,10 +163,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String name,  String icon,  bool isDefault)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String name,  String icon,  bool isDefault, @JsonKey(unknownEnumValue: WalletType.cash)  WalletType type)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _WalletModel() when $default != null:
-return $default(_that.id,_that.name,_that.icon,_that.isDefault);case _:
+return $default(_that.id,_that.name,_that.icon,_that.isDefault,_that.type);case _:
   return orElse();
 
 }
@@ -183,10 +184,10 @@ return $default(_that.id,_that.name,_that.icon,_that.isDefault);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String name,  String icon,  bool isDefault)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String name,  String icon,  bool isDefault, @JsonKey(unknownEnumValue: WalletType.cash)  WalletType type)  $default,) {final _that = this;
 switch (_that) {
 case _WalletModel():
-return $default(_that.id,_that.name,_that.icon,_that.isDefault);case _:
+return $default(_that.id,_that.name,_that.icon,_that.isDefault,_that.type);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -203,10 +204,10 @@ return $default(_that.id,_that.name,_that.icon,_that.isDefault);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String name,  String icon,  bool isDefault)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String name,  String icon,  bool isDefault, @JsonKey(unknownEnumValue: WalletType.cash)  WalletType type)?  $default,) {final _that = this;
 switch (_that) {
 case _WalletModel() when $default != null:
-return $default(_that.id,_that.name,_that.icon,_that.isDefault);case _:
+return $default(_that.id,_that.name,_that.icon,_that.isDefault,_that.type);case _:
   return null;
 
 }
@@ -217,14 +218,15 @@ return $default(_that.id,_that.name,_that.icon,_that.isDefault);case _:
 /// @nodoc
 @JsonSerializable()
 
-class _WalletModel implements WalletModel {
-  const _WalletModel({this.id, required this.name, required this.icon, this.isDefault = false});
+class _WalletModel extends WalletModel {
+  const _WalletModel({this.id, required this.name, required this.icon, this.isDefault = false, @JsonKey(unknownEnumValue: WalletType.cash) this.type = WalletType.cash}): super._();
   factory _WalletModel.fromJson(Map<String, dynamic> json) => _$WalletModelFromJson(json);
 
 @override final  String? id;
 @override final  String name;
 @override final  String icon;
 @override@JsonKey() final  bool isDefault;
+@override@JsonKey(unknownEnumValue: WalletType.cash) final  WalletType type;
 
 /// Create a copy of WalletModel
 /// with the given fields replaced by the non-null parameter values.
@@ -239,18 +241,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _WalletModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.isDefault, isDefault) || other.isDefault == isDefault));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _WalletModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.isDefault, isDefault) || other.isDefault == isDefault)&&(identical(other.type, type) || other.type == type));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,name,icon,isDefault);
+    return Object.hash(runtimeType,id,name,icon,isDefault,type);
 }
 
 @override
 String toString() {
-    return 'WalletModel(id: $id, name: $name, icon: $icon, isDefault: $isDefault)';
+    return 'WalletModel(id: $id, name: $name, icon: $icon, isDefault: $isDefault, type: $type)';
 }
 
 
@@ -261,7 +263,7 @@ abstract mixin class _$WalletModelCopyWith<$Res> implements $WalletModelCopyWith
   factory _$WalletModelCopyWith(_WalletModel value, $Res Function(_WalletModel) _then) = __$WalletModelCopyWithImpl;
 @override @useResult
 $Res call({
- String? id, String name, String icon, bool isDefault
+ String? id, String name, String icon, bool isDefault,@JsonKey(unknownEnumValue: WalletType.cash) WalletType type
 });
 
 
@@ -278,13 +280,14 @@ class __$WalletModelCopyWithImpl<$Res>
 
 /// Create a copy of WalletModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? name = null,Object? icon = null,Object? isDefault = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? name = null,Object? icon = null,Object? isDefault = null,Object? type = null,}) {
   return _then(_WalletModel(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,icon: null == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
 as String,isDefault: null == isDefault ? _self.isDefault : isDefault // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
+as WalletType,
   ));
 }
 
