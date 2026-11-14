@@ -1,3 +1,8 @@
+> **Status: Legacy — describes the implementation as of 2026-11. Not a specification.**
+> Superseded by `docs/01-brief.md` where they conflict (12-month balance window, silent rollback, lock fallback).
+> Input for `05-gap-analysis.md`. Delete after its content is migrated.
+
+
 # Production notes
 
 Concise notes on the Firestore read-cost and security design, written for the
@@ -60,7 +65,7 @@ only happen for clients with bugs or tampered data.
 
 ## Deployment order
 
-1. Deploy indexes first, if `firestore.indexes.json` changed
+1. Deploy indexes first, if `../../firestore.indexes.json` changed
    (`firebase deploy --only firestore:indexes`) and wait until they are built.
    This change needs none: the transactions query is a range plus `orderBy` on
    the single field `date`, served by the automatic single-field index.
@@ -68,7 +73,7 @@ only happen for clients with bugs or tampered data.
    a client that relies on them, and before testing on a device.
 3. Ship the client.
 
-Run `tools/rules-test` against the emulator before every rules deploy.
+Run `../../tools/rules-test` against the emulator before every rules deploy.
 
 ## Known open items
 
@@ -84,7 +89,7 @@ Run `tools/rules-test` against the emulator before every rules deploy.
 
 | ID | Topic | Status | Production approach |
 |---|---|---|---|
-| S1 | Firestore rules | Schema validation for users, wallets, transactions; negative rules tests in `tools/rules-test` run on the emulator (56 tests); not yet in CI | Run rules tests in CI pipeline. |
+| S1 | Firestore rules | Schema validation for users, wallets, transactions; negative rules tests in `../../tools/rules-test` run on the emulator (56 tests); not yet in CI | Run rules tests in CI pipeline. |
 | S2 | Biometric lock | In-session lock with 30 s background timeout (`AppLockNotifier`), unlocked after sign-in | Enforce on device unlock & app restart. |
 | S3 | App Check not enabled | Spark plan, no Play Integrity attestation here | Enable App Check (Play Integrity / App Attest) and enforce on Firestore. |
 | S4 | Offline persistence | Offline persistence is not cleared on sign-out | Clear persistence via `clearPersistence` on shared devices. |
@@ -95,4 +100,4 @@ Run `tools/rules-test` against the emulator before every rules deploy.
 
 ### Local setup and secrets
 
-`config/dev.local.json` (git-ignored) supplies `APPS_SCRIPT_PROXY_URL` and `APP_SHARED_SECRET` via `--dart-define-from-file`; `config/dev.example.json` is the template.
+`../../config/dev.local.json` (git-ignored) supplies `APPS_SCRIPT_PROXY_URL` and `APP_SHARED_SECRET` via `--dart-define-from-file`; `config/dev.example.json` is the template.
