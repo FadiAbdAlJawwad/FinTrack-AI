@@ -1,6 +1,7 @@
 # 01-brief — FinTrack-AI
 
-Status: Accepted v1.0 · 2026-11-14 · Owner: Fadi Abd AlJawwad
+Status: Accepted v1.1 · 2026-11-15 · Owner: Fadi Abd AlJawwad
+Changes in v1.1 (from 02-spec review): bilingual UI, sign-in methods, app lock is opt-in, AI disclosure requires acknowledgment, "notifications" means OS push notifications.
 Sources: ChatGPT interview (2 rounds), Gemini review, Claude review v2, decisions D1–D16 (2026-11-13), open-question answers (2026-11-14).
 Detailed scenarios and edge cases are input for `02-spec.md`, not part of this brief.
 
@@ -16,7 +17,7 @@ People who manage personal or household money across several currencies (ILS, US
 
 ## Core flow
 
-1. The owner signs in and unlocks the app.
+1. The owner signs in with email/password or Google (with password reset), and unlocks the app if app lock is on.
 2. The owner creates wallets; each wallet has one currency and a required opening balance.
 3. The owner records an income, an expense, or a transfer between wallets — by typing, by voice, or by photographing a receipt.
 4. Voice and receipt input produce an editable draft; nothing is saved until the owner reviews and confirms it.
@@ -54,7 +55,7 @@ People who manage personal or household money across several currencies (ILS, US
 - Only the voice text or the receipt image is sent for interpretation — never balances or account data.
 - Minimal extraction: only amount, currency, date, merchant, and category are kept. Card numbers and other personal identifiers are never returned or stored; any other extracted field is discarded.
 - Receipt images are not stored after interpretation.
-- Before first use, the owner is told that voice text and receipt images are sent to an external AI service.
+- Before first use, the owner is told that voice text and receipt images are sent to an external AI service, and must acknowledge it to continue.
 
 **Offline, sync & devices**
 - Recording, editing, transfers, balances, and history work offline.
@@ -64,7 +65,10 @@ People who manage personal or household money across several currencies (ILS, US
 
 **Budgets & security**
 - Monthly budgets per expense category; unused amounts do not roll over.
-- The app locks with biometrics, falls back to the device PIN/pattern, and relocks after 30 seconds in the background.
+- App lock is optional and offered after the first sign-in. When on, it uses biometrics, falls back to the device PIN/pattern, and relocks after 30 seconds in the background.
+
+**Language**
+- The full interface is available in Arabic (right-to-left) and English.
 
 ## Success criteria
 
@@ -82,7 +86,7 @@ People who manage personal or household money across several currencies (ILS, US
 - Debts, loans, investments, assets.
 - Automatic bank or e-wallet integration.
 - Shared accounts or multi-user access.
-- Notifications and reminders.
+- OS push notifications and reminders (in-app messages are in scope).
 - Recurring transactions, subscriptions, scheduled or future-dated transactions *(future candidate)*.
 - Export to Excel / PDF and advanced reports *(future candidate)*.
 - Edit history / audit log, budget rollover, saved AI drafts.
