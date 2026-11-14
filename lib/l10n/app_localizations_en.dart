@@ -516,6 +516,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addWalletTitle => 'Add Wallet';
 
   @override
+  String get openingBalanceLabel => 'OPENING BALANCE (OPTIONAL)';
+
+  @override
   String get editWalletTitle => 'Edit Wallet';
 
   @override
@@ -576,4 +579,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get analyticsEmpty => 'No transactions in this period.';
+
+  @override
+  String get walletTypeLabel => 'WALLET TYPE';
+
+  @override
+  String get walletTypeEWallet => 'E-Wallet';
+
+  @override
+  String get invalidAmount => 'Invalid amount';
+
+  @override
+  String get insufficientBalance => 'Insufficient balance';
 }

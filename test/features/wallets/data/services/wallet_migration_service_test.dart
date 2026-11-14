@@ -47,15 +47,15 @@ void main() {
       expect(repo.store['cash'], cash);
       expect(
         repo.store['bank'],
-        const WalletModel(name: 'Bank Account', icon: 'account_balance'),
+        const WalletModel(name: 'Bank Account', icon: 'account_balance', type: WalletType.bank),
       );
       expect(
         repo.store['paypal'],
-        const WalletModel(name: 'PayPal', icon: 'account_balance_wallet'),
+        const WalletModel(name: 'PayPal', icon: 'account_balance_wallet', type: WalletType.eWallet),
       );
       expect(
         repo.store['other'],
-        const WalletModel(name: 'Other', icon: 'more_horiz'),
+        const WalletModel(name: 'Other', icon: 'more_horiz', type: WalletType.cash),
       );
       expect(repo.store.values.where((w) => w.isDefault), hasLength(1));
     });

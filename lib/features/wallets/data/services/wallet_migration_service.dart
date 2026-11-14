@@ -40,6 +40,7 @@ class WalletMigrationService {
     name: 'Cash',
     icon: 'payments',
     isDefault: true,
+    type: WalletType.cash,
   );
 
   static const Map<String, WalletModel> _defaultSecondaryWallets = {
@@ -47,13 +48,15 @@ class WalletMigrationService {
       name: 'Bank Account',
       icon: 'account_balance',
       isDefault: false,
+      type: WalletType.bank,
     ),
     'paypal': WalletModel(
       name: 'PayPal',
       icon: 'account_balance_wallet',
       isDefault: false,
+      type: WalletType.eWallet,
     ),
-    'other': WalletModel(name: 'Other', icon: 'more_horiz', isDefault: false),
+    'other': WalletModel(name: 'Other', icon: 'more_horiz', isDefault: false, type: WalletType.cash),
   };
 
   /// Wraps [_seed] so Firebase errors surface as typed wallet exceptions.

@@ -7,6 +7,7 @@ import '../../../currency/presentation/utils/money_format.dart';
 
 class WalletBalanceTile extends StatelessWidget {
   final String title;
+  final String? subtitle;
   final IconData icon;
   final int? balanceMinor;
   final AppCurrency currency;
@@ -15,6 +16,7 @@ class WalletBalanceTile extends StatelessWidget {
   const WalletBalanceTile({
     super.key,
     required this.title,
+    this.subtitle,
     required this.icon,
     required this.balanceMinor,
     required this.currency,
@@ -48,6 +50,14 @@ class WalletBalanceTile extends StatelessWidget {
           title,
           style: context.labelMedium,
         ),
+        subtitle: subtitle != null
+            ? Text(
+                subtitle!,
+                style: context.labelSmall.copyWith(
+                  color: ColorManager.secondaryColor,
+                ),
+              )
+            : null,
         trailing: Text(
           amountText,
           textDirection: TextDirection.ltr,

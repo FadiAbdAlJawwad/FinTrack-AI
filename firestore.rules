@@ -66,14 +66,23 @@ service cloud.firestore {
       // ---- users/{userId}/wallets/{walletId} ----------------------------
       // Mirrors WalletModel.toJson() plus the embedded document id.
       function validWallet(data, walletId) {
-        return data.keys().hasOnly(['id', 'name', 'icon', 'isDefault'])
+        return data.keys().hasOnly(['id', 'name', 'icon', 'isDefault', 'type', 'openingBalanceMinor', 'openingBalanceCurrency'])
           && data.keys().hasAll(['id', 'name', 'icon', 'isDefault'])
           && data.id == walletId
           && data.name is string
           && data.name.size() >= 1 && data.name.size() <= 50
           && data.icon is string
           && data.icon.size() >= 1 && data.icon.size() <= 40
-          && data.isDefault is bool;
+          && data.isDefault is bool
+          && (!('type' in data) || data.type in ['cash', 'bank', 'eWallet'])
+          && (!('openingBalanceMinor' in data) || 'openingBalanceCurrency' in data)
+          && (!('openingBalanceCurrency' in data) || 'openingBalanceMinor' in data)
+          && (!('openingBalanceMinor' in data) || (
+               data.openingBalanceMinor is int
+               && data.openingBalanceMinor > 0
+               && data.openingBalanceMinor <= 1000000000000
+               && data.openingBalanceCurrency in ['USD', 'JOD', 'ILS']
+             ));
       }
 
       match /wallets/{walletId} {

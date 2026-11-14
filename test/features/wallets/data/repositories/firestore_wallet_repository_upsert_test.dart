@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fin_track_ai/core/error/wallet_exception.dart';
+import 'package:fin_track_ai/features/currency/domain/models/app_currency.dart';
 import 'package:fin_track_ai/features/wallets/data/datasources/wallet_remote_datasource.dart';
 import 'package:fin_track_ai/features/wallets/data/repositories/firestore_wallet_repository.dart';
 import 'package:fin_track_ai/features/wallets/domain/models/wallet_model.dart';
@@ -28,7 +29,34 @@ void main() {
     expect(data['name'], 'Cash');
     expect(data['icon'], 'payments');
     expect(data['isDefault'], isTrue);
-    expect(data.keys.toSet(), {'id', 'name', 'icon', 'isDefault'});
+    expect(data['type'], 'cash');
+    expect(data.keys.toSet(), {'id', 'name', 'icon', 'isDefault', 'type'});
+  });
+
+  test('upsertWallet writes opening balance fields exactly when present', () async {
+    final dataSource = RecordingWalletDataSource();
+    const walletWithBalance = WalletModel(
+      name: 'Bank',
+      icon: 'account_balance',
+      isDefault: false,
+      openingBalanceMinor: 50000,
+      openingBalanceCurrency: AppCurrency.jod,
+    );
+
+    await FirestoreWalletRepository(dataSource).upsertWallet('bank', walletWithBalance);
+
+    final (id, data) = dataSource.upserts.single;
+    expect(id, 'bank');
+    expect(data['name'], 'Bank');
+    expect(data['icon'], 'account_balance');
+    expect(data['isDefault'], isFalse);
+    expect(data['type'], 'cash');
+    expect(data['openingBalanceMinor'], 50000);
+    expect(data['openingBalanceCurrency'], 'JOD');
+    expect(data.keys.toSet(), {
+      'id', 'name', 'icon', 'isDefault', 'type',
+      'openingBalanceMinor', 'openingBalanceCurrency'
+    });
   });
 
   test('upsertWallet maps Firebase errors to WalletException', () async {

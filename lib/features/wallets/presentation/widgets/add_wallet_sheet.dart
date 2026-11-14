@@ -5,8 +5,12 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../../core/constant/color_manager.dart';
 import '../../../../core/extension/app_sizes.dart';
 import '../../../../core/extension/text_style_extension.dart';
+import '../../../../core/widgets/app_chip_selector.dart';
 import '../../../../core/widgets/bottom_sheet_drag_handle.dart';
 import '../../../../core/widgets/loading_overlay.dart';
+import '../../../currency/domain/models/app_currency.dart';
+import '../../../currency/domain/usecases/money.dart';
+import '../../../currency/presentation/state/currency_controller.dart';
 import '../../../transactions/presentation/utils/error_message.dart';
 import '../../../transactions/presentation/state/transaction_controller.dart';
 import '../../../transactions/domain/transaction_limits.dart';
@@ -15,6 +19,7 @@ import '../../domain/models/wallet_model.dart';
 import '../state/wallet_controller.dart';
 import '../utils/wallet_display_name.dart';
 import '../utils/wallet_icon.dart';
+import '../utils/wallet_type_label.dart';
 import 'wallet_icon_selector.dart';
 
 Future<void> showAddWalletSheet(BuildContext context, {WalletModel? wallet}) {
@@ -38,11 +43,34 @@ class AddWalletSheet extends HookConsumerWidget {
     final nameController = useTextEditingController(text: initialDisplayName);
     useValueListenable(nameController);
     final selectedIcon = useState<String>(wallet?.icon ?? walletIconChoices.first);
+    final selectedType = useState<WalletType>(wallet?.type ?? WalletType.cash);
     final isLoading = useState(false);
+
+    final baseCurrencyCode = ref.watch(currencyControllerProvider).valueOrNull ?? 'USD';
+    final initialCurrency = isEditMode && wallet!.openingBalanceCurrency != null
+        ? wallet!.openingBalanceCurrency!
+        : appCurrencyFromCode(baseCurrencyCode);
+    final selectedCurrency = useState<AppCurrency>(initialCurrency);
+
+    final initialBalanceText = isEditMode && wallet!.openingBalanceMinor != null
+        ? minorToPlainText(wallet!.openingBalanceMinor!, wallet!.openingBalanceCurrency!)
+        : '';
+    final balanceController = useTextEditingController(text: initialBalanceText);
+    useValueListenable(balanceController);
 
     final wallets = ref.watch(walletControllerProvider).valueOrNull ?? [];
     final transactions = ref.watch(transactionControllerProvider).valueOrNull ?? [];
     final trimmedName = nameController.text.trim();
+    final trimmedBalance = balanceController.text.trim();
+    
+    int? parsedOpeningBalance;
+    bool isBalanceValid = true;
+    if (trimmedBalance.isNotEmpty) {
+      parsedOpeningBalance = parseMinorUnits(trimmedBalance, selectedCurrency.value);
+      if (parsedOpeningBalance == null) {
+        isBalanceValid = false;
+      }
+    }
 
     final isDuplicate = trimmedName.isNotEmpty &&
         wallets.any((w) {
@@ -56,11 +84,15 @@ class AddWalletSheet extends HookConsumerWidget {
 
     final hasChanged = !isEditMode ||
         trimmedName != initialDisplayName ||
-        selectedIcon.value != wallet!.icon;
+        selectedIcon.value != wallet!.icon ||
+        selectedType.value != wallet!.type ||
+        parsedOpeningBalance != wallet!.openingBalanceMinor ||
+        (parsedOpeningBalance != null && selectedCurrency.value != wallet!.openingBalanceCurrency);
 
     final isFormValid = trimmedName.isNotEmpty &&
         trimmedName.length <= 50 &&
         !isDuplicate &&
+        isBalanceValid &&
         !isLoading.value &&
         hasChanged;
 
@@ -72,7 +104,13 @@ class AddWalletSheet extends HookConsumerWidget {
           final nameToStore =
               trimmedName == initialDisplayName ? wallet!.name : trimmedName;
           await ref.read(walletControllerProvider.notifier).updateWallet(
-                wallet!.copyWith(name: nameToStore, icon: selectedIcon.value),
+                wallet!.copyWith(
+                  name: nameToStore,
+                  icon: selectedIcon.value,
+                  type: selectedType.value,
+                  openingBalanceMinor: parsedOpeningBalance,
+                  openingBalanceCurrency: parsedOpeningBalance != null ? selectedCurrency.value : null,
+                ),
               );
         } else {
           await ref.read(walletControllerProvider.notifier).addWallet(
@@ -80,6 +118,9 @@ class AddWalletSheet extends HookConsumerWidget {
                   name: trimmedName,
                   icon: selectedIcon.value,
                   isDefault: false,
+                  type: selectedType.value,
+                  openingBalanceMinor: parsedOpeningBalance,
+                  openingBalanceCurrency: parsedOpeningBalance != null ? selectedCurrency.value : null,
                 ),
               );
         }
@@ -202,6 +243,56 @@ class AddWalletSheet extends HookConsumerWidget {
                     ),
                     errorText: isDuplicate ? context.loc.walletNameExists : null,
                   ),
+                ),
+                context.addVerticalSpace(16),
+                Text(
+                  context.loc.walletTypeLabel,
+                  style: context.labelSmall.copyWith(
+                    color: ColorManager.secondaryColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                context.addVerticalSpace(12),
+                AppChipSelector<WalletType>(
+                  items: const [WalletType.cash, WalletType.bank, WalletType.eWallet],
+                  isSelected: (type) => type == selectedType.value,
+                  labelBuilder: (type) => walletTypeLabel(context.loc, type),
+                  onSelect: (type) => selectedType.value = type,
+                ),
+                context.addVerticalSpace(16),
+                Text(
+                  context.loc.openingBalanceLabel,
+                  style: context.labelSmall.copyWith(
+                    color: ColorManager.secondaryColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                context.addVerticalSpace(8),
+                TextField(
+                  controller: balanceController,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  textInputAction: TextInputAction.done,
+                  decoration: InputDecoration(
+                    hintText: minorToPlainText(0, selectedCurrency.value),
+                    hintStyle: context.labelMedium.copyWith(color: ColorManager.secondaryColor),
+                    filled: true,
+                    fillColor: Theme.of(context).scaffoldBackgroundColor,
+                    counterText: '',
+                    border: border,
+                    enabledBorder: border,
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: ColorManager.primaryBlue, width: 1.5),
+                    ),
+                    errorText: !isBalanceValid && trimmedBalance.isNotEmpty ? context.loc.invalidAmount : null,
+                  ),
+                ),
+                context.addVerticalSpace(12),
+                AppChipSelector<AppCurrency>(
+                  items: AppCurrency.values,
+                  isSelected: (currency) => currency == selectedCurrency.value,
+                  labelBuilder: (currency) => '${currency.code} (${currency.symbol})',
+                  onSelect: (currency) => selectedCurrency.value = currency,
                 ),
                 context.addVerticalSpace(16),
                 Text(

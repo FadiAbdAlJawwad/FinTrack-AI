@@ -7,6 +7,7 @@ import '../../../transactions/domain/transaction_limits.dart';
 import '../../domain/models/wallets_overview.dart';
 import '../utils/wallet_display_name.dart';
 import '../utils/wallet_icon.dart';
+import '../utils/wallet_type_label.dart';
 import 'add_wallet_sheet.dart';
 import 'wallet_balance_tile.dart';
 import 'wallets_total_card.dart';
@@ -60,10 +61,15 @@ class WalletsOverviewView extends StatelessWidget {
             ...overview.wallets.map((wb) {
               final name = walletDisplayName(context.loc, wb.wallet);
               final icon = walletIconData(wb.wallet.icon);
+              final typeName = walletTypeLabel(context.loc, wb.wallet.type);
+              final showSubtitle =
+                  name.trim().toLowerCase() != typeName.trim().toLowerCase();
+
               return Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: WalletBalanceTile(
                   title: name,
+                  subtitle: showSubtitle ? typeName : null,
                   icon: icon,
                   balanceMinor: wb.balanceMinor,
                   currency: overview.currency,

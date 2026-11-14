@@ -177,6 +177,7 @@
   "walletsUnassigned": "Unassigned transactions",
   "walletsEmpty": "No wallets yet. Tap + to add one.",
   "addWalletTitle": "Add Wallet",
+  "openingBalanceLabel": "OPENING BALANCE (OPTIONAL)",
   "editWalletTitle": "Edit Wallet",
   "saveWallet": "Save Changes",
   "deleteWallet": "Delete Wallet",
@@ -209,5 +210,9 @@
     }
   },
   "analyticsExpensesByCategory": "Expenses by Category",
-  "analyticsEmpty": "No transactions in this period."
+  "analyticsEmpty": "No transactions in this period.",
+  "walletTypeLabel": "WALLET TYPE",
+  "walletTypeEWallet": "E-Wallet",
+  "invalidAmount": "Invalid amount",
+  "insufficientBalance": "Insufficient balance"
 }

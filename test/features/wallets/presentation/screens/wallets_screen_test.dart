@@ -64,7 +64,11 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('\$200.00'), findsOneWidget); // Total card
-      expect(find.text('Cash'), findsOneWidget);
+      final cashTile = find.widgetWithText(ListTile, '\$150.00');
+      expect(
+        find.descendant(of: cashTile, matching: find.text('Cash')),
+        findsOneWidget,
+      );
       expect(find.text('\$150.00'), findsOneWidget);
       expect(find.text('Crypto'), findsOneWidget);
       expect(find.text('\$50.00'), findsOneWidget);

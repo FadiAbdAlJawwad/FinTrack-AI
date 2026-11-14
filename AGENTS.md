@@ -60,6 +60,10 @@ Portfolio-grade Flutter finance tracker. Quality metric = architectural clarity,
 - Never sum income and expense into one number (for example a per-category total): separate by `TransactionType`.
 - Money is stored as `int` minor units plus the original currency. Never use `double` for stored or summed amounts; convert to the app currency only at display time.
 
+- Never run: firebase deploy, flutter pub add/upgrade, build_runner, or any command that changes remote services or dependencies.
+- Never change a test expectation to match new code. Report the failing test instead.
+- Work only on the branch the user created. Never work on main.
+
 ## Output
 - Summary: files changed + why, analyzer result, test result, open risks.
 - ممنوع كتابة أو حذف أي ملف خارج مجلد المشروع، وممنوع إنهاء عمليات النظام. أي «نجاح» لـflutter analyze أو flutter test يجب أن يرفق مخرجه الفعلي؛ وإن تعذّر تشغيله فيُكتب «NOT RUN» مع السبب.

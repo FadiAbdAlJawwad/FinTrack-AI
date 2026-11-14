@@ -439,11 +439,11 @@ class AppLocalizationsAr extends AppLocalizations {
   String get groupEarlier => 'سابقاً';
 
   @override
-  String get bootErrorTitle => 'Initialization Failed';
+  String get bootErrorTitle => 'فشل التهيئة';
 
   @override
   String get bootErrorMessage =>
-      'Unable to initialize the app. Please check your connection and try again.';
+      'تعذّر تهيئة التطبيق. تحقق من اتصالك وحاول مرة أخرى.';
 
   @override
   String transactionsWindowNote(int months) {
@@ -514,6 +514,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get addWalletTitle => 'إضافة محفظة';
 
   @override
+  String get openingBalanceLabel => 'الرصيد الافتتاحي (اختياري)';
+
+  @override
   String get editWalletTitle => 'تعديل المحفظة';
 
   @override
@@ -573,4 +576,16 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get analyticsEmpty => 'لا توجد معاملات في هذه الفترة.';
+
+  @override
+  String get walletTypeLabel => 'نوع المحفظة';
+
+  @override
+  String get walletTypeEWallet => 'محفظة إلكترونية';
+
+  @override
+  String get invalidAmount => 'مبلغ غير صالح';
+
+  @override
+  String get insufficientBalance => 'الرصيد غير كافٍ';
 }

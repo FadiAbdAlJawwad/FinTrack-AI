@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$WalletModel {
 
- String? get id; String get name; String get icon; bool get isDefault;
+ String? get id; String get name; String get icon; bool get isDefault;@JsonKey(unknownEnumValue: WalletType.cash) WalletType get type;@JsonKey(includeIfNull: false) int? get openingBalanceMinor;@JsonKey(includeIfNull: false)@_AppCurrencyConverter() AppCurrency? get openingBalanceCurrency;
 /// Create a copy of WalletModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -30,20 +30,20 @@ $WalletModelCopyWith<WalletModel> get copyWith => _$WalletModelCopyWithImpl<Wall
 @override
 bool operator ==(Object other) {
   final _this = this as WalletModel;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WalletModel&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.icon, _this.icon) || other.icon == _this.icon)&&(identical(other.isDefault, _this.isDefault) || other.isDefault == _this.isDefault));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WalletModel&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.icon, _this.icon) || other.icon == _this.icon)&&(identical(other.isDefault, _this.isDefault) || other.isDefault == _this.isDefault)&&(identical(other.type, _this.type) || other.type == _this.type)&&(identical(other.openingBalanceMinor, _this.openingBalanceMinor) || other.openingBalanceMinor == _this.openingBalanceMinor)&&(identical(other.openingBalanceCurrency, _this.openingBalanceCurrency) || other.openingBalanceCurrency == _this.openingBalanceCurrency));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as WalletModel;
-  return Object.hash(runtimeType,_this.id,_this.name,_this.icon,_this.isDefault);
+  return Object.hash(runtimeType,_this.id,_this.name,_this.icon,_this.isDefault,_this.type,_this.openingBalanceMinor,_this.openingBalanceCurrency);
 }
 
 @override
 String toString() {
   final _this = this as WalletModel;
-  return 'WalletModel(id: ${_this.id}, name: ${_this.name}, icon: ${_this.icon}, isDefault: ${_this.isDefault})';
+  return 'WalletModel(id: ${_this.id}, name: ${_this.name}, icon: ${_this.icon}, isDefault: ${_this.isDefault}, type: ${_this.type}, openingBalanceMinor: ${_this.openingBalanceMinor}, openingBalanceCurrency: ${_this.openingBalanceCurrency})';
 }
 
 
@@ -54,7 +54,7 @@ abstract mixin class $WalletModelCopyWith<$Res>  {
   factory $WalletModelCopyWith(WalletModel value, $Res Function(WalletModel) _then) = _$WalletModelCopyWithImpl;
 @useResult
 $Res call({
- String? id, String name, String icon, bool isDefault
+ String? id, String name, String icon, bool isDefault,@JsonKey(unknownEnumValue: WalletType.cash) WalletType type,@JsonKey(includeIfNull: false) int? openingBalanceMinor,@JsonKey(includeIfNull: false)@_AppCurrencyConverter() AppCurrency? openingBalanceCurrency
 });
 
 
@@ -71,13 +71,16 @@ class _$WalletModelCopyWithImpl<$Res>
 
 /// Create a copy of WalletModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? name = null,Object? icon = null,Object? isDefault = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? name = null,Object? icon = null,Object? isDefault = null,Object? type = null,Object? openingBalanceMinor = freezed,Object? openingBalanceCurrency = freezed,}) {
   return _then(WalletModel(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,icon: null == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
 as String,isDefault: null == isDefault ? _self.isDefault : isDefault // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
+as WalletType,openingBalanceMinor: freezed == openingBalanceMinor ? _self.openingBalanceMinor : openingBalanceMinor // ignore: cast_nullable_to_non_nullable
+as int?,openingBalanceCurrency: freezed == openingBalanceCurrency ? _self.openingBalanceCurrency : openingBalanceCurrency // ignore: cast_nullable_to_non_nullable
+as AppCurrency?,
   ));
 }
 
@@ -162,10 +165,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String name,  String icon,  bool isDefault)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String name,  String icon,  bool isDefault, @JsonKey(unknownEnumValue: WalletType.cash)  WalletType type, @JsonKey(includeIfNull: false)  int? openingBalanceMinor, @JsonKey(includeIfNull: false)@_AppCurrencyConverter()  AppCurrency? openingBalanceCurrency)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _WalletModel() when $default != null:
-return $default(_that.id,_that.name,_that.icon,_that.isDefault);case _:
+return $default(_that.id,_that.name,_that.icon,_that.isDefault,_that.type,_that.openingBalanceMinor,_that.openingBalanceCurrency);case _:
   return orElse();
 
 }
@@ -183,10 +186,10 @@ return $default(_that.id,_that.name,_that.icon,_that.isDefault);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String name,  String icon,  bool isDefault)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String name,  String icon,  bool isDefault, @JsonKey(unknownEnumValue: WalletType.cash)  WalletType type, @JsonKey(includeIfNull: false)  int? openingBalanceMinor, @JsonKey(includeIfNull: false)@_AppCurrencyConverter()  AppCurrency? openingBalanceCurrency)  $default,) {final _that = this;
 switch (_that) {
 case _WalletModel():
-return $default(_that.id,_that.name,_that.icon,_that.isDefault);case _:
+return $default(_that.id,_that.name,_that.icon,_that.isDefault,_that.type,_that.openingBalanceMinor,_that.openingBalanceCurrency);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -203,10 +206,10 @@ return $default(_that.id,_that.name,_that.icon,_that.isDefault);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String name,  String icon,  bool isDefault)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String name,  String icon,  bool isDefault, @JsonKey(unknownEnumValue: WalletType.cash)  WalletType type, @JsonKey(includeIfNull: false)  int? openingBalanceMinor, @JsonKey(includeIfNull: false)@_AppCurrencyConverter()  AppCurrency? openingBalanceCurrency)?  $default,) {final _that = this;
 switch (_that) {
 case _WalletModel() when $default != null:
-return $default(_that.id,_that.name,_that.icon,_that.isDefault);case _:
+return $default(_that.id,_that.name,_that.icon,_that.isDefault,_that.type,_that.openingBalanceMinor,_that.openingBalanceCurrency);case _:
   return null;
 
 }
@@ -217,14 +220,17 @@ return $default(_that.id,_that.name,_that.icon,_that.isDefault);case _:
 /// @nodoc
 @JsonSerializable()
 
-class _WalletModel implements WalletModel {
-  const _WalletModel({this.id, required this.name, required this.icon, this.isDefault = false});
+class _WalletModel extends WalletModel {
+  const _WalletModel({this.id, required this.name, required this.icon, this.isDefault = false, @JsonKey(unknownEnumValue: WalletType.cash) this.type = WalletType.cash, @JsonKey(includeIfNull: false) this.openingBalanceMinor, @JsonKey(includeIfNull: false)@_AppCurrencyConverter() this.openingBalanceCurrency}): super._();
   factory _WalletModel.fromJson(Map<String, dynamic> json) => _$WalletModelFromJson(json);
 
 @override final  String? id;
 @override final  String name;
 @override final  String icon;
 @override@JsonKey() final  bool isDefault;
+@override@JsonKey(unknownEnumValue: WalletType.cash) final  WalletType type;
+@override@JsonKey(includeIfNull: false) final  int? openingBalanceMinor;
+@override@JsonKey(includeIfNull: false)@_AppCurrencyConverter() final  AppCurrency? openingBalanceCurrency;
 
 /// Create a copy of WalletModel
 /// with the given fields replaced by the non-null parameter values.
@@ -239,18 +245,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _WalletModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.isDefault, isDefault) || other.isDefault == isDefault));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _WalletModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.isDefault, isDefault) || other.isDefault == isDefault)&&(identical(other.type, type) || other.type == type)&&(identical(other.openingBalanceMinor, openingBalanceMinor) || other.openingBalanceMinor == openingBalanceMinor)&&(identical(other.openingBalanceCurrency, openingBalanceCurrency) || other.openingBalanceCurrency == openingBalanceCurrency));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,name,icon,isDefault);
+    return Object.hash(runtimeType,id,name,icon,isDefault,type,openingBalanceMinor,openingBalanceCurrency);
 }
 
 @override
 String toString() {
-    return 'WalletModel(id: $id, name: $name, icon: $icon, isDefault: $isDefault)';
+    return 'WalletModel(id: $id, name: $name, icon: $icon, isDefault: $isDefault, type: $type, openingBalanceMinor: $openingBalanceMinor, openingBalanceCurrency: $openingBalanceCurrency)';
 }
 
 
@@ -261,7 +267,7 @@ abstract mixin class _$WalletModelCopyWith<$Res> implements $WalletModelCopyWith
   factory _$WalletModelCopyWith(_WalletModel value, $Res Function(_WalletModel) _then) = __$WalletModelCopyWithImpl;
 @override @useResult
 $Res call({
- String? id, String name, String icon, bool isDefault
+ String? id, String name, String icon, bool isDefault,@JsonKey(unknownEnumValue: WalletType.cash) WalletType type,@JsonKey(includeIfNull: false) int? openingBalanceMinor,@JsonKey(includeIfNull: false)@_AppCurrencyConverter() AppCurrency? openingBalanceCurrency
 });
 
 
@@ -278,13 +284,16 @@ class __$WalletModelCopyWithImpl<$Res>
 
 /// Create a copy of WalletModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? name = null,Object? icon = null,Object? isDefault = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? name = null,Object? icon = null,Object? isDefault = null,Object? type = null,Object? openingBalanceMinor = freezed,Object? openingBalanceCurrency = freezed,}) {
   return _then(_WalletModel(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,icon: null == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
 as String,isDefault: null == isDefault ? _self.isDefault : isDefault // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
+as WalletType,openingBalanceMinor: freezed == openingBalanceMinor ? _self.openingBalanceMinor : openingBalanceMinor // ignore: cast_nullable_to_non_nullable
+as int?,openingBalanceCurrency: freezed == openingBalanceCurrency ? _self.openingBalanceCurrency : openingBalanceCurrency // ignore: cast_nullable_to_non_nullable
+as AppCurrency?,
   ));
 }
 

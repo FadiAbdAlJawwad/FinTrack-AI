@@ -355,5 +355,108 @@ void main() {
 
       expect(overview.hasUnassigned, isFalse);
     });
+
+    test('17. Wallet with opening balance only -> uses opening balance', () {
+      final wallets = [
+        const WalletModel(
+          id: 'w1',
+          name: 'Bank',
+          icon: 'bank',
+          openingBalanceMinor: 10000,
+          openingBalanceCurrency: AppCurrency.usd,
+        ),
+      ];
+
+      final overview = buildWalletsOverview(
+        wallets: wallets,
+        transactions: [],
+        target: AppCurrency.usd,
+        rateBetween: noRate,
+      );
+
+      expect(overview.wallets.first.balanceMinor, 10000);
+      expect(overview.totalMinor, 10000);
+    });
+
+    test('18. Opening balance plus same-currency transactions are summed before conversion', () {
+      final wallets = [
+        const WalletModel(
+          id: 'w1',
+          name: 'Bank',
+          icon: 'bank',
+          openingBalanceMinor: 5000,
+          openingBalanceCurrency: AppCurrency.usd,
+        ),
+      ];
+      final transactions = [
+        tx('w1', TransactionType.income, 2000, AppCurrency.usd),
+        tx('w1', TransactionType.expense, 1000, AppCurrency.usd),
+      ];
+
+      final overview = buildWalletsOverview(
+        wallets: wallets,
+        transactions: transactions,
+        target: AppCurrency.usd,
+        rateBetween: noRate,
+      );
+
+      expect(overview.wallets.first.balanceMinor, 6000); // 5000 + 2000 - 1000
+    });
+
+    test('19. Opening balance in a different currency than the transactions -> converted individually', () {
+      final wallets = [
+        const WalletModel(
+          id: 'w1',
+          name: 'Bank',
+          icon: 'bank',
+          openingBalanceMinor: 1000,
+          openingBalanceCurrency: AppCurrency.jod, // 1 JOD -> 1.41 USD -> 141 cents
+        ),
+      ];
+      final transactions = [
+        tx('w1', TransactionType.expense, 50, AppCurrency.usd),
+      ];
+
+      final overview = buildWalletsOverview(
+        wallets: wallets,
+        transactions: transactions,
+        target: AppCurrency.usd,
+        rateBetween: (from, to) {
+          if (from == AppCurrency.jod && to == AppCurrency.usd) return 1.41;
+          if (from == to) return 1.0;
+          throw Exception();
+        },
+      );
+
+      expect(overview.wallets.first.balanceMinor, 91); // 141 - 50 = 91
+      expect(overview.totalMinor, 91);
+    });
+
+    test('20. Missing rate for opening balance currency makes wallet balance null', () {
+      final wallets = [
+        const WalletModel(
+          id: 'w1',
+          name: 'Bank',
+          icon: 'bank',
+          openingBalanceMinor: 1000,
+          openingBalanceCurrency: AppCurrency.jod,
+        ),
+        w('w2', 'Cash'),
+      ];
+
+      final overview = buildWalletsOverview(
+        wallets: wallets,
+        transactions: [],
+        target: AppCurrency.usd,
+        rateBetween: (from, to) {
+          if (from == to) return 1.0;
+          throw Exception();
+        },
+      );
+
+      expect(overview.wallets.firstWhere((w) => w.wallet.id == 'w1').balanceMinor, isNull);
+      expect(overview.wallets.firstWhere((w) => w.wallet.id == 'w2').balanceMinor, 0);
+      expect(overview.totalMinor, isNull);
+    });
   });
 }
