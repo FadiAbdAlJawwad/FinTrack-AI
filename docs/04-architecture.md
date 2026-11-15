@@ -1,8 +1,8 @@
 # 04-architecture — FinTrack-AI
 
 Status: Accepted v1.2 · 2026-11-15 · Owner: Fadi Abd AlJawwad
-Changes from draft v1: aligned with ADR-0001..0005 v2 after the devil's-advocate review (`claude/fintrack/04-architecture-review-v1.md`).
-Sources: `docs/02-spec.md` (v1.3), `docs/03-domain.md` (v1.1), `docs/legacy/production-notes.md` (risks S1–S8), ADR-0001..0005.
+Changes from draft v1: aligned with ADR-0001..0005 v2 (then 0006–0008) after the devil's-advocate review (`claude/fintrack/04-architecture-review-v1.md`).
+Sources: `docs/02-spec.md` (v1.4), `docs/03-domain.md` (v1.3), `docs/legacy/production-notes.md` (risks S1–S8), ADR-0001..0008.
 
 ## 1. Quality attributes (top 3, owner 2026-11-15)
 
