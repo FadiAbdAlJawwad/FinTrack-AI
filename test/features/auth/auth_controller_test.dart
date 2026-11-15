@@ -4,7 +4,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fin_track_ai/core/constant/shared_prefs_keys.dart';
 import 'package:fin_track_ai/core/providers/shared_prefs_provider.dart';
-import 'package:fin_track_ai/core/services/biometric_service.dart';
 import 'package:fin_track_ai/features/auth/domain/repositories/auth_repository.dart';
 import 'package:fin_track_ai/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:fin_track_ai/features/auth/domain/models/user_model.dart';
@@ -27,11 +26,6 @@ class MockAuthRepository extends Fake implements AuthRepositoryInterface {
   }
 }
 
-class FakeBiometricService extends Fake implements BiometricService {
-  @override
-  Future<bool> authenticate() async => true;
-}
-
 void main() {
   late MockAuthRepository mockRepo;
   late SharedPreferences prefs;
@@ -48,18 +42,9 @@ void main() {
       overrides: [
         authRepositoryProvider.overrideWithValue(mockRepo),
         sharedPrefsProvider.overrideWithValue(prefs),
-        biometricServiceProvider.overrideWithValue(FakeBiometricService()),
         appLockNotifierProvider.overrideWithValue(appLockNotifier),
       ],
     );
-  });
-
-  test('11. successful unlockWithBiometrics unlocks', () async {
-    expect(appLockNotifier.isLocked, isTrue);
-
-    await container.read(authControllerProvider.notifier).unlockWithBiometrics();
-
-    expect(appLockNotifier.isLocked, isFalse);
   });
 
   test('12. signOut unlocks and clears the biometric preference', () async {

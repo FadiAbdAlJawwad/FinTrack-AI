@@ -163,8 +163,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get biometricDenied => 'تم رفض المصادقة الحيوية أو تم إلغاؤها.';
 
   @override
-  String get noSavedCredentials =>
-      'لم يتم العثور على بيانات اعتماد محفوظة. يرجى تسجيل الدخول باستخدام بريدك الإلكتروني أولاً.';
+  String get biometricReason =>
+      'يرجى التحقق من هويتك للوصول إلى بياناتك المالية';
 
   @override
   String get enableBiometricLogin => 'تمكين تسجيل الدخول عبر البيانات الحيوية';
@@ -285,9 +285,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get expense => 'مصاريف';
-
-  @override
-  String get dateRange => 'الفترة الزمنية';
 
   @override
   String get selectDateRange => 'اختر الفترة الزمنية';

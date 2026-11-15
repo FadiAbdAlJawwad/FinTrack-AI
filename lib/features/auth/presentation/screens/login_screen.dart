@@ -9,8 +9,8 @@ import '../../../../core/extension/app_sizes.dart';
 import '../../../../core/extension/text_style_extension.dart';
 import '../../../../core/extension/string_validation.dart';
 import '../../../../core/extension/snackbar_extension.dart';
-import '../../../../core/error/auth_exception.dart';
 import '../../../../core/error/auth_exception_extension.dart';
+import '../../../../core/routing/app_routes.dart';
 import '../../../../core/widgets/loading_overlay.dart';
 import '../state/auth_controller.dart';
 
@@ -24,19 +24,16 @@ class LoginScreen extends HookConsumerWidget {
     final formKey = useMemoized(() => GlobalKey<FormState>());
     final authState = ref.watch(authControllerProvider);
     final obscurePassword = useState(true);
-    final isBiometricAvailable = ref.watch(isBiometricAvailableProvider);
 
     ref.listen<AsyncValue<void>>(authControllerProvider, (previous, next) {
       next.whenOrNull(
         error: (error, stack) {
-          final errorMessage = error is AppAuthException
-              ? error.getLocalizedMessage(context)
-              : error.toString();
+          final errorMessage = authErrorMessage(context, error);
           context.showErrorSnackBar(errorMessage);
         },
         data: (_) {
           if (previous is AsyncLoading && context.mounted) {
-            context.goNamed('homeScreen');
+            context.goNamed(AppRoutes.homeScreenName);
           }
         },
       );
@@ -91,7 +88,7 @@ class LoginScreen extends HookConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         TextButton(
-                          onPressed: () => context.pushNamed('resetPassword'),
+                          onPressed: () => context.pushNamed(AppRoutes.resetPasswordName),
                           child: Text(context.loc.forgotPassword),
                         ),
                       ],
@@ -118,27 +115,6 @@ class LoginScreen extends HookConsumerWidget {
                             child: Text(context.loc.login),
                           ),
                         ),
-                        if (isBiometricAvailable == true) ...[
-                          context.addHorizontalSpace(16),
-                          IconButton.filled(
-                            onPressed: authState.isLoading
-                                ? null
-                                : () {
-                                    FocusScope.of(context).unfocus();
-                                    ref
-                                        .read(authControllerProvider.notifier)
-                                        .unlockWithBiometrics();
-                                  },
-                            icon: const Icon(
-                              Icons.fingerprint,
-                              color: ColorManager.white,
-                            ),
-                            style: IconButton.styleFrom(
-                              backgroundColor: ColorManager.primaryBlue,
-                              padding: const EdgeInsets.all(12),
-                            ),
-                          ),
-                        ],
                       ],
                     ),
                     context.addVerticalSpace(32),
@@ -192,7 +168,7 @@ class LoginScreen extends HookConsumerWidget {
                     TextButton(
                       onPressed: authState.isLoading
                           ? null
-                          : () => context.pushNamed('signup'),
+                          : () => context.pushNamed(AppRoutes.signupName),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [

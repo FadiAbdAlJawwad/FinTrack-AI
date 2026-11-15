@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import '../extension/app_sizes.dart';
 import 'auth_exception.dart';
 
+String authErrorMessage(BuildContext context, Object error) {
+  if (error is AppAuthException) {
+    return error.getLocalizedMessage(context);
+  }
+  return context.loc.unknownError;
+}
+
 extension AuthExceptionExtension on AppAuthException {
   String getLocalizedMessage(BuildContext context) {
     switch (type) {
@@ -27,8 +34,6 @@ extension AuthExceptionExtension on AppAuthException {
         return context.loc.databaseError;
       case AuthErrorType.biometricDenied:
         return context.loc.biometricDenied;
-      case AuthErrorType.noSavedCredentials:
-        return context.loc.noSavedCredentials;
       case AuthErrorType.googleSignInCanceled:
         return context.loc.googleSignInCanceled;
       case AuthErrorType.sessionExpired:

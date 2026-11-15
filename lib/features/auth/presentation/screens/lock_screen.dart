@@ -9,6 +9,7 @@ import '../../../../core/extension/text_style_extension.dart';
 import '../../../../core/extension/snackbar_extension.dart';
 import '../../../../core/services/biometric_service.dart';
 import '../../../../core/routing/app_lock_notifier.dart';
+import '../../../../core/routing/app_routes.dart';
 import '../state/auth_controller.dart';
 
 class LockScreen extends HookConsumerWidget {
@@ -26,7 +27,7 @@ class LockScreen extends HookConsumerWidget {
         } else {
           // Session expired
           context.showErrorSnackBar(context.loc.sessionExpired);
-          context.goNamed('login');
+          context.goNamed(AppRoutes.loginName);
         }
       }
     }
@@ -34,7 +35,7 @@ class LockScreen extends HookConsumerWidget {
     Future<void> handleSignOut() async {
       await ref.read(authControllerProvider.notifier).signOut();
       if (context.mounted) {
-        context.goNamed('login');
+        context.goNamed(AppRoutes.loginName);
       }
     }
 

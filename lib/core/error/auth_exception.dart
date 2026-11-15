@@ -10,7 +10,6 @@ enum AuthErrorType {
   networkRequestFailed,
   databaseError,
   biometricDenied,
-  noSavedCredentials,
   googleSignInCanceled,
   sessionExpired,
   unknown,

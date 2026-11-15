@@ -7,7 +7,7 @@ extension SnackbarExtension on BuildContext {
     ScaffoldMessenger.of(this).showSnackBar(
       SnackBar(
         content: Text(message, style: const TextStyle(color: ColorManager.white)),
-        backgroundColor: Colors.red,
+        backgroundColor: ColorManager.errorColor,
       ),
     );
   }
@@ -17,7 +17,7 @@ extension SnackbarExtension on BuildContext {
     ScaffoldMessenger.of(this).showSnackBar(
       SnackBar(
         content: Text(message, style: const TextStyle(color: ColorManager.white)),
-        backgroundColor: Colors.green,
+        backgroundColor: ColorManager.successColor,
       ),
     );
   }
