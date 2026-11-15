@@ -16,16 +16,17 @@ The code is migrating from the legacy layout to the target layout story by story
 | `tools/rules-test/`                                                       | Emulator tests for `firestore.rules`. Own rules: `tools/rules-test/AGENTS.md`                                                                |
 | `worker/`                                                                 | Cloudflare Worker AI proxy (stage 3)                                                                                                         |
 | `tools/check.dart`, `tools/repo_map.dart`                                 | `check.dart` (single gate), `repo_map.dart` (regenerates the exports section below). Stage 0 "Gate and guards"                               |
-| `docs/work/`                                                              | `US-xx-plan.md`: approved plan of the current story; deleted when the story merges                                                           |
+| `docs/work/`                                                              | `<US-xx or B-nn>-plan.md`: approved plan of the current item; deleted when the item merges                                                   |
 | `evals/tasks.md`                                                          | Fixed tasks to run before and after every agent-context change                                                                               |
 
 ## Legacy (being replaced; do not extend)
-| Path                                                               | Replaced by                            |
-|--------------------------------------------------------------------|----------------------------------------|
-| `lib/features/*/domain/`, `lib/features/*/data/`                   | `lib/domain/`, `lib/data/`             |
-| `lib/features/currency/data/services/exchange_rate_service.dart`   | `lib/data/rates/` (ADR-0005, ADR-0006) |
-| `lib/core/services/gemini_service.dart` (Apps Script)              | `lib/data/ai/` + `worker/` (ADR-0004)  |
-| `lib/features/wallets/data/services/wallet_migration_service.dart` | Removed (gap C-20)                     |
+| Path                                                               | Replaced by                                                     |
+|--------------------------------------------------------------------|-----------------------------------------------------------------|
+| `lib/features/*/domain/`, `lib/features/*/data/`                   | `lib/domain/`, `lib/data/`                                      |
+| `lib/features/currency/data/services/exchange_rate_service.dart`   | `lib/data/rates/` (ADR-0005, ADR-0006)                          |
+| `lib/core/services/gemini_service.dart` (Apps Script)              | `lib/data/ai/` + `worker/` (ADR-0004)                           |
+| `lib/features/wallets/data/services/wallet_migration_service.dart` | Removed (gap C-20)                                              |
+| `bench-check.ps1`                                                  | `tools/check.dart` (gap C-24); deleted when the new gate exists |
 
 ## Exports (generated)
 Not generated yet. From stage 0 "Gate and guards": `dart run tools/repo_map.dart` rewrites this section (one line per file under `lib/domain`, `lib/data`, `lib/core`: path → public top-level names); the gate fails if it is stale. Do not edit by hand.
