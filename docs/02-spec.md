@@ -309,7 +309,7 @@ Everything in `01-brief.md` → Not now. In addition:
 - [ASSUMPTION] Several wallets of the same kind are allowed.
 - [ASSUMPTION] Custom date ranges are allowed in insights and period comparison (AC-11.3, AC-11.4).
 - [ASSUMPTION] Target devices: mid- or low-end Android on 3G-class connections.
-- [ASSUMPTION] The owner's real network in Gaza is weak but unmeasured (owner, 2026-11-16). The 3G profile stays as the test condition; measure the real connection (median of daily speed tests over one week) before release and recalibrate NFR-02a/02b.
+- [ASSUMPTION] The owner's real network in Gaza is weak but unmeasured (owner, 2026-11-15). The 3G profile stays as the test condition; measure the real connection (median of daily speed tests over one week) before release and recalibrate NFR-02a/02b.
 - [ASSUMPTION] A 3-day threshold for outdated rates and a 7-day lookback for missing historical rates are adequate.
 
 ## 8. Open questions

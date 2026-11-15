@@ -5,7 +5,7 @@ Open only the file and section the task needs. IDs (`US-`, `AC-`, `BR-`, `NFR-`,
 | File | Holds | Canonical for |
 |---|---|---|
 | `01-brief.md` | Problem, users, product rules, success criteria, not now | Product scope |
-| `02-spec.md` | Stories US-01..14, acceptance criteria, BR-01..29, NFR-01..10, messages MSG-01..14 | **Behavior** (what the app does) |
+| `02-spec.md` | Stories US-01..14, acceptance criteria, BR-01..29, NFR-01..10, messages MSG-01..15 | **Behavior** (what the app does) |
 | `03-domain.md` | Glossary, ERD, invariants I-01..27, rules R-01..17, lifecycles | **Names and invariants** (code names come from the glossary) |
 | `04-architecture.md` | Quality attributes, C4, ports, Firestore layout, security model | Structure overview (links to ADRs) |
 | `adr/0001..0008` | Decisions with alternatives and consequences | **Each decision** (never edited after acceptance; superseded by a new ADR) |

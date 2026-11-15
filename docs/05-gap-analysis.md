@@ -1,14 +1,15 @@
 # 05-gap-analysis — FinTrack-AI
 
-Status: Accepted v1.1 · 2026-11-15 · Owner: Fadi Abd AlJawwad
-Compares the code on `main` (= local copy, owner 2026-11-16) with `docs/01..04` and ADR-0001..0005.
-Scope read: domain models, DTOs, repositories, rate service, money utilities, AI parsing, voice screen, auth sign-out, app lock, access rules, Android manifest, architecture test, test inventory (≈ 55 test files), current `AGENTS.md`. Widgets and screens were inventoried, not read line by line.
+Status: Accepted v1.2 · 2026-11-15
+Changes in v1.2 (legacy cleanup review): headers, MSG-15, test count, C-21 result, M-10 stage, OI-1 closed, rate wording · Owner: Fadi Abd AlJawwad
+Compares the code on `main` (= local copy, owner 2026-11-15) with `docs/01..04` and ADR-0001..0008.
+Scope read: domain models, DTOs, repositories, rate service, money utilities, AI parsing, voice screen, auth sign-out, app lock, access rules, Android manifest, architecture test, test inventory (66 test files), current `AGENTS.md`. Widgets and screens were inventoried, not read line by line.
 
 ## 1. Verdict
 
 The UI layer, theme, localization, app lock, and auth flows are reusable. The domain and data layers do not match the accepted documents: no transfers, no wallet currency, fixed categories, double-based rates and AI parsing, a Firestore-cache data layer, and rules without cross-document checks. The gap is a **rebuild of domain + data behind the existing UI**, delivered story by story (strangler approach), not a full rewrite.
 
-Existing Firestore data is test data (owner, 2026-11-16): **no migration**; collections are deleted before the new sync starts.
+Existing Firestore data is test data (owner, 2026-11-15): **no migration**; collections are deleted before the new sync starts.
 
 ---
 
@@ -17,7 +18,7 @@ Existing Firestore data is test data (owner, 2026-11-16): **no migration**; coll
 | ID | Item | Evidence | Note |
 |---|---|---|---|
 | K-01 | Integer minor units + per-currency decimals (ILS 2, USD 2, JOD 3) | `AppCurrency.decimals`, `parseMinorUnits` (no floating point, no rounding on input) | Move into `lib/domain` as `Money`/`CurrencyCode` |
-| K-02 | Bilingual UI, ARB files ar/en | `lib/l10n/intl_ar.arb`, `intl_en.arb` | Add MSG-01..14 keys |
+| K-02 | Bilingual UI, ARB files ar/en | `lib/l10n/intl_ar.arb`, `intl_en.arb` | Add MSG-01..15 keys |
 | K-03 | App lock with device-credential fallback, 30 s timeout | `biometricOnly: false`, `AppLockNotifier.lockTimeout` | See C-14 for the boundary |
 | K-04 | Firebase Auth (email/password, Google, reset) | `auth_repository_impl.dart` | Adapter behind `AuthGateway` |
 | K-05 | `allowBackup="false"` | AndroidManifest | Matches S5 |
@@ -43,7 +44,7 @@ Existing Firestore data is test data (owner, 2026-11-16): **no migration**; coll
 | C-08 | Wallet `icon` and `isDefault` inside the model → appearance in `PreferenceStore`; no default wallet concept | M7, AC-03.7 | Change |
 | C-09 | No wallet status → active/archived lifecycle, restore, delete only without transactions | US-04, I-14, I-27 | Change |
 | C-10 | Opening balance optional and > 0 → required, ≥ 0, minor units in wallet currency | AC-03.1, AC-03.6, I-18 | Change |
-| C-11 | Rates: `double`, latest only, `SharedPreferences`, per device → exact decimal, dated rows vs USD, synced per owner, `lastRefreshedOn` | ADR-0005, R-02b..R-05, I-21 | Change |
+| C-11 | Rates: `double`, latest only, `SharedPreferences`, per device → integer micros (ADR-0007), dated rows vs USD, synced per owner, `lastRefreshedOn` | ADR-0005, R-02b..R-05, I-21 | Change |
 | C-12 | `convertMinorUnits` uses `double` → exact-decimal conversion (R-02b), half-up at display | NFR-07, BR-15 | Change |
 | C-13 | AI parsing: `double` amount, unknown type → expense, date defaults to now, no future-date check, enum category match → draft with empty type, minor units, R-14..R-16 | BR-07, R-14..R-16, AC-07.4, AC-08.5 | Change |
 | C-14 | Relock uses `elapsed > 30 s`; spec says 30 s or more locks | AC-02.3 | Change (`>=`) |
@@ -53,7 +54,7 @@ Existing Firestore data is test data (owner, 2026-11-16): **no migration**; coll
 | C-18 | No guard against editing tests during implementation → CI gate on `test/` changes after the contract commit | 02-spec Conventions, P2 T1 | Change |
 | C-19 | AI proxy on Apps Script with shared secret in the app → Cloudflare Worker, token verified, limits, no shared secret | ADR-0004, S7 | Change |
 | C-20 | Default wallet seeding (Cash, Bank Account, PayPal, Other) without currency → no seeding; after sign-up the owner creates wallets | AC-01.6 | Change (remove seeding) |
-| C-21 | Insufficient balance: `check_sufficient_balance_usecase` exists; behavior not verified (block or warn) | BR-12, R-11 | Verify, then align to warn + confirm |
+| C-21 | Insufficient balance: verified 2026-11-15, the add sheet **blocks** (`add_transaction_bottom_sheet.dart` shows a SnackBar and returns) | BR-12, R-11 | Change in US-05: warn + confirm |
 | C-22 | `AGENTS.md` ~70 lines, duplicated rules (test-expectation rule twice), outdated layout, Apps Script references | P2 backlog | Change in phase P2 (draft saved) |
 | C-23 | Rate source: Frankfurter **v2** serves JOD; owner verified conversions against the market rate (2026-11-15) | ADR-0006 | Resolved: keep source JOD; storage still changes per C-11 |
 
@@ -73,7 +74,7 @@ Existing Firestore data is test data (owner, 2026-11-16): **no migration**; coll
 | M-08 | Period comparison and custom ranges | AC-11.3, AC-11.4, AC-11.7 |
 | M-09 | Wallet archive/restore | US-04 |
 | M-10 | Sign-up lands on wallet creation; system categories seeded | AC-01.6, AC-01.7 |
-| M-11 | Message catalog MSG-01..14 in ARB | §3 of spec |
+| M-11 | Message catalog MSG-01..15 in ARB | §3 of spec |
 
 ---
 
@@ -111,7 +112,7 @@ Each item = one story-sized branch, S03 loop: plan → contract → failing AC t
 | 0 | Architecture tests (ADR-0001) + CI test-change gate | C-17, C-18 | — |
 | 0 | Access rules v2 + emulator tests; delete test data | C-16, R-06 | — |
 | 0 | Walking skeleton: **US-03 create wallet** end to end (UI → use case → Drift → outbox) | C-04, C-10, C-20 | all above |
-| 1 Core money | US-13 categories (defaults, custom, delete) | C-06, M-02 | stage 0 |
+| 1 Core money | US-13 categories (defaults, custom, delete) + M-10 sign-up seeding (system categories, user document) | C-06, M-02, M-10 | stage 0 |
 | 1 | US-05 income/expense | C-03, C-05, C-07, C-21 | US-13 |
 | 1 | US-06 transfers + fees | M-01 | US-05 |
 | 1 | US-09 edit/delete | — | US-05, US-06 |
@@ -132,10 +133,10 @@ Each item = one story-sized branch, S03 loop: plan → contract → failing AC t
 |---|---|---|
 | GQ-1 | Strangler approach (new domain + data behind the existing UI, story by story) | Approved 2026-11-15 |
 | GQ-2 | Backlog order (walking skeleton = US-03) | Approved 2026-11-15 |
-| GQ-3 | Spikes before stage 1 | Approved; C-23 resolved by owner test; C-21 spike remains |
+| GQ-3 | Spikes before stage 1 | Approved; C-23 resolved by owner test; C-21 resolved by code reading (block) |
 
 ## 9. Open items
 
 | ID | Item |
 |---|---|
-| OI-1 | Files changed on 2026-11-14, after the freeze (2026-11-13), e.g. `wallet_edit_sheet`, `check_sufficient_balance_usecase`. Owner to confirm whether they were critical fixes (R7 exception); they are covered by C-08, C-09, C-21 either way |
+| OI-1 | Closed 2026-11-15: commit `2f12ab7` (2026-11-14) added wallet type, opening balance, and balance check in 38 files after the code freeze (plan rule R7 in `claude/fintrack/02-option-c-plan.md`: only critical fixes). Owner decision: accepted breach, no revert; all of it is replaced by C-08, C-09, C-10, C-21 |
