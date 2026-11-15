@@ -1,6 +1,6 @@
 # 04-architecture — FinTrack-AI
 
-Status: Accepted v1.0 · 2026-11-16 · Owner: Fadi Abd AlJawwad
+Status: Accepted v1.1 · 2026-11-16 · Owner: Fadi Abd AlJawwad
 Changes from draft v1: aligned with ADR-0001..0005 v2 after the devil's-advocate review (`claude/fintrack/04-architecture-review-v1.md`).
 Sources: `docs/02-spec.md` (v1.3), `docs/03-domain.md` (v1.1), `docs/legacy/production-notes.md` (risks S1–S8), ADR-0001..0005.
 
@@ -29,7 +29,7 @@ flowchart LR
     proxy["AI proxy<br/>Cloudflare Worker"]
     llm["Gemini API"]
     rates["Rates API<br/>Frankfurter"]
-    rc["Firebase Remote Config<br/>JOD peg, flags"]
+    rc["Firebase Remote Config<br/>feature flags"]
 
     owner -->|records, reviews| app
     app -->|sign in, ID token| auth
@@ -97,7 +97,7 @@ lib/
 | `UnitOfWork` | Drift transaction | One atomic local transaction across stores + outbox rows | I-08, I-26, ADR-0002 |
 | `SyncGateway` | Sync engine (Firestore) | Push then pull; FIFO outbox; held dependents; cursor; Needs attention | US-14, BR-24, BR-25 |
 | `AiExtractor` | Worker HTTP client | Transcript or ≤ 60 KB grayscale image → allowed fields; 20 s timeout | US-07, US-08 |
-| `RateProvider` | Frankfurter client + JOD peg | Daily and range fetch, base USD | BR-18 |
+| `RateProvider` | Frankfurter v2 client | Daily and range fetch, base USD, symbols ILS and JOD (ADR-0006) | BR-18 |
 | `AuthGateway` | Firebase Auth + Google Sign-In | Sign up, sign in, reset, sign out | US-01 |
 | `AppLock` | local_auth + secure storage | Biometric with device-credential fallback; 30 s relock | US-02 |
 | `Clock` | System clock | Local today | I-09, R-08 |
@@ -130,7 +130,7 @@ sequenceDiagram
     Sync->>DB: apply idempotently, advance cursor to max received
 ```
 
-Delivery: stage 1 = push + full restore on sign-in (single device); stage 2 = multi-device delta pull and conflict cases.
+Rules, ordering, cursor, and staged delivery: see ADR-0002 (single source). The diagram is an overview only.
 
 ---
 
@@ -147,7 +147,7 @@ users/{uid}/rates/{year}             map: date → {currency: perUsd}; write-onc
 ```
 Every synced document carries `serverUpdatedAt` (server timestamp) and `deleted` (bool). Fee document id is derived from its transfer id (I-07).
 
-Access rules (ADR-0003): ownership, schema, closed sets; no write to a document whose stored `deleted` is true; transaction writes `get()` their wallet(s) for existence, not archived, and currency match; the first transaction in a wallet sets `hasTransactions` in the same batch; wallet deletion only while `hasTransactions` is false.
+Access rules: see ADR-0003 (single source; not repeated here).
 
 ---
 
@@ -176,7 +176,7 @@ Access rules (ADR-0003): ownership, schema, closed sets; no write to a document 
 | Errors | Adapters translate SDK/HTTP errors into typed domain failures; features map failures to MSG-IDs |
 | Money | `Money(minorUnits: int, currency)`; exact decimal rates; half-up display rounding at the edge (BR-15) |
 | Testing | One test per AC, named by ID; tests are the contract; architecture tests (ADR-0001); access-rule tests on the emulator (ADR-0003); sync tests with emulator and fake clock (ADR-0002); Worker tests (ADR-0004); NFR-02 runs on the 3G profile and then on the owner's measured network |
-| Configuration | Build-time defines for endpoints; JOD peg and flags in Remote Config; Gemini key only in the Worker |
+| Configuration | Build-time defines for endpoints; feature flags in Remote Config; Gemini key only in the Worker |
 
 ---
 
@@ -188,6 +188,7 @@ Access rules (ADR-0003): ownership, schema, closed sets; no write to a document 
 | 0002 | Local database source of truth with staged delta sync | Accepted (v2) |
 | 0003 | Access rules validate ownership, schema, and cross-document invariants | Accepted (v2) |
 | 0004 | Gemini behind a Cloudflare Worker proxy, behind one port | Accepted (v2) |
-| 0005 | Rates fetched by the device, synced per owner, USD pivot | Accepted (v2) |
+| 0005 | Rates fetched by the device, synced per owner, USD pivot | Accepted (v2), JOD bullet superseded by 0006 |
+| 0006 | JOD rates come from the rate source | Accepted |
 
-Pending ADR (after gap analysis): state management version (Riverpod 2.6 vs 3).
+Pending: ADR-0007 state management version (Riverpod 2.6 vs 3), after stage 0 (gap analysis D-01).

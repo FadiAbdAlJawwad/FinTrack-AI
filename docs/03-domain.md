@@ -1,6 +1,7 @@
 # 03-domain — FinTrack-AI
 
-Status: Accepted v1.1 · 2026-11-16 · Owner: Fadi Abd AlJawwad
+Status: Accepted v1.2 · 2026-11-15 · Owner: Fadi Abd AlJawwad
+Changes in v1.2: JOD rates from the source (ADR-0006).
 Changes in v1.1 (from architecture review): reference rates stored as one rate per currency against a USD pivot, synced per owner; "outdated" measured from the last successful refresh.
 Sources: `docs/01-brief.md` (v1.1), `docs/02-spec.md` (v1.3), modeling decisions M1–M7 (owner, 2026-11-15).
 Review log: `claude/fintrack/03-domain-review-v1.md` (Gemini findings, accepted and rejected).
@@ -142,7 +143,7 @@ erDiagram
 
 Notes
 - `INCOME`, `EXPENSE`, and `TRANSFER` are the three disjoint kinds of `Transaction` (M2). They share `id`, `date`, and `note`. Mermaid cannot draw an exclusive supertype, so the supertype is stated here, not drawn.
-- `EXCHANGE_RATE` stores one rate per (date, currency) against USD; USD is implicitly 1. Rates are synced per owner so all devices convert the same way. JOD rows are derived from the USD peg at fetch time and written as dated rows, so a later peg change never alters past conversions.
+- `EXCHANGE_RATE` stores one rate per (date, currency) against USD; USD is implicitly 1. Rates are synced per owner so all devices convert the same way. JOD rows come from the rate source like ILS (ADR-0006). Stored rows never change, so later rate changes never alter past conversions.
 - `TransactionDraft` is not an entity: it lives in memory only and is never persisted (I-20). Its shape is in section 5.
 
 ---
