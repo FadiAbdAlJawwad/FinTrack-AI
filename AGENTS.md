@@ -11,7 +11,8 @@ Progress: docs/progress.md (read first, update last)
 ## Rules not obvious from the code
 - `features → domain ← data`. A feature never imports another feature. `lib/domain` imports no Flutter, Firebase, HTTP, or Drift (ADR-0001).
 - Every write goes through `UnitOfWork`: record + outbox row in one local transaction (ADR-0002).
-- Money = `int` minor units + currency. Rates = exact decimals. Never `double` for stored or summed values.
+- Money = `int` minor units + currency. Rates = `int` micros (ADR-0007). Never `double` for stored or summed values.
+- Approved packages for stage 0: `drift`, `drift_dev`, `sqlite3_flutter_libs`, `path`. Anything else: ask.
 - Tests of the current story are read-only during implementation. If a test looks wrong: stop and report its AC ID. Never change an expectation to make it pass.
 - User-visible text only in ARB files (ar, en). User messages by MSG-ID (02-spec §3).
 - Firebase Spark only: no Cloud Functions, Cloud Storage, or anything that needs Blaze.

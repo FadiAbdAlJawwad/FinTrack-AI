@@ -1,9 +1,10 @@
 # 03-domain — FinTrack-AI
 
-Status: Accepted v1.2 · 2026-11-15 · Owner: Fadi Abd AlJawwad
+Status: Accepted v1.3 · 2026-11-15 · Owner: Fadi Abd AlJawwad
+Changes in v1.3 (final review): I-13, I-14, I-27 aligned with spec v1.4; R-03 weekend gaps exact; rates as scaled integers (ADR-0007); display currency in owner preferences; deterministic ids for default categories.
 Changes in v1.2: JOD rates from the source (ADR-0006).
 Changes in v1.1 (from architecture review): reference rates stored as one rate per currency against a USD pivot, synced per owner; "outdated" measured from the last successful refresh.
-Sources: `docs/01-brief.md` (v1.1), `docs/02-spec.md` (v1.3), modeling decisions M1–M7 (owner, 2026-11-15).
+Sources: `docs/01-brief.md` (v1.1), `docs/02-spec.md` (v1.4), modeling decisions M1–M7 (owner, 2026-11-15).
 Review log: `claude/fintrack/03-domain-review-v1.md` (Gemini findings, accepted and rejected).
 
 ## Modeling decisions
@@ -48,7 +49,7 @@ One term, one meaning. Synonyms in other documents are listed so they map to one
 | Budget | الميزانية | Monthly limit for one expense category, versioned | `Budget` |
 | Reference rate | سعر الصرف المرجعي | Daily rate of one currency against the USD pivot (units of that currency per 1 USD). "Latest reference rate" = most recent stored rate (spec: "current reference rate"). Shared by all devices of the owner | `ExchangeRate` |
 | Rate book | سجل الأسعار | All stored reference rates plus the date of the last successful refresh | `RateBook` |
-| Display currency | عملة العرض | Owner preference for net worth and reports; also the currency of a new budget | `Owner.displayCurrency` |
+| Display currency | عملة العرض | Owner preference for net worth and reports; also the currency of a new budget. Stored once, in the owner's synced preferences | `OwnerPreferences.displayCurrency` |
 | AI disclosure acknowledgment | إقرار الإفصاح | Date the owner acknowledged MSG-08; recorded once per owner | `Owner.aiDisclosureAcknowledgedOn` |
 | Draft | المسودة | Unsaved, possibly incomplete result of voice or receipt input; becomes an income or expense only on save | `TransactionDraft` |
 | Net worth | صافي الثروة | Sum of all wallet balances (active and archived) in the display currency; computed | `NetWorth` (value) |
@@ -83,7 +84,6 @@ erDiagram
         string id PK
         string email
         string displayName
-        CurrencyCode displayCurrency
         date aiDisclosureAcknowledgedOn "nullable"
     }
     WALLET {
@@ -137,7 +137,7 @@ erDiagram
     EXCHANGE_RATE {
         date date PK
         CurrencyCode currency PK "not USD"
-        decimal perUsd "> 0, exact decimal"
+        int perUsdMicros "> 0, rate x 1,000,000"
     }
 ```
 
@@ -166,21 +166,21 @@ Notes
 | I-10 | An income uses an income category; an expense uses an expense category | AC-13.2 | Domain |
 | I-11 | Active wallet names are unique per owner (case-insensitive); restoring an archived wallet requires its name to be free | AC-03.5, AC-04.7 | Domain (cross-device race accepted) |
 | I-12 | Category names are unique per owner and type (case-insensitive) | AC-13.3 | Domain |
-| I-13 | No new or edited transaction references an archived wallet | AC-04.3 | Domain |
-| I-14 | A wallet that has transactions is never deleted | BR-05 | Domain + sync rejection (AC-04.8); server check decided in `04` |
-| I-15 | Exactly one category per system key (`fees`, `otherExpense`, `otherIncome`) exists per owner; system and default categories cannot be deleted; `systemKey` set ⇒ `isDefault` | AC-13.1, AC-13.5 | Domain |
+| I-13 | No transaction is created in, or moved into, an archived wallet. Existing transactions in an archived wallet can be corrected or deleted | AC-04.3, AC-04.9 | Domain + Rules (ADR-0008) |
+| I-14 | A wallet that has or ever had a transaction is never deleted | BR-05, AC-04.1 | Domain + Rules (`hasTransactions`, ADR-0003) |
+| I-15 | Exactly one category per system key (`fees`, `otherExpense`, `otherIncome`) exists per owner; system and default categories cannot be deleted; `systemKey` set ⇒ `isDefault`; default categories have fixed ids so two devices never create duplicates | AC-13.1, AC-13.5 | Domain |
 | I-16 | At most one budget version per (category, effectiveFrom); budgets only for expense categories | AC-12.7, AC-12.8 | Domain |
 | I-17 | `Budget.limit` > 0 | AC-12.4 | Domain + Rules |
 | I-18 | `Wallet.openingBalanceMinor` ≥ 0 | AC-03.6 | Domain + Rules |
 | I-19 | Only the owner reads or writes the owner's data | BR-27 | Rules |
 | I-20 | A draft is never persisted, starts with an empty type, and can only become an income or an expense | BR-07, BR-19 | Domain |
-| I-21 | `ExchangeRate.perUsd` > 0, exact decimal, currency ≠ USD, one rate per (date, currency); a stored row never changes | NFR-07, AC-11.2 | Domain + Data + Rules |
+| I-21 | `ExchangeRate.perUsdMicros` > 0 (integer, rate × 10^6, ADR-0007), currency ≠ USD, one rate per (date, currency); a stored row never changes | NFR-07, AC-11.2 | Domain + Data + Rules |
 | I-22 | Every income or expense references an existing category of the right type; when a custom category is deleted its references move to the matching "Other" system category | AC-13.4, AC-13.6 | Domain |
 | I-23 | `Wallet.currency` and `Category.type` never change after creation | BR-02, I-10 | Domain + Rules |
 | I-24 | Currency ∈ {ILS, USD, JOD}; wallet kind ∈ {cash, eWallet, bank} | BR-03, AC-03.1 | Domain (enums) + Rules |
 | I-25 | All versions of one category's budget share one currency: the owner's display currency when the first version was created | AC-12.6 | Domain |
 | I-26 | Deleting a custom category deletes all its budget versions | AC-13.4 | Domain + Data (same batch) |
-| I-27 | An archived wallet can only be restored; its name, kind, and opening balance cannot be edited | AC-04.3 | Domain |
+| I-27 | An archived wallet's name, kind, and opening balance cannot be edited; an active wallet's can (AC-03.8) | AC-03.8, AC-04.3 | Domain |
 
 ---
 
@@ -192,8 +192,8 @@ Pure functions in the domain. Each has unit tests named after the ACs it serves.
 |---|---|---|
 | R-01 | **Wallet balance** = `openingBalanceMinor` + Σ income − Σ expense (fees included) − Σ `amountSent` where source + Σ `amountReceived` where destination; all time; wallet currency | AC-10.1, AC-10.6 |
 | R-02 | **Net worth** = Σ over all wallets, active and archived, of balance converted at the latest reference rate to the display currency | AC-10.2, AC-04.4 |
-| R-02b | **Conversion** A → B on date d = amount × perUsd(B, d) ÷ perUsd(A, d), with perUsd(USD) = 1; exact decimal; same formula both ways, so conversions are symmetric | NFR-05, NFR-07 |
-| R-03 | **Rate for a date** = rate stored for that date; else nearest earlier rate within 7 days (quality `approximate`); else none (quality `unavailable`) | AC-11.2, AC-11.5, AC-11.6 |
+| R-02b | **Conversion** A → B on date d = amount × perUsd(B, d) ÷ perUsd(A, d), with perUsd(USD) = 1; exact integer fraction (ADR-0007), rounded once at display; same formula both ways, so conversions are symmetric | NFR-05, NFR-07 |
+| R-03 | **Rate for a date** = rate stored for that date; else the nearest earlier rate: 1–4 days earlier = `exact` (weekend and holiday gaps of the source), 5–7 days = `approximate`; else none (`unavailable`) | AC-11.2, AC-11.5, AC-11.6 |
 | R-04 | **Latest rate quality** = `outdated` when the last successful refresh (`RateBook.lastRefreshedOn`) is more than 3 days before local today; `unavailable` when no rate exists; else `exact`. Source gaps on weekends or holidays do not count | AC-10.4, AC-10.5, BR-17 |
 | R-05 | **Converted total** = Σ convertible amounts, computed exactly, rounded half-up for display only; carries the worst quality of its parts and the count of excluded amounts | BR-15, AC-11.6 |
 | R-06 | **Period totals**: income and expense summed separately, each converted at its own date rate (R-03); transfers excluded; a period includes dates from start to end inclusive | AC-11.1, AC-11.2, BR-09 |
@@ -235,7 +235,7 @@ A draft is partial by nature, so every field is optional. Saving turns it into a
 ```mermaid
 stateDiagram-v2
     [*] --> Active : create
-    Active --> Active : edit name or kind
+    Active --> Active : edit name, kind, or opening balance
     Active --> Archived : remove, has transactions
     Active --> [*] : delete, no transactions (confirmed)
     Archived --> Active : restore, name free
@@ -244,7 +244,7 @@ stateDiagram-v2
 Forbidden (each is a test)
 - Change of currency in any state (I-23).
 - Archived → deleted (I-14).
-- Archived → edited, or used by a new or edited transaction (I-13, I-27).
+- Archived → edited, or used by a new or moved transaction (I-13, I-27).
 - Archived → Active while an active wallet has the same name (I-11).
 - Creation in Archived state (only `create` → Active exists).
 
@@ -399,7 +399,7 @@ Findings
 | Wrong multiplicity | Checked: transfer–fee 0..1 to 0..1 (I-07); budget versions per category (M5); exclusive transaction kinds stated in text |
 | Missing invariant (unique constraint, state) | Covered: I-11, I-12, I-15, I-16, I-21 uniqueness; lifecycles for wallet, transaction, category, budget, draft |
 | No history or change log | Accepted: edit history out of scope (brief). Budget history by versioning (M5). Sync ordering and deletion markers are infrastructure (`04`) |
-| UI properties inside domain entities | Avoided: wallet icon/color out of `Wallet` (M7). `displayCurrency` stays: it decides a new budget's currency (I-25), so it is a domain preference |
+| UI properties inside domain entities | Avoided: wallet icon/color out of `Wallet` (M7). `displayCurrency` is a domain preference (it decides a new budget's currency, I-25), kept in `OwnerPreferences` |
 
 ## 10. Handed to `04-architecture.md`
 

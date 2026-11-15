@@ -21,7 +21,7 @@ Every prompt states in one line why this model was chosen and the fallback when 
 
 ## Executor prompt template (S03 loop)
 
-One story per branch. Two prompts per story: **contract** (types + failing AC tests; owner approves and commits) then **implementation** (tests read-only).
+One story per branch. The contract commit message starts with `contract(US-xx):`; the CI gate fails if any file under `test/` changes after that commit on the branch. Two prompts per story: **contract** (types + failing AC tests; owner approves and commits) then **implementation** (tests read-only).
 
 ```
 Target: <tool> → <model> (new session) · Why: <one line> · Fallback: <tool → model>
