@@ -1,23 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:shimmer/shimmer.dart';
 import '../../../../core/constant/color_manager.dart';
 import '../../../../core/extension/app_sizes.dart';
+import '../../../../core/widgets/skeleton_shimmer.dart';
 
 class HomeSkeleton extends StatelessWidget {
   const HomeSkeleton({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final baseColor = Theme.of(context).brightness == Brightness.dark
-        ? Colors.grey[800]!
-        : Colors.grey[300]!;
-    final highlightColor = Theme.of(context).brightness == Brightness.dark
-        ? Colors.grey[700]!
-        : Colors.grey[100]!;
-
-    return Shimmer.fromColors(
-      baseColor: baseColor,
-      highlightColor: highlightColor,
+    return SkeletonShimmer(
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

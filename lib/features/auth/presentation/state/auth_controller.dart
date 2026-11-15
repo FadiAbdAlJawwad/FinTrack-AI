@@ -4,7 +4,6 @@ import '../../../../core/constant/shared_prefs_keys.dart';
 import '../../../../core/providers/firebase_providers.dart';
 import '../../../../core/providers/shared_prefs_provider.dart';
 import '../../../../core/services/biometric_service.dart';
-import '../../../../core/error/auth_exception.dart';
 import '../../../../core/routing/app_lock_notifier.dart';
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../domain/models/user_model.dart';
@@ -19,11 +18,6 @@ final currentUserProvider = Provider<UserModel?>((ref) {
   return ref.watch(authRepositoryProvider).currentUser;
 });
 
-
-final isBiometricAvailableProvider = Provider.autoDispose<bool>((ref) {
-  final prefs = ref.watch(sharedPrefsProvider);
-  return prefs.getBool(SharedPrefsKeys.isBiometricEnabledKey) ?? false;
-});
 
 final authControllerProvider = AsyncNotifierProvider<AuthController, void>(
   AuthController.new,
@@ -55,23 +49,6 @@ class AuthController extends AsyncNotifier<void> {
     }
 
     state = result;
-  }
-
-  Future<void> unlockWithBiometrics() async {
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(() async {
-      final biometricService = ref.read(biometricServiceProvider);
-      final authenticated = await biometricService.authenticate();
-      if (!authenticated) {
-        throw AppAuthException(AuthErrorType.biometricDenied);
-      }
-      
-      if (_repository.currentUser == null) {
-        throw AppAuthException(AuthErrorType.sessionExpired);
-      }
-      
-      ref.read(appLockNotifierProvider).unlock();
-    });
   }
 
   Future<void> register(

@@ -164,8 +164,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get biometricDenied => 'Biometric authentication denied or cancelled.';
 
   @override
-  String get noSavedCredentials =>
-      'No saved credentials found. Please log in with your email first.';
+  String get biometricReason =>
+      'Please authenticate to access your financial data';
 
   @override
   String get enableBiometricLogin => 'Enable Biometric Login';
@@ -287,9 +287,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get expense => 'Expense';
-
-  @override
-  String get dateRange => 'Date Range';
 
   @override
   String get selectDateRange => 'Select Date Range';

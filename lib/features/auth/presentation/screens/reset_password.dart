@@ -8,8 +8,8 @@ import '../../../../core/extension/app_sizes.dart';
 import '../../../../core/extension/text_style_extension.dart';
 import '../../../../core/extension/string_validation.dart';
 import '../../../../core/extension/snackbar_extension.dart';
-import '../../../../core/error/auth_exception.dart';
 import '../../../../core/error/auth_exception_extension.dart';
+import '../../../../core/routing/app_routes.dart';
 import '../../../../core/widgets/loading_overlay.dart';
 import '../state/reset_password_controller.dart';
 
@@ -28,9 +28,7 @@ class ResetPassword extends HookConsumerWidget {
     ) {
       next.whenOrNull(
         error: (error, stack) {
-          final errorMessage = error is AppAuthException
-              ? error.getLocalizedMessage(context)
-              : error.toString();
+          final errorMessage = authErrorMessage(context, error);
           context.showErrorSnackBar(errorMessage);
         },
         data: (_) {
@@ -40,7 +38,7 @@ class ResetPassword extends HookConsumerWidget {
               if (context.canPop()) {
                 context.pop();
               } else {
-                context.goNamed('homeScreen');
+                context.goNamed(AppRoutes.homeScreenName);
               }
             }
           }

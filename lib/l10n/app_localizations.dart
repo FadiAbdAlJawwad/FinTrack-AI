@@ -392,11 +392,11 @@ abstract class AppLocalizations {
   /// **'Biometric authentication denied or cancelled.'**
   String get biometricDenied;
 
-  /// No description provided for @noSavedCredentials.
+  /// No description provided for @biometricReason.
   ///
   /// In en, this message translates to:
-  /// **'No saved credentials found. Please log in with your email first.'**
-  String get noSavedCredentials;
+  /// **'Please authenticate to access your financial data'**
+  String get biometricReason;
 
   /// No description provided for @enableBiometricLogin.
   ///
@@ -637,12 +637,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Expense'**
   String get expense;
-
-  /// No description provided for @dateRange.
-  ///
-  /// In en, this message translates to:
-  /// **'Date Range'**
-  String get dateRange;
 
   /// No description provided for @selectDateRange.
   ///

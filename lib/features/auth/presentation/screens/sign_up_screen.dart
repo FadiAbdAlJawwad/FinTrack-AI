@@ -9,8 +9,8 @@ import '../../../../core/extension/app_sizes.dart';
 import '../../../../core/extension/text_style_extension.dart';
 import '../../../../core/extension/string_validation.dart';
 import '../../../../core/extension/snackbar_extension.dart';
-import '../../../../core/error/auth_exception.dart';
 import '../../../../core/error/auth_exception_extension.dart';
+import '../../../../core/routing/app_routes.dart';
 import '../../../../core/widgets/loading_overlay.dart';
 import '../state/auth_controller.dart';
 
@@ -30,14 +30,12 @@ class SignUpScreen extends HookConsumerWidget {
     ref.listen<AsyncValue<void>>(authControllerProvider, (previous, next) {
       next.whenOrNull(
         error: (error, stack) {
-          final errorMessage = error is AppAuthException
-              ? error.getLocalizedMessage(context)
-              : error.toString();
+          final errorMessage = authErrorMessage(context, error);
           context.showErrorSnackBar(errorMessage);
         },
         data: (_) {
           if (previous is AsyncLoading && context.mounted) {
-            context.goNamed('homeScreen');
+            context.goNamed(AppRoutes.homeScreenName);
           }
         },
       );
@@ -182,7 +180,7 @@ class SignUpScreen extends HookConsumerWidget {
                     TextButton(
                       onPressed: authState.isLoading
                           ? null
-                          : () => context.goNamed('login'),
+                          : () => context.goNamed(AppRoutes.loginName),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [

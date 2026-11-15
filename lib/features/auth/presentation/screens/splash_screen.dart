@@ -6,6 +6,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import '../../../../core/constant/images_manager.dart';
 import '../../../../core/extension/app_sizes.dart';
 import '../../../../core/extension/text_style_extension.dart';
+import '../../../../core/routing/app_routes.dart';
 
 class SplashScreen extends HookConsumerWidget {
   const SplashScreen({super.key});
@@ -55,7 +56,7 @@ class SplashScreen extends HookConsumerWidget {
         if (status == AnimationStatus.completed) {
           await Future.delayed(const Duration(milliseconds: 800));
           if (context.mounted) {
-            context.goNamed('onboarding');
+            context.goNamed(AppRoutes.onboardingName);
           }
         }
       }

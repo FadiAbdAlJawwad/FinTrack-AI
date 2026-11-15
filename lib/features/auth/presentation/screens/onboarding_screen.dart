@@ -6,6 +6,7 @@ import '../../../../core/constant/shared_prefs_keys.dart';
 import '../../../../core/providers/shared_prefs_provider.dart';
 import '../../../../core/extension/app_sizes.dart';
 import '../../../../core/extension/text_style_extension.dart';
+import '../../../../core/routing/app_routes.dart';
 import '../viewmodels/onboarding_view_model.dart';
 import '../widgets/slider_indicator.dart';
 
@@ -23,7 +24,7 @@ class OnboardingScreen extends HookConsumerWidget {
       final prefs = ref.read(sharedPrefsProvider);
       await prefs.setBool(SharedPrefsKeys.hasSeenOnboardingKey, true);
       if (context.mounted) {
-        context.goNamed('login');
+        context.goNamed(AppRoutes.loginName);
       }
     }
 
