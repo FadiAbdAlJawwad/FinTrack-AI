@@ -1,10 +1,11 @@
 # 02-spec — FinTrack-AI
 
-Status: Accepted v1.4 · 2026-11-15 · Owner: Fadi Abd AlJawwad
+Status: Accepted v1.5 · 2026-11-15 · Owner: Fadi Abd AlJawwad
 Changes in v1.1: test-immutability rule added to Conventions.
 Changes in v1.2 (from 03-domain review): account creation ACs (AC-01.6, AC-01.7); "transfer fee" wording; AC-04.3 wording; category renaming listed as Not now.
 Changes in v1.3 (from architecture review): AC-04.8 arrival order; AC-03.7 wallet appearance; AC-08.7 image budget; "outdated" measured from the last successful refresh (AC-10.4, BR-17, MSG-10); NFR-02 split into voice and receipt; network assumption.
 Changes in v1.4 (final review, `claude/fintrack/06-final-review.md`): AC-01.8 sign-out with pending changes; AC-03.8 edit wallet; AC-04.1 never-used wallets only; AC-04.3 and AC-04.9 archived-wallet edits; AC-11.5 weekend gaps are exact; MSG-15.
+Changes in v1.5 (owner, 2026-11-15, S03 §22): digits, separators, and month names (BR-30..BR-32, AC-05.8..AC-05.10, NFR-10).
 Source of truth above this file: `docs/01-brief.md` (Accepted v1.2). Where they conflict, the brief wins until this spec is accepted.
 Review log: Gemini skeptical-tester review of v1, accepted/rejected items recorded in `claude/fintrack/02-spec-review-v1.md`.
 
@@ -25,19 +26,19 @@ Review log: Gemini skeptical-tester review of v1, accepted/rejected items record
 
 ## 1. Glossary (preview — full version in `03-domain.md`)
 
-| Term | Meaning |
-|---|---|
-| Owner | The single person who operates the account |
-| Wallet | A place where the owner holds money. Kind: cash, e-wallet, or bank. One currency per wallet |
-| Opening balance | Amount in a wallet at creation. Not a transaction; not income |
-| Transaction | Income, expense, or transfer |
-| Transfer | One record that moves money between two of the owner's wallets |
+| Term                 | Meaning                                                                                                                                        |
+|----------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
+| Owner                | The single person who operates the account                                                                                                     |
+| Wallet               | A place where the owner holds money. Kind: cash, e-wallet, or bank. One currency per wallet                                                    |
+| Opening balance      | Amount in a wallet at creation. Not a transaction; not income                                                                                  |
+| Transaction          | Income, expense, or transfer                                                                                                                   |
+| Transfer             | One record that moves money between two of the owner's wallets                                                                                 |
 | Transfer fee ("fee") | Expense in category "Fees", linked to one transfer, from that transfer's source wallet. The Fees category can also be used for manual expenses |
-| Draft | Unsaved, editable transaction produced by voice or receipt input |
-| Display currency | Currency used for net worth and reports (ILS, USD, or JOD) |
-| Reference rate | Daily exchange rate from the shared reference source. "Current" = the latest stored daily rate |
-| Net worth | Sum of all wallet balances, converted to the display currency |
-| Needs attention | In-app list of local changes the server rejected |
+| Draft                | Unsaved, editable transaction produced by voice or receipt input                                                                               |
+| Display currency     | Currency used for net worth and reports (ILS, USD, or JOD)                                                                                     |
+| Reference rate       | Daily exchange rate from the shared reference source. "Current" = the latest stored daily rate                                                 |
+| Net worth            | Sum of all wallet balances, converted to the display currency                                                                                  |
+| Needs attention      | In-app list of local changes the server rejected                                                                                               |
 
 ---
 
@@ -101,6 +102,9 @@ As the owner, I want to record income and expenses in seconds, so that tracking 
 - **AC-05.5 (unhappy: future date)** Given a date after the device's local current date, when the owner saves, then the date is invalid.
 - **AC-05.6 (insufficient balance)** Given a wallet balance of 10 USD, when the owner saves an expense of 15 USD, then MSG-06 asks for confirmation; after confirmation the expense is saved and the balance becomes −5 USD.
 - **AC-05.7** Given income or expense is saved, when the owner views it, then its amount is in the wallet's currency and the optional note is kept.
+- **AC-05.8 (Arabic-Indic input)** Given an active ILS wallet and the Arabic UI, when the owner types the amount `١٢٥٫٥` (or `۱۲۵٫۵`) and saves, then the stored amount is 12550 minor units and it is displayed as `125.50`. `[DERIVED: BR-31]`
+- **AC-05.9 (same digits in both languages)** Given an expense of 1234.500 JOD, when the owner views it in Arabic and then in English, then both show `1,234.500` with Latin digits. `[DERIVED: BR-30]`
+- **AC-05.10 (month names)** Given an expense dated 2026-11-15, when the owner views its date in Arabic and then in English, then the Arabic UI shows the month as `نوفمبر` and the English UI as `November`, both with Latin digits. `[DERIVED: BR-32]`
 
 ### US-06 — Transfer between wallets
 As the owner, I want to move money between my wallets, including across currencies and with fees, so that every wallet stays accurate without inflating income or expenses.
@@ -213,59 +217,62 @@ As the owner, I want the app to work without internet, so that connectivity neve
 
 Each message exists in Arabic and English. Tests assert the ID.
 
-| ID | Meaning |
-|---|---|
-| MSG-01 | Wrong email or password |
-| MSG-02 | First sign-in on this device needs a connection |
-| MSG-03 | App lock needs a biometric or device PIN/pattern on this device |
-| MSG-04 | Voice and receipt entry need a connection |
-| MSG-05 | AI service failed; continue manually |
-| MSG-06 | Amount exceeds wallet balance; confirm to continue |
-| MSG-07 | Leaving discards this draft; confirm to continue |
+| ID     | Meaning                                                                                   |
+|--------|-------------------------------------------------------------------------------------------|
+| MSG-01 | Wrong email or password                                                                   |
+| MSG-02 | First sign-in on this device needs a connection                                           |
+| MSG-03 | App lock needs a biometric or device PIN/pattern on this device                           |
+| MSG-04 | Voice and receipt entry need a connection                                                 |
+| MSG-05 | AI service failed; continue manually                                                      |
+| MSG-06 | Amount exceeds wallet balance; confirm to continue                                        |
+| MSG-07 | Leaving discards this draft; confirm to continue                                          |
 | MSG-08 | Voice text and receipt images are sent to an external AI service; acknowledge to continue |
-| MSG-09 | A change could not be saved; review it in Needs attention |
-| MSG-10 | Label: converted with outdated rates (date of last successful refresh shown) |
-| MSG-11 | Label: conversion unavailable (count of excluded items shown when relevant) |
-| MSG-12 | Label: approximate conversion |
-| MSG-13 | Session expired; sign in to finish syncing |
-| MSG-14 | Password reset email sent |
-| MSG-15 | Signing out now loses N unsynced changes; confirm to continue |
+| MSG-09 | A change could not be saved; review it in Needs attention                                 |
+| MSG-10 | Label: converted with outdated rates (date of last successful refresh shown)              |
+| MSG-11 | Label: conversion unavailable (count of excluded items shown when relevant)               |
+| MSG-12 | Label: approximate conversion                                                             |
+| MSG-13 | Session expired; sign in to finish syncing                                                |
+| MSG-14 | Password reset email sent                                                                 |
+| MSG-15 | Signing out now loses N unsynced changes; confirm to continue                             |
 
 ---
 
 ## 4. Business rules (EARS)
 
-| ID | Rule |
-|---|---|
-| BR-01 | The system shall store every amount in its wallet's currency as an exact value with that currency's precision (ILS 2, USD 2, JOD 3 decimals). |
-| BR-02 | The system shall allow exactly one currency per wallet; a transaction's currency is its wallet's currency. |
-| BR-03 | The system shall support ILS, USD, and JOD only in v1. |
-| BR-04 | The system shall not count opening balances as income. |
-| BR-05 | When a wallet has or ever had a transaction, the system shall archive it instead of deleting it. |
-| BR-06 | The system shall not save income or expense without type, amount > 0, wallet, category, and date; or a transfer without source, destination, and amount sent > 0. |
-| BR-07 | The system shall never infer a transaction type; AI drafts always leave the type empty. |
-| BR-08 | If a new or changed transaction date is after the device's local current date, then the system shall reject it. |
-| BR-09 | The system shall exclude transfers from income and expense totals. |
-| BR-10 | When a transfer has a fee, the system shall save, change, and delete the transfer and its fee together or not at all. |
-| BR-11 | When a transfer is cross-currency, the system shall store both the amount sent and the amount received. |
-| BR-12 | If an expense or transfer exceeds the wallet balance, then the system shall warn the owner and save only after confirmation. |
-| BR-13 | The system shall compute wallet balances over all time from the opening balance and current transactions. |
-| BR-14 | The system shall convert net worth at the current reference rate and period income/expense at each transaction's date rate. |
-| BR-15 | The system shall compute totals from exact values and round only for display, half-up, to the target currency's precision. `[PROPOSED]` |
-| BR-16 | The system shall not let the owner override reference rates, except the amount received in a cross-currency transfer. |
-| BR-17 | While the last successful rate refresh is more than 3 days old, the system shall label converted totals "outdated". |
-| BR-18 | The system shall refresh reference rates at most once per day while online. `[PROPOSED]` |
-| BR-19 | The system shall never save AI output without owner confirmation, and shall not keep unsaved drafts. |
-| BR-20 | The system shall send only the voice transcript or the receipt image to the AI service, and shall keep only amount, currency, date, merchant (as note), and category from its response. |
-| BR-21 | The system shall not store receipt images. |
-| BR-22 | When the owner first uses voice or receipt entry, the system shall disclose external AI processing and require acknowledgment. |
-| BR-23 | While offline, the system shall provide every function except voice and receipt entry. |
-| BR-24 | If the server rejects a synced change, then the system shall show an in-app banner and keep the item in Needs attention. |
-| BR-25 | When two devices change the same transaction, the system shall keep the change that reached the server last; a deletion wins over an edit. |
-| BR-26 | While app lock is on, the system shall require biometric or device-credential authentication at launch and after 30 seconds or more in the background. |
-| BR-27 | The system shall allow only the owner to read or change the account's data. |
-| BR-28 | The system shall not carry unused budget into the next month. |
-| BR-29 | The system shall provide the full UI in Arabic (right-to-left) and English. |
+| ID    | Rule                                                                                                                                                                                                                                                  |
+|-------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| BR-01 | The system shall store every amount in its wallet's currency as an exact value with that currency's precision (ILS 2, USD 2, JOD 3 decimals).                                                                                                         |
+| BR-02 | The system shall allow exactly one currency per wallet; a transaction's currency is its wallet's currency.                                                                                                                                            |
+| BR-03 | The system shall support ILS, USD, and JOD only in v1.                                                                                                                                                                                                |
+| BR-04 | The system shall not count opening balances as income.                                                                                                                                                                                                |
+| BR-05 | When a wallet has or ever had a transaction, the system shall archive it instead of deleting it.                                                                                                                                                      |
+| BR-06 | The system shall not save income or expense without type, amount > 0, wallet, category, and date; or a transfer without source, destination, and amount sent > 0.                                                                                     |
+| BR-07 | The system shall never infer a transaction type; AI drafts always leave the type empty.                                                                                                                                                               |
+| BR-08 | If a new or changed transaction date is after the device's local current date, then the system shall reject it.                                                                                                                                       |
+| BR-09 | The system shall exclude transfers from income and expense totals.                                                                                                                                                                                    |
+| BR-10 | When a transfer has a fee, the system shall save, change, and delete the transfer and its fee together or not at all.                                                                                                                                 |
+| BR-11 | When a transfer is cross-currency, the system shall store both the amount sent and the amount received.                                                                                                                                               |
+| BR-12 | If an expense or transfer exceeds the wallet balance, then the system shall warn the owner and save only after confirmation.                                                                                                                          |
+| BR-13 | The system shall compute wallet balances over all time from the opening balance and current transactions.                                                                                                                                             |
+| BR-14 | The system shall convert net worth at the current reference rate and period income/expense at each transaction's date rate.                                                                                                                           |
+| BR-15 | The system shall compute totals from exact values and round only for display, half-up, to the target currency's precision. `[PROPOSED]`                                                                                                               |
+| BR-16 | The system shall not let the owner override reference rates, except the amount received in a cross-currency transfer.                                                                                                                                 |
+| BR-17 | While the last successful rate refresh is more than 3 days old, the system shall label converted totals "outdated".                                                                                                                                   |
+| BR-18 | The system shall refresh reference rates at most once per day while online. `[PROPOSED]`                                                                                                                                                              |
+| BR-19 | The system shall never save AI output without owner confirmation, and shall not keep unsaved drafts.                                                                                                                                                  |
+| BR-20 | The system shall send only the voice transcript or the receipt image to the AI service, and shall keep only amount, currency, date, merchant (as note), and category from its response.                                                               |
+| BR-21 | The system shall not store receipt images.                                                                                                                                                                                                            |
+| BR-22 | When the owner first uses voice or receipt entry, the system shall disclose external AI processing and require acknowledgment.                                                                                                                        |
+| BR-23 | While offline, the system shall provide every function except voice and receipt entry.                                                                                                                                                                |
+| BR-24 | If the server rejects a synced change, then the system shall show an in-app banner and keep the item in Needs attention.                                                                                                                              |
+| BR-25 | When two devices change the same transaction, the system shall keep the change that reached the server last; a deletion wins over an edit.                                                                                                            |
+| BR-26 | While app lock is on, the system shall require biometric or device-credential authentication at launch and after 30 seconds or more in the background.                                                                                                |
+| BR-27 | The system shall allow only the owner to read or change the account's data.                                                                                                                                                                           |
+| BR-28 | The system shall not carry unused budget into the next month.                                                                                                                                                                                         |
+| BR-29 | The system shall provide the full UI in Arabic (right-to-left) and English.                                                                                                                                                                           |
+| BR-30 | The system shall display every number with Latin digits 0–9, `.` as the decimal separator, and `,` as the thousands separator, in both languages. (owner, 2026-11-15; `,` grouping `[PROPOSED]`)                                                      |
+| BR-31 | When the owner enters a number, the system shall accept Latin, Arabic-Indic (U+0660–U+0669), and Extended Arabic-Indic (U+06F0–U+06F9) digits, and `.` or `٫` (U+066B) as the decimal separator, and shall normalize them to Latin before validation. |
+| BR-32 | The system shall display dates in the Gregorian calendar with Latin digits; month names follow the UI language, and the Arabic UI uses يناير … ديسمبر (for example نوفمبر, not تشرين الثاني). (owner, 2026-11-15)                                     |
 
 ---
 
@@ -273,19 +280,19 @@ Each message exists in Arabic and English. Tests assert the ID.
 
 Network profile "3G" = 750 kbps down, 250 kbps up, 100 ms round-trip latency, emulated.
 
-| ID | Attribute | Metric and threshold | Condition | Verification |
-|---|---|---|---|---|
-| NFR-01 | Entry speed | Manual entry ≤ 15 s | Form open to saved, owner after one practice run | Manual benchmark, 10 timed runs, median |
-| NFR-02a | AI latency, voice | Draft shown ≤ 8 s in 90% of attempts | 3G profile | Instrumented test, 30 runs |
-| NFR-02b | AI latency, receipt | Draft shown ≤ 12 s in 90% of attempts | 3G profile, image within AC-08.7 budget | Instrumented test, 30 runs |
-| NFR-03 | AI accuracy | Amount and currency correct ≥ 90% | Fixed test set: 30 receipts + 30 transcripts, Arabic and English | Scripted evaluation |
-| NFR-04 | Offline endurance | 500 transactions created offline over a simulated 30 days, 0 lost or duplicated after sync | Device with 3 GB RAM | Automated test |
-| NFR-05 | Correctness | Exact (unrounded) balances match the expected fixture values 100% | Fixture of 50 mixed transactions incl. cross-currency transfers and fees | Automated test |
-| NFR-06 | Adoption | Owner records daily for 14 consecutive days | Real use after release | Product metric from history (not automated) |
-| NFR-07 | Numeric exactness | 0 floating-point errors in stored or summed amounts | All BR-01 currencies | Unit tests |
-| NFR-08 | Data isolation | 0 cross-account reads or writes succeed | Access-rule tests | Automated, before every rules deploy |
-| NFR-09 | AI privacy | 100% of AI requests contain only allowed content (BR-20) | Request-payload tests | Automated |
-| NFR-10 | Localization | 100% of user-visible strings exist in Arabic and English; layouts render RTL in Arabic | All screens | Automated string-coverage test + manual RTL pass |
+| ID      | Attribute           | Metric and threshold                                                                                                                                     | Condition                                                                | Verification                                                                                                                                       |
+|---------|---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| NFR-01  | Entry speed         | Manual entry ≤ 15 s                                                                                                                                      | Form open to saved, owner after one practice run                         | Manual benchmark, 10 timed runs, median                                                                                                            |
+| NFR-02a | AI latency, voice   | Draft shown ≤ 8 s in 90% of attempts                                                                                                                     | 3G profile                                                               | Instrumented test, 30 runs                                                                                                                         |
+| NFR-02b | AI latency, receipt | Draft shown ≤ 12 s in 90% of attempts                                                                                                                    | 3G profile, image within AC-08.7 budget                                  | Instrumented test, 30 runs                                                                                                                         |
+| NFR-03  | AI accuracy         | Amount and currency correct ≥ 90%                                                                                                                        | Fixed test set: 30 receipts + 30 transcripts, Arabic and English         | Scripted evaluation                                                                                                                                |
+| NFR-04  | Offline endurance   | 500 transactions created offline over a simulated 30 days, 0 lost or duplicated after sync                                                               | Device with 3 GB RAM                                                     | Automated test                                                                                                                                     |
+| NFR-05  | Correctness         | Exact (unrounded) balances match the expected fixture values 100%                                                                                        | Fixture of 50 mixed transactions incl. cross-currency transfers and fees | Automated test                                                                                                                                     |
+| NFR-06  | Adoption            | Owner records daily for 14 consecutive days                                                                                                              | Real use after release                                                   | Product metric from history (not automated)                                                                                                        |
+| NFR-07  | Numeric exactness   | 0 floating-point errors in stored or summed amounts                                                                                                      | All BR-01 currencies                                                     | Unit tests                                                                                                                                         |
+| NFR-08  | Data isolation      | 0 cross-account reads or writes succeed                                                                                                                  | Access-rule tests                                                        | Automated, before every rules deploy                                                                                                               |
+| NFR-09  | AI privacy          | 100% of AI requests contain only allowed content (BR-20)                                                                                                 | Request-payload tests                                                    | Automated                                                                                                                                          |
+| NFR-10  | Localization        | 100% of user-visible strings exist in Arabic and English with the same placeholders; layouts render RTL in Arabic; numbers and dates follow BR-30..BR-32 | All screens                                                              | Automated ARB key and placeholder parity check in the gate; formatting tests per BR-30..BR-32; manual RTL pass with Arabic and English screenshots |
 
 Display rounding note: category totals are each rounded for display, so their displayed sum may differ from the displayed grand total by up to half a minor unit per category. This is expected and not a correctness defect.
 
@@ -314,23 +321,23 @@ Everything in `01-brief.md` → Not now. In addition:
 
 ## 8. Open questions
 
-| ID | Question | Status |
-|---|---|---|
+| ID  | Question                                                                              | Status                            |
+|-----|---------------------------------------------------------------------------------------|-----------------------------------|
 | O-3 | Do the AI service's terms allow sending receipts and voice text without training use? | Decided in the assisted-entry ADR |
-| O-5 | Approval of all `[PROPOSED]` rules in v2 | Resolved 2026-11-15: all approved |
+| O-5 | Approval of all `[PROPOSED]` rules in v2                                              | Resolved 2026-11-15: all approved |
 
 ---
 
 ## 9. Traceability (brief → spec)
 
-| Brief section | Stories / rules |
-|---|---|
-| Users & roles, sign-in | US-01, BR-27 |
-| Money & wallets | US-03, US-04, BR-01–05 |
-| Transactions | US-05, US-06, US-09, BR-06–12 |
-| Balances & conversion | US-10, US-11, BR-13–18 |
-| Assisted entry | US-07, US-08, BR-19–22 |
-| Offline, sync & devices | US-14, BR-23–25 |
-| Budgets & security | US-12, US-13, US-02, BR-26, BR-28 |
-| Language | BR-29, NFR-10 |
-| Success criteria | NFR-01–06 |
+| Brief section           | Stories / rules                   |
+|-------------------------|-----------------------------------|
+| Users & roles, sign-in  | US-01, BR-27                      |
+| Money & wallets         | US-03, US-04, BR-01–05            |
+| Transactions            | US-05, US-06, US-09, BR-06–12     |
+| Balances & conversion   | US-10, US-11, BR-13–18            |
+| Assisted entry          | US-07, US-08, BR-19–22            |
+| Offline, sync & devices | US-14, BR-23–25                   |
+| Budgets & security      | US-12, US-13, US-02, BR-26, BR-28 |
+| Language                | BR-29..BR-32, NFR-10              |
+| Success criteria        | NFR-01–06                         |

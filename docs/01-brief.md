@@ -73,15 +73,15 @@ People who manage personal or household money across several currencies (ILS, US
 
 ## Success criteria
 
-| Criterion | Target | Measured under |
-|---|---|---|
-| Manual entry time | ≤ 15 s | From opening the form to saved |
-| Voice draft time | ≤ 8 s in 90% of attempts | 3G connection |
-| Receipt draft time | ≤ 12 s in 90% of attempts | 3G connection, image ≤ 60 KB |
-| Amount + currency extraction accuracy | ≥ 90% | Test set: 30 receipts + 30 voice notes (Arabic / English) |
-| Offline endurance | 500 transactions over 30 days, then sync with zero loss | Device with 3 GB RAM |
-| Balance correctness | 100% match with hand calculation | 50 mixed transactions incl. cross-currency transfers |
-| Real use | Owner uses it daily for 14 consecutive days | Transaction history |
+| Criterion                             | Target                                                  | Measured under                                            |
+|---------------------------------------|---------------------------------------------------------|-----------------------------------------------------------|
+| Manual entry time                     | ≤ 15 s                                                  | From opening the form to saved                            |
+| Voice draft time                      | ≤ 8 s in 90% of attempts                                | 3G connection                                             |
+| Receipt draft time                    | ≤ 12 s in 90% of attempts                               | 3G connection, image ≤ 60 KB                              |
+| Amount + currency extraction accuracy | ≥ 90%                                                   | Test set: 30 receipts + 30 voice notes (Arabic / English) |
+| Offline endurance                     | 500 transactions over 30 days, then sync with zero loss | Device with 3 GB RAM                                      |
+| Balance correctness                   | 100% match with hand calculation                        | 50 mixed transactions incl. cross-currency transfers      |
+| Real use                              | Owner uses it daily for 14 consecutive days             | Transaction history                                       |
 
 ## Not now
 
@@ -107,13 +107,13 @@ People who manage personal or household money across several currencies (ILS, US
 
 ## Resolved questions (2026-11-14)
 
-| # | Question | Decision |
-|---|---|---|
-| 1 | Background time before the app relocks | 30 seconds |
-| 2 | Manual exchange-rate override | Not allowed; only the amount actually received in a cross-currency transfer may differ from the reference rate |
-| 3 | Two devices edit the same transaction | Last saved edit wins; conflict detection is out of scope |
-| 4 | Age after which stored rates are labeled outdated | 3 days |
-| 5 | Redaction of receipt content | Minimal extraction (amount, currency, date, merchant, category); identifiers never returned or stored; images not stored; on-device redaction out of scope |
+| # | Question                                          | Decision                                                                                                                                                   |
+|---|---------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 1 | Background time before the app relocks            | 30 seconds                                                                                                                                                 |
+| 2 | Manual exchange-rate override                     | Not allowed; only the amount actually received in a cross-currency transfer may differ from the reference rate                                             |
+| 3 | Two devices edit the same transaction             | Last saved edit wins; conflict detection is out of scope                                                                                                   |
+| 4 | Age after which stored rates are labeled outdated | 3 days                                                                                                                                                     |
+| 5 | Redaction of receipt content                      | Minimal extraction (amount, currency, date, merchant, category); identifiers never returned or stored; images not stored; on-device redaction out of scope |
 
 ## Open questions
 
