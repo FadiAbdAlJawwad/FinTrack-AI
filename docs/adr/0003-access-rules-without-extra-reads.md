@@ -2,6 +2,7 @@
 
 Status: Accepted · 2026-11-16 · Decider: Fadi Abd AlJawwad
 Revision: v2 after devil's-advocate review. v1 chose "no extra reads"; reversed. File name kept for link stability.
+Amended by: ADR-0008 (the archived-wallet check applies only to create and move).
 Drivers: data isolation (NFR-08, BR-27), correctness across devices (AC-04.8, AC-09.8, BR-24), cost.
 
 ## Context

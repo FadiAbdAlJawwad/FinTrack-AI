@@ -1,6 +1,6 @@
 # 05-gap-analysis — FinTrack-AI
 
-Status: Accepted v1.0 · 2026-11-16 · Owner: Fadi Abd AlJawwad
+Status: Accepted v1.1 · 2026-11-15 · Owner: Fadi Abd AlJawwad
 Compares the code on `main` (= local copy, owner 2026-11-16) with `docs/01..04` and ADR-0001..0005.
 Scope read: domain models, DTOs, repositories, rate service, money utilities, AI parsing, voice screen, auth sign-out, app lock, access rules, Android manifest, architecture test, test inventory (≈ 55 test files), current `AGENTS.md`. Widgets and screens were inventoried, not read line by line.
 
@@ -94,7 +94,7 @@ Existing Firestore data is test data (owner, 2026-11-16): **no migration**; coll
 
 | ID | Item | Reason |
 |---|---|---|
-| D-01 | Riverpod 2.6 → 3 | Not needed by any AC; record as ADR-0007 when stage 0 is done |
+| D-01 | Riverpod 2.6 → 3 | Not needed by any AC; record as a new ADR when stage 0 is done |
 | D-02 | Local database encryption (S9) | Not in v1 |
 | D-03 | App Check (S3) | Not on Spark budget |
 
@@ -106,7 +106,7 @@ Each item = one story-sized branch, S03 loop: plan → contract → failing AC t
 
 | Stage | Item | Covers | Depends on |
 |---|---|---|---|
-| 0 Foundation | Domain kernel: `Money`, `CurrencyCode`, `Clock`, exact decimal | C-01, C-12, K-01 | — |
+| 0 Foundation | Domain kernel: `Money`, `CurrencyCode`, `Clock`, integer rates and exact conversion (ADR-0007) | C-01, C-12, K-01 | — |
 | 0 | Drift schema v1 + `UnitOfWork` + outbox table | C-02 | kernel |
 | 0 | Architecture tests (ADR-0001) + CI test-change gate | C-17, C-18 | — |
 | 0 | Access rules v2 + emulator tests; delete test data | C-16, R-06 | — |

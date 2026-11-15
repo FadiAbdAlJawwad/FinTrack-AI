@@ -1,6 +1,6 @@
 # 04-architecture — FinTrack-AI
 
-Status: Accepted v1.1 · 2026-11-16 · Owner: Fadi Abd AlJawwad
+Status: Accepted v1.2 · 2026-11-15 · Owner: Fadi Abd AlJawwad
 Changes from draft v1: aligned with ADR-0001..0005 v2 after the devil's-advocate review (`claude/fintrack/04-architecture-review-v1.md`).
 Sources: `docs/02-spec.md` (v1.3), `docs/03-domain.md` (v1.1), `docs/legacy/production-notes.md` (risks S1–S8), ADR-0001..0005.
 
@@ -9,7 +9,7 @@ Sources: `docs/02-spec.md` (v1.3), `docs/03-domain.md` (v1.1), `docs/legacy/prod
 | Rank | Attribute | Measurable requirement | Effect on architecture |
 |---|---|---|---|
 | 1 | Offline-first reliability | NFR-04: 500 transactions over 30 days offline, 0 lost or duplicated; BR-23 | Source of truth on the device; outbox and staged sync engine (ADR-0002) |
-| 2 | Correctness of money | NFR-05 exact balances; NFR-07 no floating point; R-01 all-time balances; R-02b symmetric conversion | Integer minor units; exact decimal rates against a USD pivot (ADR-0005); aggregates in SQL tested on real queries (ADR-0001) |
+| 2 | Correctness of money | NFR-05 exact balances; NFR-07 no floating point; R-01 all-time balances; R-02b symmetric conversion | Integer minor units; integer rates against a USD pivot (ADR-0005, ADR-0007); aggregates in SQL tested on real queries (ADR-0001) |
 | 3 | Cost | Firebase Spark only: 50,000 reads / 20,000 writes per day; no card | No Cloud Functions; delta sync; 1–2 reads per transaction write in access rules (ADR-0003); free-tier proxy (ADR-0004) |
 
 Secondary: privacy and security (NFR-08, NFR-09), AI latency on a weak network (NFR-02a ≤ 8 s voice, NFR-02b ≤ 12 s receipt, 3G profile; real network weak and unmeasured), localization (NFR-10), explainability.
@@ -174,8 +174,8 @@ Access rules: see ADR-0003 (single source; not repeated here).
 |---|---|
 | Localization | ARB files (ar, en); RTL; messages by MSG-ID (NFR-10) |
 | Errors | Adapters translate SDK/HTTP errors into typed domain failures; features map failures to MSG-IDs |
-| Money | `Money(minorUnits: int, currency)`; exact decimal rates; half-up display rounding at the edge (BR-15) |
-| Testing | One test per AC, named by ID; tests are the contract; architecture tests (ADR-0001); access-rule tests on the emulator (ADR-0003); sync tests with emulator and fake clock (ADR-0002); Worker tests (ADR-0004); NFR-02 runs on the 3G profile and then on the owner's measured network |
+| Money | `Money(minorUnits: int, currency)`; integer rates (ADR-0007); half-up display rounding at the edge (BR-15) |
+| Testing | One test per AC, named by ID; tests are the contract; architecture tests (ADR-0001); access-rule tests on the emulator (ADR-0003); sync tests with emulator and fake clock (ADR-0002); Worker tests (ADR-0004); NFR-02a/02b runs on the 3G profile and then on the owner's measured network |
 | Configuration | Build-time defines for endpoints; feature flags in Remote Config; Gemini key only in the Worker |
 
 ---
@@ -190,5 +190,7 @@ Access rules: see ADR-0003 (single source; not repeated here).
 | 0004 | Gemini behind a Cloudflare Worker proxy, behind one port | Accepted (v2) |
 | 0005 | Rates fetched by the device, synced per owner, USD pivot | Accepted (v2), JOD bullet superseded by 0006 |
 | 0006 | JOD rates come from the rate source | Accepted |
+| 0007 | Rates as scaled integers, exact conversion without a decimal package | Accepted |
+| 0008 | Archived-wallet check only on create and move (amends 0003) | Accepted |
 
-Pending: ADR-0007 state management version (Riverpod 2.6 vs 3), after stage 0 (gap analysis D-01).
+Pending (next free number): state management version (Riverpod 2.6 vs 3), after stage 0 (gap analysis D-01).

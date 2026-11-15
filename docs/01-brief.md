@@ -1,6 +1,7 @@
 # 01-brief — FinTrack-AI
 
-Status: Accepted v1.1 · 2026-11-15 · Owner: Fadi Abd AlJawwad
+Status: Accepted v1.2 · 2026-11-15 · Owner: Fadi Abd AlJawwad
+Changes in v1.2 (final review): outdated-rate wording and receipt time aligned with spec v1.4.
 Changes in v1.1 (from 02-spec review): bilingual UI, sign-in methods, app lock is opt-in, AI disclosure requires acknowledgment, "notifications" means OS push notifications.
 Sources: ChatGPT interview (2 rounds), Gemini review, Claude review v2, decisions D1–D16 (2026-11-13), open-question answers (2026-11-14).
 Detailed scenarios and edge cases are input for `02-spec.md`, not part of this brief.
@@ -48,7 +49,7 @@ People who manage personal or household money across several currencies (ILS, US
 - Wallet balances are shown in the wallet's own currency.
 - Net worth uses current exchange rates; income and expense reports for a period use the rate of each transaction's date.
 - Exchange rates come from one shared reference source; the owner cannot override them. The only exception is the amount actually received in a cross-currency transfer.
-- Recording never depends on exchange rates being available. Converted totals are marked "outdated" when the stored rates are older than 3 days, and "unavailable" when no rate exists.
+- Recording never depends on exchange rates being available. Converted totals are marked "outdated" when the last successful rate refresh is more than 3 days old, and "unavailable" when no rate exists.
 
 **Assisted entry (voice / receipt)**
 - Output is always a draft; drafts are not kept if the owner leaves without saving (the owner is warned).
@@ -75,7 +76,8 @@ People who manage personal or household money across several currencies (ILS, US
 | Criterion | Target | Measured under |
 |---|---|---|
 | Manual entry time | ≤ 15 s | From opening the form to saved |
-| Voice / receipt draft time | ≤ 8 s in 90% of attempts | 3G connection |
+| Voice draft time | ≤ 8 s in 90% of attempts | 3G connection |
+| Receipt draft time | ≤ 12 s in 90% of attempts | 3G connection, image ≤ 60 KB |
 | Amount + currency extraction accuracy | ≥ 90% | Test set: 30 receipts + 30 voice notes (Arabic / English) |
 | Offline endurance | 500 transactions over 30 days, then sync with zero loss | Device with 3 GB RAM |
 | Balance correctness | 100% match with hand calculation | 50 mixed transactions incl. cross-currency transfers |

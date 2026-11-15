@@ -1,10 +1,11 @@
 # 02-spec — FinTrack-AI
 
-Status: Accepted v1.3 · 2026-11-16 · Owner: Fadi Abd AlJawwad
+Status: Accepted v1.4 · 2026-11-15 · Owner: Fadi Abd AlJawwad
 Changes in v1.1: test-immutability rule added to Conventions.
 Changes in v1.2 (from 03-domain review): account creation ACs (AC-01.6, AC-01.7); "transfer fee" wording; AC-04.3 wording; category renaming listed as Not now.
 Changes in v1.3 (from architecture review): AC-04.8 arrival order; AC-03.7 wallet appearance; AC-08.7 image budget; "outdated" measured from the last successful refresh (AC-10.4, BR-17, MSG-10); NFR-02 split into voice and receipt; network assumption.
-Source of truth above this file: `docs/01-brief.md` (Accepted v1.1). Where they conflict, the brief wins until this spec is accepted.
+Changes in v1.4 (final review, `claude/fintrack/06-final-review.md`): AC-01.8 sign-out with pending changes; AC-03.8 edit wallet; AC-04.1 never-used wallets only; AC-04.3 and AC-04.9 archived-wallet edits; AC-11.5 weekend gaps are exact; MSG-15.
+Source of truth above this file: `docs/01-brief.md` (Accepted v1.2). Where they conflict, the brief wins until this spec is accepted.
 Review log: Gemini skeptical-tester review of v1, accepted/rejected items recorded in `claude/fintrack/02-spec-review-v1.md`.
 
 ## Conventions
@@ -52,6 +53,7 @@ As the owner, I want to sign in to my account, so that my data is available on a
 - **AC-01.5 (sign out)** Given a signed-in owner, when they sign out, then the device contains no financial data of that account. `[PROPOSED]`
 - **AC-01.6 (create account)** Given a new email and a valid password, when the person signs up, then an account is created with display currency ILS and the system categories, and the owner lands on wallet creation. `[DERIVED: brief v1.1 sign-in]`; `[PROPOSED]` for default ILS (approved 2026-11-15).
 - **AC-01.7 (first Google sign-in)** Given a Google account never used before, when the person signs in with Google, then an account is created as in AC-01.6. `[DERIVED: brief v1.1 sign-in]`
+- **AC-01.8 (unhappy: sign out with pending changes)** Given changes that are not yet synced, when the owner signs out, then the app syncs them first; if it cannot (offline or rejected items in Needs attention), MSG-15 states how many changes will be lost and sign-out continues only after explicit confirmation.
 
 ### US-02 — App lock
 As the owner, I want the app to lock, so that someone holding my phone cannot see my money.
@@ -74,18 +76,20 @@ As the owner, I want to create wallets with their currency and opening balance, 
 - **AC-03.5 (unhappy: duplicate name)** Given an active wallet with the same name (case-insensitive), when the owner saves a new wallet with that name, then the name is invalid. `[PROPOSED]`
 - **AC-03.6 (unhappy: negative opening balance)** Given a negative opening balance, when the owner saves, then the opening balance is invalid. `[PROPOSED]`
 - **AC-03.7 (appearance)** Given a wallet, when the owner picks an optional icon and color, then the wallet shows them on every signed-in device. `[PROPOSED]` (owner, DQ-2)
+- **AC-03.8 (edit)** Given an active wallet, when the owner changes its name, kind, or opening balance and saves, then the change is kept and the balance reflects the new opening balance; the currency cannot be changed. The rules of AC-03.2, AC-03.5, and AC-03.6 apply.
 
 ### US-04 — Archive, restore, or delete a wallet
 As the owner, I want to remove wallets I no longer use, without breaking my history.
 
-- **AC-04.1 (delete)** Given a wallet with no transactions, when the owner deletes it and confirms, then it is removed.
-- **AC-04.2 (archive)** Given a wallet with transactions, when the owner removes it, then it is archived, not deleted, and its transactions stay in history and reports.
-- **AC-04.3** Given an archived wallet, when the owner records or edits any transaction (income, expense, or transfer), then the archived wallet is not offered.
+- **AC-04.1 (delete)** Given a wallet that never had a transaction, when the owner deletes it and confirms, then it is removed.
+- **AC-04.2 (archive)** Given a wallet that has or ever had a transaction, when the owner removes it, then it is archived, not deleted, and its transactions stay in history and reports.
+- **AC-04.3** Given an archived wallet, when the owner records a new transaction or moves an existing transaction to another wallet, then the archived wallet is not offered.
 - **AC-04.4** Given an archived wallet with a non-zero balance, when net worth is shown, then that balance is included. `[PROPOSED]`
 - **AC-04.5 (restore)** Given an archived wallet, when the owner restores it, then it is offered again for new transactions. `[PROPOSED]`
 - **AC-04.6 (unhappy: cancel)** Given the delete or archive confirmation, when the owner cancels, then nothing changes.
 - **AC-04.7 (unhappy: restore name collision)** Given an active wallet now has the same name as an archived one, when the owner restores the archived wallet, then restore is blocked until one of them is renamed. `[DERIVED: AC-03.5]`
 - **AC-04.8 (unhappy: offline race)** Given device A deleted an empty wallet offline and device B added a transaction to it offline, when both sync, then the change that reaches the server first wins: if the deletion arrives first, B's transaction is rejected and goes to Needs attention, where the owner can move it to another wallet; if the transaction arrives first, the deletion is rejected and the wallet stays. `[DERIVED: BR-05, BR-25]`
+- **AC-04.9 (history in an archived wallet)** Given a transaction in an archived wallet, when the owner corrects its amount, category, date, or note, or deletes it, then the change is saved and the archived wallet's balance reflects it.
 
 ### US-05 — Record income or expense manually
 As the owner, I want to record income and expenses in seconds, so that tracking does not become a chore.
@@ -166,7 +170,7 @@ As the owner, I want to see where my money goes, so that I can change habits.
 - **AC-11.2 (historical rate)** Given a USD expense dated 2026-10-01, when October expenses are shown in ILS, then it is converted at the 2026-10-01 rate, not the current rate.
 - **AC-11.3 (period comparison)** Given a selected period (month or custom range), when the owner compares, then each category shows the selected period and the immediately preceding period of equal length. `[PROPOSED]` for "equal length".
 - **AC-11.4 (custom range)** Given a custom date range, when insights load, then only transactions dated inside the range are counted. `[ASSUMPTION]`
-- **AC-11.5 (missing rate for a date)** Given no rate is stored for a transaction's date, when it is converted, then the nearest earlier rate within 7 days is used and the total carries the "approximate" label (MSG-12); if none exists within 7 days, AC-11.6 applies. `[PROPOSED]`
+- **AC-11.5 (missing rate for a date)** Given no rate is stored for a transaction's date, when it is converted, then the nearest earlier rate is used: within 4 days it counts as exact (the source publishes no rates on weekends and holidays); within 5–7 days the total carries the "approximate" label (MSG-12); if none exists within 7 days, AC-11.6 applies. `[PROPOSED]`
 - **AC-11.6 (unhappy: no usable rate)** Given an amount with no usable rate, when converted totals are shown, then that amount is excluded from the converted total, and the total states how many transactions were excluded (MSG-11). `[PROPOSED]`
 - **AC-11.7 (unhappy: invalid range)** Given a custom range whose start is after its end, or whose end is after today, when the owner applies it, then the range is invalid.
 
@@ -225,6 +229,7 @@ Each message exists in Arabic and English. Tests assert the ID.
 | MSG-12 | Label: approximate conversion |
 | MSG-13 | Session expired; sign in to finish syncing |
 | MSG-14 | Password reset email sent |
+| MSG-15 | Signing out now loses N unsynced changes; confirm to continue |
 
 ---
 
@@ -236,7 +241,7 @@ Each message exists in Arabic and English. Tests assert the ID.
 | BR-02 | The system shall allow exactly one currency per wallet; a transaction's currency is its wallet's currency. |
 | BR-03 | The system shall support ILS, USD, and JOD only in v1. |
 | BR-04 | The system shall not count opening balances as income. |
-| BR-05 | When a wallet has transactions, the system shall archive it instead of deleting it. |
+| BR-05 | When a wallet has or ever had a transaction, the system shall archive it instead of deleting it. |
 | BR-06 | The system shall not save income or expense without type, amount > 0, wallet, category, and date; or a transfer without source, destination, and amount sent > 0. |
 | BR-07 | The system shall never infer a transaction type; AI drafts always leave the type empty. |
 | BR-08 | If a new or changed transaction date is after the device's local current date, then the system shall reject it. |
