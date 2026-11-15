@@ -25,7 +25,7 @@ Each phase runs in a **new session** that reads only the previous phase's file, 
 
 | Phase | Input | Output | Who approves |
 |---|---|---|---|
-| 1 Research | Story ID, `docs/index.md`, `docs/repo-map.md` | Files involved, constraints (I-xx, R-xx, ADR), questions — top of `docs/work/US-xx-plan.md` | — |
+| 1 Research | Story or backlog ID, `docs/index.md`, `docs/repo-map.md` | Files involved, constraints (I-xx, R-xx, ADR), questions — top of `docs/work/<US-xx or B-nn>-plan.md` | — |
 | 2 Plan | The research section only | Steps, file list, AC → test-file map, exemplar to follow, diff estimate (readable in ~10 min) — same file | Owner (reviewing the plan matters more than reviewing the code) |
 | 3 Contract | Approved plan | Types, signatures, typed failures, failing AC tests; commit `contract(US-xx): …` | Owner commits |
 | 4 Implementation | Approved plan + contract commit | Minimal code, gate green, `docs/progress.md` updated | — |
@@ -41,7 +41,7 @@ After every review: a finding seen twice becomes a line in `AGENTS.md` or a fold
 
 ## Executor prompt template (S03 loop)
 
-One story per branch. The contract commit message starts with `contract(US-xx):`; the CI gate fails if any file under `test/` changes after that commit on the branch. Two prompts per story: **contract** (types + failing AC tests; owner approves and commits) then **implementation** (tests read-only).
+One story per branch. The contract commit message starts with `contract(US-xx):`; from stage 0 item B-05 "Gate and guards", CI fails if any file under `test/` changes after that commit on the branch; until then the owner checks `git diff <contract-commit> -- test/` before merging. Deleting tests of removed code (gap R-04) happens in a commit **before** the contract commit, never after it. Items that only remove or restructure code have no contract step: the gate stays green and the PR explains any change in the test count. Two prompts per story: **contract** (types + failing AC tests; owner approves and commits) then **implementation** (tests read-only).
 
 ```
 Target: <tool> → <model> (new session) · Why: <one line> · Fallback: <tool → model>
@@ -53,7 +53,7 @@ Context (read only these):
 - docs/02-spec.md → <US-xx: AC-xx.1..AC-xx.n>
 - docs/03-domain.md → <I-xx, R-xx>
 - docs/adr/<nnnn> → <rule numbers>
-- Plan: docs/work/US-xx-plan.md (approved)
+- Plan: docs/work/<US-xx or B-nn>-plan.md (approved)
 - Exemplar to follow: <path, or "none yet">
 - Approved packages for this story: <list, or none>
 

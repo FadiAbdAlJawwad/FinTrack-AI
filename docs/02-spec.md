@@ -1,11 +1,12 @@
 # 02-spec — FinTrack-AI
 
-Status: Accepted v1.5 · 2026-11-15 · Owner: Fadi Abd AlJawwad
+Status: Accepted v1.6 · 2026-11-15 · Owner: Fadi Abd AlJawwad
 Changes in v1.1: test-immutability rule added to Conventions.
 Changes in v1.2 (from 03-domain review): account creation ACs (AC-01.6, AC-01.7); "transfer fee" wording; AC-04.3 wording; category renaming listed as Not now.
 Changes in v1.3 (from architecture review): AC-04.8 arrival order; AC-03.7 wallet appearance; AC-08.7 image budget; "outdated" measured from the last successful refresh (AC-10.4, BR-17, MSG-10); NFR-02 split into voice and receipt; network assumption.
 Changes in v1.4 (final review, `claude/fintrack/06-final-review.md`): AC-01.8 sign-out with pending changes; AC-03.8 edit wallet; AC-04.1 never-used wallets only; AC-04.3 and AC-04.9 archived-wallet edits; AC-11.5 weekend gaps are exact; MSG-15.
 Changes in v1.5 (owner, 2026-11-15, S03 §22): digits, separators, and month names (BR-30..BR-32, AC-05.8..AC-05.10, NFR-10).
+Changes in v1.6 (FinTrack project review, owner 2026-11-15): MSG-16 for unexpected failures; `,` grouping in BR-30 approved.
 Source of truth above this file: `docs/01-brief.md` (Accepted v1.2). Where they conflict, the brief wins until this spec is accepted.
 Review log: Gemini skeptical-tester review of v1, accepted/rejected items recorded in `claude/fintrack/02-spec-review-v1.md`.
 
@@ -217,23 +218,24 @@ As the owner, I want the app to work without internet, so that connectivity neve
 
 Each message exists in Arabic and English. Tests assert the ID.
 
-| ID     | Meaning                                                                                   |
-|--------|-------------------------------------------------------------------------------------------|
-| MSG-01 | Wrong email or password                                                                   |
-| MSG-02 | First sign-in on this device needs a connection                                           |
-| MSG-03 | App lock needs a biometric or device PIN/pattern on this device                           |
-| MSG-04 | Voice and receipt entry need a connection                                                 |
-| MSG-05 | AI service failed; continue manually                                                      |
-| MSG-06 | Amount exceeds wallet balance; confirm to continue                                        |
-| MSG-07 | Leaving discards this draft; confirm to continue                                          |
-| MSG-08 | Voice text and receipt images are sent to an external AI service; acknowledge to continue |
-| MSG-09 | A change could not be saved; review it in Needs attention                                 |
-| MSG-10 | Label: converted with outdated rates (date of last successful refresh shown)              |
-| MSG-11 | Label: conversion unavailable (count of excluded items shown when relevant)               |
-| MSG-12 | Label: approximate conversion                                                             |
-| MSG-13 | Session expired; sign in to finish syncing                                                |
-| MSG-14 | Password reset email sent                                                                 |
-| MSG-15 | Signing out now loses N unsynced changes; confirm to continue                             |
+| ID     | Meaning                                                                                                 |
+|--------|---------------------------------------------------------------------------------------------------------|
+| MSG-01 | Wrong email or password                                                                                 |
+| MSG-02 | First sign-in on this device needs a connection                                                         |
+| MSG-03 | App lock needs a biometric or device PIN/pattern on this device                                         |
+| MSG-04 | Voice and receipt entry need a connection                                                               |
+| MSG-05 | AI service failed; continue manually                                                                    |
+| MSG-06 | Amount exceeds wallet balance; confirm to continue                                                      |
+| MSG-07 | Leaving discards this draft; confirm to continue                                                        |
+| MSG-08 | Voice text and receipt images are sent to an external AI service; acknowledge to continue               |
+| MSG-09 | A change could not be saved; review it in Needs attention                                               |
+| MSG-10 | Label: converted with outdated rates (date of last successful refresh shown)                            |
+| MSG-11 | Label: conversion unavailable (count of excluded items shown when relevant)                             |
+| MSG-12 | Label: approximate conversion                                                                           |
+| MSG-13 | Session expired; sign in to finish syncing                                                              |
+| MSG-14 | Password reset email sent                                                                               |
+| MSG-15 | Signing out now loses N unsynced changes; confirm to continue                                           |
+| MSG-16 | Something went wrong; try again (any failure without a specific message; never shows technical details) |
 
 ---
 
@@ -270,7 +272,7 @@ Each message exists in Arabic and English. Tests assert the ID.
 | BR-27 | The system shall allow only the owner to read or change the account's data.                                                                                                                                                                           |
 | BR-28 | The system shall not carry unused budget into the next month.                                                                                                                                                                                         |
 | BR-29 | The system shall provide the full UI in Arabic (right-to-left) and English.                                                                                                                                                                           |
-| BR-30 | The system shall display every number with Latin digits 0–9, `.` as the decimal separator, and `,` as the thousands separator, in both languages. (owner, 2026-11-15; `,` grouping `[PROPOSED]`)                                                      |
+| BR-30 | The system shall display every number with Latin digits 0–9, `.` as the decimal separator, and `,` as the thousands separator, in both languages. (owner, 2026-11-15)                                                                                 |
 | BR-31 | When the owner enters a number, the system shall accept Latin, Arabic-Indic (U+0660–U+0669), and Extended Arabic-Indic (U+06F0–U+06F9) digits, and `.` or `٫` (U+066B) as the decimal separator, and shall normalize them to Latin before validation. |
 | BR-32 | The system shall display dates in the Gregorian calendar with Latin digits; month names follow the UI language, and the Arabic UI uses يناير … ديسمبر (for example نوفمبر, not تشرين الثاني). (owner, 2026-11-15)                                     |
 
