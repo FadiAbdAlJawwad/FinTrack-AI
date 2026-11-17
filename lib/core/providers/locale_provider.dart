@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import '../../l10n/app_localizations.dart';
 import 'shared_prefs_provider.dart';
 
 final localeProvider = NotifierProvider<LocaleNotifier, Locale>(
@@ -12,8 +14,14 @@ class LocaleNotifier extends Notifier<Locale> {
   @override
   Locale build() {
     final prefs = ref.watch(sharedPrefsProvider);
-    final savedLocale = prefs.getString(_key);
-    return savedLocale != null ? Locale(savedLocale) : const Locale('en');
+    final saved = prefs.getString(_key);
+    if (saved != null) {
+      final locale = Locale(saved);
+      return AppLocalizations.delegate.isSupported(locale)
+          ? locale
+          : const Locale('en');
+    }
+    return const Locale('en');
   }
 
   Future<void> setLocale(Locale locale) async {
