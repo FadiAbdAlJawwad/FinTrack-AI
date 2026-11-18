@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
 ({Color baseColor, Color highlightColor}) skeletonColors(
-    Brightness brightness) {
+  Brightness brightness,
+) {
   final isDark = brightness == Brightness.dark;
   return (
     baseColor: isDark ? Colors.grey[800]! : Colors.grey[300]!,
@@ -13,10 +14,7 @@ import 'package:shimmer/shimmer.dart';
 class SkeletonShimmer extends StatelessWidget {
   final Widget child;
 
-  const SkeletonShimmer({
-    super.key,
-    required this.child,
-  });
+  const SkeletonShimmer({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

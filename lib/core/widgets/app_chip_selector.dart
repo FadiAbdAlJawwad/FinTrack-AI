@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../constant/color_manager.dart';
 import '../extension/text_style_extension.dart';
 
@@ -35,10 +36,12 @@ class AppChipSelector<T> extends StatelessWidget {
                 selected: selected,
                 onSelected: (_) => onSelect(item),
                 selectedColor: ColorManager.primaryBlue,
-                backgroundColor:
-                    Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
+                backgroundColor: Theme.of(context).colorScheme.onSurface
+                    .withValues(alpha: 0.05),
                 labelStyle: context.labelSmall.copyWith(
-                  color: selected ? ColorManager.white : ColorManager.secondaryColor,
+                  color: selected
+                      ? ColorManager.white
+                      : ColorManager.secondaryColor,
                 ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),

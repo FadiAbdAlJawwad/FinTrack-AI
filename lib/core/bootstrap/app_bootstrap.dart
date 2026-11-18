@@ -100,10 +100,7 @@ class _BootstrapAppState extends State<BootstrapApp> {
     }
 
     if (_error != null) {
-      return BootErrorScreen(
-        onRetry: _runBootstrap,
-        isRetrying: _isRetrying,
-      );
+      return BootErrorScreen(onRetry: _runBootstrap, isRetrying: _isRetrying);
     }
 
     return const SizedBox.shrink();

@@ -60,7 +60,10 @@ class _ToggleItem extends StatelessWidget {
         onTap: onTap,
         child: Container(
           decoration: BoxDecoration(
-            color: isSelected ? Theme.of(context).colorScheme.surfaceTint.withValues(alpha: 0.1) : Colors.transparent,
+            color: isSelected
+                ? Theme.of(context).colorScheme.surfaceTint
+                      .withValues(alpha: 0.1)
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
           alignment: Alignment.center,

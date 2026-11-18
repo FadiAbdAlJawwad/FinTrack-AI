@@ -1,4 +1,5 @@
 import '../../../../core/constant/color_manager.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../../currency/presentation/utils/money_format.dart';

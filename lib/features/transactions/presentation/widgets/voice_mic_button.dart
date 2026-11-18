@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../../core/constant/color_manager.dart';
 import '../state/use_speech_recognition.dart';
 
@@ -50,8 +51,8 @@ class VoiceMicButton extends StatelessWidget {
                   status == VoiceEntryStatus.listening
                       ? Icons.mic
                       : status == VoiceEntryStatus.error
-                          ? Icons.mic_off
-                          : Icons.mic_none,
+                      ? Icons.mic_off
+                      : Icons.mic_none,
                   color: ColorManager.white,
                   size: 48,
                 ),

@@ -7,14 +7,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 Widget createHeaderTestWidget({UserModel? user}) {
   return ProviderScope(
-    overrides: [
-      currentUserProvider.overrideWithValue(user),
-    ],
-    child: const MaterialApp(
-      home: Scaffold(
-        body: SettingsProfileHeader(),
-      ),
-    ),
+    overrides: [currentUserProvider.overrideWithValue(user)],
+    child: const MaterialApp(home: Scaffold(body: SettingsProfileHeader())),
   );
 }
 
@@ -49,7 +43,9 @@ void main() {
     },
   );
 
-  testWidgets('2. Pumping header with null user does not throw', (tester) async {
+  testWidgets('2. Pumping header with null user does not throw', (
+    tester,
+  ) async {
     await tester.pumpWidget(createHeaderTestWidget(user: null));
 
     expect(tester.takeException(), isNull);

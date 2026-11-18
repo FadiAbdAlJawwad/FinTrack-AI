@@ -20,7 +20,7 @@ void main() {
         AppCurrency.usd,
         (from, to) => throw Exception('No rate available'),
       );
-      
+
       expect(result.incomeMinor, 1000);
       expect(result.expenseMinor, isNull);
     });

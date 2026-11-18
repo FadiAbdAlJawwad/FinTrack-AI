@@ -96,7 +96,9 @@ Widget createTestWidget({
       currencyRepositoryProvider.overrideWithValue(
         FakeCurrencyRepository(currency),
       ),
-      appLockNotifierProvider.overrideWithValue(AppLockNotifier(initialLocked: false)),
+      appLockNotifierProvider.overrideWithValue(
+        AppLockNotifier(initialLocked: false),
+      ),
     ],
     child: Consumer(
       builder: (context, ref, _) {
@@ -396,7 +398,9 @@ void main() {
           currencyRepositoryProvider.overrideWithValue(
             FakeCurrencyRepository('USD'),
           ),
-          appLockNotifierProvider.overrideWithValue(AppLockNotifier(initialLocked: false)),
+          appLockNotifierProvider.overrideWithValue(
+            AppLockNotifier(initialLocked: false),
+          ),
           dashboardControllerProvider.overrideWithValue(
             const AsyncValue.data(dashboardState),
           ),

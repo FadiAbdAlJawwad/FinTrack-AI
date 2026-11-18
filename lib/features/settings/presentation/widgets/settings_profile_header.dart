@@ -28,31 +28,19 @@ class SettingsProfileHeader extends ConsumerWidget {
           padding: EdgeInsets.all(gap),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            border: Border.all(
-              color: ColorManager.primaryBlue,
-              width: ring,
-            ),
+            border: Border.all(color: ColorManager.primaryBlue, width: ring),
           ),
           child: ClipOval(
-            child: Image.asset(
-              ImagesManager.userAvatar,
-              fit: BoxFit.cover,
-            ),
+            child: Image.asset(ImagesManager.userAvatar, fit: BoxFit.cover),
           ),
         ),
         if (fullName.isNotEmpty) ...[
           context.addVerticalSpace(12),
-          Text(
-            fullName,
-            style: context.labelLarge,
-          ),
+          Text(fullName, style: context.labelLarge),
         ],
         if (email.isNotEmpty) ...[
           context.addVerticalSpace(4),
-          Text(
-            email,
-            style: context.bodyMedium,
-          ),
+          Text(email, style: context.bodyMedium),
         ],
       ],
     );

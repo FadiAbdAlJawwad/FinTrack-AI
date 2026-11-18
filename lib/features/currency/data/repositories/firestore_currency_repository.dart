@@ -94,4 +94,3 @@ class FirestoreCurrencyRepository implements CurrencyRepository {
     }
   }
 }
-

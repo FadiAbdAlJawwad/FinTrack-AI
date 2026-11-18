@@ -16,27 +16,29 @@ void main() {
 
   group('BootstrapApp Widget Tests', () {
     testWidgets(
-        'bootstrap fails -> BootErrorScreen shown, appBuilder never invoked',
-        (tester) async {
-      bool appBuilderCalled = false;
+      'bootstrap fails -> BootErrorScreen shown, appBuilder never invoked',
+      (tester) async {
+        bool appBuilderCalled = false;
 
-      await tester.pumpWidget(
-        BootstrapApp(
-          bootstrap: () async => throw Exception('Init error'),
-          appBuilder: (prefs) {
-            appBuilderCalled = true;
-            return const SizedBox();
-          },
-        ),
-      );
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(
+          BootstrapApp(
+            bootstrap: () async => throw Exception('Init error'),
+            appBuilder: (prefs) {
+              appBuilderCalled = true;
+              return const SizedBox();
+            },
+          ),
+        );
+        await tester.pumpAndSettle();
 
-      expect(find.byType(BootErrorScreen), findsOneWidget);
-      expect(appBuilderCalled, isFalse);
-    });
+        expect(find.byType(BootErrorScreen), findsOneWidget);
+        expect(appBuilderCalled, isFalse);
+      },
+    );
 
-    testWidgets('fails then retry succeeds -> appBuilder content shown',
-        (tester) async {
+    testWidgets('fails then retry succeeds -> appBuilder content shown', (
+      tester,
+    ) async {
       bool shouldFail = true;
 
       await tester.pumpWidget(
@@ -64,66 +66,70 @@ void main() {
       expect(find.byType(BootErrorScreen), findsNothing);
     });
 
-    testWidgets('during retry -> button disabled and progress indicator visible',
-        (tester) async {
-      final completer = Completer<SharedPreferences>();
-      bool isFirstAttempt = true;
+    testWidgets(
+      'during retry -> button disabled and progress indicator visible',
+      (tester) async {
+        final completer = Completer<SharedPreferences>();
+        bool isFirstAttempt = true;
 
-      await tester.pumpWidget(
-        BootstrapApp(
-          bootstrap: () {
-            if (isFirstAttempt) {
-              isFirstAttempt = false;
-              throw Exception('First error');
-            }
-            return completer.future;
-          },
-          appBuilder: (prefs) => const SizedBox(),
-        ),
-      );
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(
+          BootstrapApp(
+            bootstrap: () {
+              if (isFirstAttempt) {
+                isFirstAttempt = false;
+                throw Exception('First error');
+              }
+              return completer.future;
+            },
+            appBuilder: (prefs) => const SizedBox(),
+          ),
+        );
+        await tester.pumpAndSettle();
 
-      expect(find.byType(BootErrorScreen), findsOneWidget);
+        expect(find.byType(BootErrorScreen), findsOneWidget);
 
-      // Tap retry button to initiate the second attempt
-      await tester.tap(find.byType(ElevatedButton));
-      await tester.pump(); // Advance frame to reflect isRetrying state
+        // Tap retry button to initiate the second attempt
+        await tester.tap(find.byType(ElevatedButton));
+        await tester.pump(); // Advance frame to reflect isRetrying state
 
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
-      final button = tester.widget<ElevatedButton>(find.byType(ElevatedButton));
-      expect(button.onPressed, isNull);
+        expect(find.byType(CircularProgressIndicator), findsOneWidget);
+        final button = tester.widget<ElevatedButton>(
+          find.byType(ElevatedButton),
+        );
+        expect(button.onPressed, isNull);
 
-      completer.complete(await SharedPreferences.getInstance());
-      await tester.pumpAndSettle();
-    });
+        completer.complete(await SharedPreferences.getInstance());
+        await tester.pumpAndSettle();
+      },
+    );
 
-    testWidgets('widget disposed during pending bootstrap -> no setState error',
-        (tester) async {
-      final completer = Completer<SharedPreferences>();
+    testWidgets(
+      'widget disposed during pending bootstrap -> no setState error',
+      (tester) async {
+        final completer = Completer<SharedPreferences>();
 
-      await tester.pumpWidget(
-        BootstrapApp(
-          bootstrap: () => completer.future,
-          appBuilder: (prefs) => const SizedBox(),
-        ),
-      );
-      await tester.pump();
+        await tester.pumpWidget(
+          BootstrapApp(
+            bootstrap: () => completer.future,
+            appBuilder: (prefs) => const SizedBox(),
+          ),
+        );
+        await tester.pump();
 
-      // Unmount the BootstrapApp while bootstrap is pending
-      await tester.pumpWidget(const SizedBox());
+        // Unmount the BootstrapApp while bootstrap is pending
+        await tester.pumpWidget(const SizedBox());
 
-      // Complete the pending bootstrap
-      completer.complete(await SharedPreferences.getInstance());
-      await tester.pump();
+        // Complete the pending bootstrap
+        completer.complete(await SharedPreferences.getInstance());
+        await tester.pump();
 
-      expect(tester.takeException(), isNull);
-    });
+        expect(tester.takeException(), isNull);
+      },
+    );
   });
 
   group('runBootstrap Unit Tests', () {
-    test(
-        'runBootstrap: initFirebase throws FirebaseException(code duplicate-app) -> succeeds',
-        () async {
+    test('runBootstrap: initFirebase throws FirebaseException(code duplicate-app) -> succeeds', () async {
       final prefs = await runBootstrap(
         initFirebase: () async {
           throw FirebaseException(plugin: 'core', code: 'duplicate-app');
@@ -134,19 +140,21 @@ void main() {
       expect(prefs, isNotNull);
     });
 
-    test('runBootstrap: init never completes -> TimeoutException after timeout',
-        () async {
-      final completer = Completer<void>();
+    test(
+      'runBootstrap: init never completes -> TimeoutException after timeout',
+      () async {
+        final completer = Completer<void>();
 
-      expect(
-        () => runBootstrap(
-          initFirebase: () => completer.future,
-          getPrefs: SharedPreferences.getInstance,
-          timeout: const Duration(milliseconds: 50),
-        ),
-        throwsA(isA<TimeoutException>()),
-      );
-    });
+        expect(
+          () => runBootstrap(
+            initFirebase: () => completer.future,
+            getPrefs: SharedPreferences.getInstance,
+            timeout: const Duration(milliseconds: 50),
+          ),
+          throwsA(isA<TimeoutException>()),
+        );
+      },
+    );
 
     test('runBootstrap: getPrefs throws -> error propagates', () async {
       expect(

@@ -37,11 +37,7 @@ class AnalyticsSkeleton extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const SkeletonBlock(
-                            width: 80,
-                            height: 14,
-                            radius: 4,
-                          ),
+                          const SkeletonBlock(width: 80, height: 14, radius: 4),
                           context.addVerticalSpace(8),
                           const SkeletonBlock(height: 8, radius: 4),
                         ],

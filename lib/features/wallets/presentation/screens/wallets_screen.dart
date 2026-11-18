@@ -17,10 +17,7 @@ class WalletsScreen extends ConsumerWidget {
     final overviewAsync = ref.watch(walletsOverviewProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(context.loc.navWallets),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: Text(context.loc.navWallets), centerTitle: true),
       floatingActionButton: FloatingActionButton(
         onPressed: () => showAddWalletSheet(context),
         backgroundColor: ColorManager.primaryBlue,
@@ -29,9 +26,7 @@ class WalletsScreen extends ConsumerWidget {
       ),
       body: overviewAsync.when(
         loading: () => const WalletsSkeleton(),
-        error: (error, _) => Center(
-          child: Text(errorMessage(context, error)),
-        ),
+        error: (error, _) => Center(child: Text(errorMessage(context, error))),
         data: (overview) => WalletsOverviewView(overview: overview),
       ),
     );

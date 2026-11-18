@@ -16,9 +16,7 @@ Widget createTestApp({
   Locale locale = const Locale('en'),
 }) {
   return ProviderScope(
-    overrides: [
-      walletsOverviewProvider.overrideWith((ref) => overviewState),
-    ],
+    overrides: [walletsOverviewProvider.overrideWith((ref) => overviewState)],
     child: MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
@@ -31,92 +29,97 @@ Widget createTestApp({
 void main() {
   group('WalletsScreen', () {
     testWidgets(
-        '6. total card shows formatted total, wallet tile shows localized name and balance',
-        (tester) async {
-      final overview = WalletsOverview(
-        currency: AppCurrency.usd,
-        wallets: [
-          const WalletBalance(
-            wallet: WalletModel(
-              id: 'cash',
-              name: 'Cash',
-              icon: 'payments',
-              isDefault: true,
+      '6. total card shows formatted total, wallet tile shows localized name and balance',
+      (tester) async {
+        final overview = WalletsOverview(
+          currency: AppCurrency.usd,
+          wallets: [
+            const WalletBalance(
+              wallet: WalletModel(
+                id: 'cash',
+                name: 'Cash',
+                icon: 'payments',
+                isDefault: true,
+              ),
+              balanceMinor: 15000, // $150.00
             ),
-            balanceMinor: 15000, // $150.00
-          ),
-          const WalletBalance(
-            wallet: WalletModel(
-              id: 'custom_1',
-              name: 'Crypto',
-              icon: 'savings',
+            const WalletBalance(
+              wallet: WalletModel(
+                id: 'custom_1',
+                name: 'Crypto',
+                icon: 'savings',
+              ),
+              balanceMinor: 5000, // $50.00
             ),
-            balanceMinor: 5000, // $50.00
-          ),
-        ],
-        unassignedMinor: 0,
-        hasUnassigned: false,
-        totalMinor: 20000, // $200.00
-      );
+          ],
+          unassignedMinor: 0,
+          hasUnassigned: false,
+          totalMinor: 20000, // $200.00
+        );
 
-      await tester
-          .pumpWidget(createTestApp(overviewState: AsyncData(overview)));
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(
+          createTestApp(overviewState: AsyncData(overview)),
+        );
+        await tester.pumpAndSettle();
 
-      expect(find.text('\$200.00'), findsOneWidget); // Total card
-      final cashTile = find.widgetWithText(ListTile, '\$150.00');
-      expect(
-        find.descendant(of: cashTile, matching: find.text('Cash')),
-        findsOneWidget,
-      );
-      expect(find.text('\$150.00'), findsOneWidget);
-      expect(find.text('Crypto'), findsOneWidget);
-      expect(find.text('\$50.00'), findsOneWidget);
-    });
+        expect(find.text('\$200.00'), findsOneWidget); // Total card
+        final cashTile = find.widgetWithText(ListTile, '\$150.00');
+        expect(
+          find.descendant(of: cashTile, matching: find.text('Cash')),
+          findsOneWidget,
+        );
+        expect(find.text('\$150.00'), findsOneWidget);
+        expect(find.text('Crypto'), findsOneWidget);
+        expect(find.text('\$50.00'), findsOneWidget);
+      },
+    );
 
     testWidgets(
-        '7. negative balance uses errorColor, null balance and null total show em-dash',
-        (tester) async {
-      final overview = WalletsOverview(
-        currency: AppCurrency.usd,
-        wallets: [
-          const WalletBalance(
-            wallet: WalletModel(
-              id: 'w1',
-              name: 'Negative Wallet',
-              icon: 'payments',
+      '7. negative balance uses errorColor, null balance and null total show em-dash',
+      (tester) async {
+        final overview = WalletsOverview(
+          currency: AppCurrency.usd,
+          wallets: [
+            const WalletBalance(
+              wallet: WalletModel(
+                id: 'w1',
+                name: 'Negative Wallet',
+                icon: 'payments',
+              ),
+              balanceMinor: -3500, // -$35.00
             ),
-            balanceMinor: -3500, // -$35.00
-          ),
-          const WalletBalance(
-            wallet: WalletModel(
-              id: 'w2',
-              name: 'Null Wallet',
-              icon: 'savings',
+            const WalletBalance(
+              wallet: WalletModel(
+                id: 'w2',
+                name: 'Null Wallet',
+                icon: 'savings',
+              ),
+              balanceMinor: null,
             ),
-            balanceMinor: null,
-          ),
-        ],
-        unassignedMinor: 0,
-        hasUnassigned: false,
-        totalMinor: null,
-      );
+          ],
+          unassignedMinor: 0,
+          hasUnassigned: false,
+          totalMinor: null,
+        );
 
-      await tester
-          .pumpWidget(createTestApp(overviewState: AsyncData(overview)));
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(
+          createTestApp(overviewState: AsyncData(overview)),
+        );
+        await tester.pumpAndSettle();
 
-      // Total card shows '—', null balance shows '—'
-      expect(find.text('—'), findsNWidgets(2));
+        // Total card shows '—', null balance shows '—'
+        expect(find.text('—'), findsNWidgets(2));
 
-      final negTextFinder = find.text('-\$35.00');
-      expect(negTextFinder, findsOneWidget);
-      final textWidget = tester.widget<Text>(negTextFinder);
-      expect(textWidget.style?.color, ColorManager.errorColor);
-    });
+        final negTextFinder = find.text('-\$35.00');
+        expect(negTextFinder, findsOneWidget);
+        final textWidget = tester.widget<Text>(negTextFinder);
+        expect(textWidget.style?.color, ColorManager.errorColor);
+      },
+    );
 
-    testWidgets('8. unassigned tile appears when hasUnassigned is true',
-        (tester) async {
+    testWidgets('8. unassigned tile appears when hasUnassigned is true', (
+      tester,
+    ) async {
       final overviewWithUnassigned = WalletsOverview(
         currency: AppCurrency.usd,
         wallets: [
@@ -139,68 +142,82 @@ void main() {
       expect(find.text('\$5.00'), findsOneWidget);
     });
 
-    testWidgets('8b. unassigned tile appears when hasUnassigned is true and unassignedMinor is 0',
-        (tester) async {
-      final overviewWithUnassignedZero = WalletsOverview(
-        currency: AppCurrency.usd,
-        wallets: [],
-        unassignedMinor: 0,
-        hasUnassigned: true,
-        totalMinor: 0,
-      );
+    testWidgets(
+      '8b. unassigned tile appears when hasUnassigned is true and unassignedMinor is 0',
+      (tester) async {
+        final overviewWithUnassignedZero = WalletsOverview(
+          currency: AppCurrency.usd,
+          wallets: [],
+          unassignedMinor: 0,
+          hasUnassigned: true,
+          totalMinor: 0,
+        );
 
-      await tester.pumpWidget(
-        createTestApp(overviewState: AsyncData(overviewWithUnassignedZero)),
-      );
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(
+          createTestApp(overviewState: AsyncData(overviewWithUnassignedZero)),
+        );
+        await tester.pumpAndSettle();
 
-      expect(find.text('Unassigned transactions'), findsOneWidget);
-      final unassignedTile = find.widgetWithText(ListTile, 'Unassigned transactions');
-      expect(
-        find.descendant(of: unassignedTile, matching: find.text('\$0.00')),
-        findsOneWidget,
-      );
-    });
+        expect(find.text('Unassigned transactions'), findsOneWidget);
+        final unassignedTile = find.widgetWithText(
+          ListTile,
+          'Unassigned transactions',
+        );
+        expect(
+          find.descendant(of: unassignedTile, matching: find.text('\$0.00')),
+          findsOneWidget,
+        );
+      },
+    );
 
-    testWidgets('9. empty overview shows walletsEmpty text when hasUnassigned is false', (tester) async {
-      final overviewEmpty = WalletsOverview(
-        currency: AppCurrency.usd,
-        wallets: [],
-        unassignedMinor: 0,
-        hasUnassigned: false,
-        totalMinor: 0,
-      );
+    testWidgets(
+      '9. empty overview shows walletsEmpty text when hasUnassigned is false',
+      (tester) async {
+        final overviewEmpty = WalletsOverview(
+          currency: AppCurrency.usd,
+          wallets: [],
+          unassignedMinor: 0,
+          hasUnassigned: false,
+          totalMinor: 0,
+        );
 
-      await tester
-          .pumpWidget(createTestApp(overviewState: AsyncData(overviewEmpty)));
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(
+          createTestApp(overviewState: AsyncData(overviewEmpty)),
+        );
+        await tester.pumpAndSettle();
 
-      expect(find.text('No wallets yet. Tap + to add one.'), findsOneWidget);
-    });
+        expect(find.text('No wallets yet. Tap + to add one.'), findsOneWidget);
+      },
+    );
 
-    testWidgets('10. loading state shows WalletsSkeleton and no CircularProgressIndicator',
-        (tester) async {
-      await tester
-          .pumpWidget(createTestApp(overviewState: const AsyncLoading()));
-      await tester.pump();
+    testWidgets(
+      '10. loading state shows WalletsSkeleton and no CircularProgressIndicator',
+      (tester) async {
+        await tester.pumpWidget(
+          createTestApp(overviewState: const AsyncLoading()),
+        );
+        await tester.pump();
 
-      expect(find.byType(WalletsSkeleton), findsOneWidget);
-      expect(find.byType(CircularProgressIndicator), findsNothing);
-    });
+        expect(find.byType(WalletsSkeleton), findsOneWidget);
+        expect(find.byType(CircularProgressIndicator), findsNothing);
+      },
+    );
 
-    testWidgets('10b. WalletsSkeleton renders in Arabic without overflow exceptions',
-        (tester) async {
-      await tester.pumpWidget(
-        createTestApp(
-          overviewState: const AsyncLoading(),
-          locale: const Locale('ar'),
-        ),
-      );
-      await tester.pump();
+    testWidgets(
+      '10b. WalletsSkeleton renders in Arabic without overflow exceptions',
+      (tester) async {
+        await tester.pumpWidget(
+          createTestApp(
+            overviewState: const AsyncLoading(),
+            locale: const Locale('ar'),
+          ),
+        );
+        await tester.pump();
 
-      expect(find.byType(WalletsSkeleton), findsOneWidget);
-      expect(tester.takeException(), isNull);
-    });
+        expect(find.byType(WalletsSkeleton), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
 
     testWidgets('11. error state shows error message', (tester) async {
       await tester.pumpWidget(
@@ -219,8 +236,9 @@ void main() {
       );
     });
 
-    testWidgets('12. window note shows "Balances cover the last 12 months"',
-        (tester) async {
+    testWidgets('12. window note shows "Balances cover the last 12 months"', (
+      tester,
+    ) async {
       final overview = WalletsOverview(
         currency: AppCurrency.usd,
         wallets: [
@@ -234,42 +252,44 @@ void main() {
         totalMinor: 1000,
       );
 
-      await tester
-          .pumpWidget(createTestApp(overviewState: AsyncData(overview)));
+      await tester.pumpWidget(
+        createTestApp(overviewState: AsyncData(overview)),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Balances cover the last 12 months'), findsOneWidget);
     });
 
     testWidgets(
-        '13. Arabic locale renders screen with long wallet names without overflow',
-        (tester) async {
-      final overview = WalletsOverview(
-        currency: AppCurrency.usd,
-        wallets: [
-          const WalletBalance(
-            wallet: WalletModel(
-              id: 'w_long',
-              name: 'محفظة التوفير الطويلة جدا جدا جدا للاستثمار المستقبلي',
-              icon: 'savings',
+      '13. Arabic locale renders screen with long wallet names without overflow',
+      (tester) async {
+        final overview = WalletsOverview(
+          currency: AppCurrency.usd,
+          wallets: [
+            const WalletBalance(
+              wallet: WalletModel(
+                id: 'w_long',
+                name: 'محفظة التوفير الطويلة جدا جدا جدا للاستثمار المستقبلي',
+                icon: 'savings',
+              ),
+              balanceMinor: 99999900,
             ),
-            balanceMinor: 99999900,
+          ],
+          unassignedMinor: 0,
+          hasUnassigned: false,
+          totalMinor: 99999900,
+        );
+
+        await tester.pumpWidget(
+          createTestApp(
+            overviewState: AsyncData(overview),
+            locale: const Locale('ar'),
           ),
-        ],
-        unassignedMinor: 0,
-        hasUnassigned: false,
-        totalMinor: 99999900,
-      );
+        );
+        await tester.pumpAndSettle();
 
-      await tester.pumpWidget(
-        createTestApp(
-          overviewState: AsyncData(overview),
-          locale: const Locale('ar'),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      expect(tester.takeException(), isNull);
-    });
+        expect(tester.takeException(), isNull);
+      },
+    );
   });
 }

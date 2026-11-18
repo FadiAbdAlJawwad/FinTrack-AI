@@ -17,6 +17,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
+
 import 'dart:async';
 
 import 'package:fin_track_ai/core/routing/app_lock_notifier.dart';
@@ -26,7 +27,8 @@ import 'package:fin_track_ai/core/constant/shared_prefs_keys.dart';
 import 'package:fin_track_ai/core/routing/app_routes.dart';
 
 class MockFirebaseAuth extends Fake implements FirebaseAuth {
-  final StreamController<User?> _authStateController = StreamController<User?>.broadcast();
+  final StreamController<User?> _authStateController =
+      StreamController<User?>.broadcast();
   User? _currentUser;
 
   @override
@@ -120,7 +122,11 @@ void main() {
           appLockNotifierProvider.overrideWithValue(lock),
           biometricServiceProvider.overrideWithValue(FakeBiometricService()),
           currentUserProvider.overrideWithValue(
-            const UserModel(uid: '123', email: 'test@test.com', fullName: 'Test'),
+            const UserModel(
+              uid: '123',
+              email: 'test@test.com',
+              fullName: 'Test',
+            ),
           ),
           sharedPrefsProvider.overrideWithValue(prefs),
           transactionRepositoryProvider.overrideWithValue(DummyTxRepo()),
@@ -135,20 +141,23 @@ void main() {
       );
     }
 
-    testWidgets('3. signed in + biometric on + locked + target /home -> redirected to lockScreen', (tester) async {
-      mockAuth.mockCurrentUser(mockUser);
-      await prefs.setBool(SharedPrefsKeys.hasSeenOnboardingKey, true);
-      await prefs.setBool(SharedPrefsKeys.isBiometricEnabledKey, true);
-      final lock = AppLockNotifier(initialLocked: true);
+    testWidgets(
+      '3. signed in + biometric on + locked + target /home -> redirected to lockScreen',
+      (tester) async {
+        mockAuth.mockCurrentUser(mockUser);
+        await prefs.setBool(SharedPrefsKeys.hasSeenOnboardingKey, true);
+        await prefs.setBool(SharedPrefsKeys.isBiometricEnabledKey, true);
+        final lock = AppLockNotifier(initialLocked: true);
 
-      final router = createRouter(lock);
-      await tester.pumpWidget(buildTestApp(router, lock));
-      router.go(AppRoutes.homeScreen);
-      await tester.pumpAndSettle();
-      
-      final lastMatch = router.routerDelegate.currentConfiguration.last;
-      expect(lastMatch.route.path, AppRoutes.lockScreen);
-    });
+        final router = createRouter(lock);
+        await tester.pumpWidget(buildTestApp(router, lock));
+        router.go(AppRoutes.homeScreen);
+        await tester.pumpAndSettle();
+
+        final lastMatch = router.routerDelegate.currentConfiguration.last;
+        expect(lastMatch.route.path, AppRoutes.lockScreen);
+      },
+    );
 
     testWidgets('4. same but unlocked -> stays', (tester) async {
       mockAuth.mockCurrentUser(mockUser);
@@ -160,42 +169,56 @@ void main() {
       await tester.pumpWidget(buildTestApp(router, lock));
       router.go(AppRoutes.homeScreen);
       await tester.pumpAndSettle();
-      
+
       final lastMatch = router.routerDelegate.currentConfiguration.last;
       expect(lastMatch.route.path, AppRoutes.homeScreen);
     });
 
-    testWidgets('5. lockScreen while unlocked -> redirected to home', (tester) async {
+    testWidgets('5. lockScreen while unlocked -> redirected to home', (
+      tester,
+    ) async {
       mockAuth.mockCurrentUser(mockUser);
       await prefs.setBool(SharedPrefsKeys.hasSeenOnboardingKey, true);
       await prefs.setBool(SharedPrefsKeys.isBiometricEnabledKey, true);
-      
+
       // Start locked so we get to lockScreen
       final lock = AppLockNotifier(initialLocked: true);
       final router = createRouter(lock);
       await tester.pumpWidget(buildTestApp(router, lock));
       router.go(AppRoutes.homeScreen);
       await tester.pumpAndSettle();
-      expect(router.routerDelegate.currentConfiguration.last.route.path, AppRoutes.lockScreen);
+      expect(
+        router.routerDelegate.currentConfiguration.last.route.path,
+        AppRoutes.lockScreen,
+      );
 
       // Now unlock it, the router should refresh and redirect to home
       lock.unlock();
       await tester.pumpAndSettle();
-      expect(router.routerDelegate.currentConfiguration.last.route.path, AppRoutes.homeScreen);
+      expect(
+        router.routerDelegate.currentConfiguration.last.route.path,
+        AppRoutes.homeScreen,
+      );
     });
 
-    testWidgets('6. biometric off -> never redirected to lockScreen even if locked', (tester) async {
-      mockAuth.mockCurrentUser(mockUser);
-      await prefs.setBool(SharedPrefsKeys.hasSeenOnboardingKey, true);
-      await prefs.setBool(SharedPrefsKeys.isBiometricEnabledKey, false);
-      final lock = AppLockNotifier(initialLocked: true); // Locked!
+    testWidgets(
+      '6. biometric off -> never redirected to lockScreen even if locked',
+      (tester) async {
+        mockAuth.mockCurrentUser(mockUser);
+        await prefs.setBool(SharedPrefsKeys.hasSeenOnboardingKey, true);
+        await prefs.setBool(SharedPrefsKeys.isBiometricEnabledKey, false);
+        final lock = AppLockNotifier(initialLocked: true); // Locked!
 
-      final router = createRouter(lock);
-      await tester.pumpWidget(buildTestApp(router, lock));
-      router.go(AppRoutes.homeScreen);
-      await tester.pumpAndSettle();
-      expect(router.routerDelegate.currentConfiguration.last.route.path, AppRoutes.homeScreen);
-    });
+        final router = createRouter(lock);
+        await tester.pumpWidget(buildTestApp(router, lock));
+        router.go(AppRoutes.homeScreen);
+        await tester.pumpAndSettle();
+        expect(
+          router.routerDelegate.currentConfiguration.last.route.path,
+          AppRoutes.homeScreen,
+        );
+      },
+    );
 
     testWidgets('7. signed out -> login (unchanged)', (tester) async {
       mockAuth.mockCurrentUser(null);
@@ -206,7 +229,10 @@ void main() {
       await tester.pumpWidget(buildTestApp(router, lock));
       router.go(AppRoutes.homeScreen);
       await tester.pumpAndSettle();
-      expect(router.routerDelegate.currentConfiguration.last.route.path, AppRoutes.login);
+      expect(
+        router.routerDelegate.currentConfiguration.last.route.path,
+        AppRoutes.login,
+      );
     });
   });
 
@@ -242,8 +268,10 @@ void main() {
       await prefs.setBool(SharedPrefsKeys.isBiometricEnabledKey, true);
 
       await tester.pumpWidget(buildObserver());
-      
-      final observerState = tester.state<State<AppLockLifecycleObserver>>(find.byType(AppLockLifecycleObserver));
+
+      final observerState = tester.state<State<AppLockLifecycleObserver>>(
+        find.byType(AppLockLifecycleObserver),
+      );
       final observer = observerState as WidgetsBindingObserver;
 
       currentTime = DateTime(2025, 1, 1, 12, 0, 0);
@@ -260,8 +288,10 @@ void main() {
       await prefs.setBool(SharedPrefsKeys.isBiometricEnabledKey, true);
 
       await tester.pumpWidget(buildObserver());
-      
-      final observerState = tester.state<State<AppLockLifecycleObserver>>(find.byType(AppLockLifecycleObserver));
+
+      final observerState = tester.state<State<AppLockLifecycleObserver>>(
+        find.byType(AppLockLifecycleObserver),
+      );
       final observer = observerState as WidgetsBindingObserver;
 
       currentTime = DateTime(2025, 1, 1, 12, 0, 0);
@@ -273,13 +303,17 @@ void main() {
       expect(lock.isLocked, isFalse);
     });
 
-    testWidgets('10. signed out or biometric off -> never locks', (tester) async {
+    testWidgets('10. signed out or biometric off -> never locks', (
+      tester,
+    ) async {
       mockAuth.mockCurrentUser(null); // Signed out
       await prefs.setBool(SharedPrefsKeys.isBiometricEnabledKey, true);
 
       await tester.pumpWidget(buildObserver());
-      
-      final observerState = tester.state<State<AppLockLifecycleObserver>>(find.byType(AppLockLifecycleObserver));
+
+      final observerState = tester.state<State<AppLockLifecycleObserver>>(
+        find.byType(AppLockLifecycleObserver),
+      );
       final observer = observerState as WidgetsBindingObserver;
 
       currentTime = DateTime(2025, 1, 1, 12, 0, 0);
@@ -290,7 +324,10 @@ void main() {
       expect(lock.isLocked, isFalse);
 
       mockAuth.mockCurrentUser(mockUser); // Signed in
-      await prefs.setBool(SharedPrefsKeys.isBiometricEnabledKey, false); // Biometric off
+      await prefs.setBool(
+        SharedPrefsKeys.isBiometricEnabledKey,
+        false,
+      ); // Biometric off
 
       currentTime = DateTime(2025, 1, 1, 12, 0, 0);
       observer.didChangeAppLifecycleState(AppLifecycleState.paused);
@@ -300,19 +337,24 @@ void main() {
       expect(lock.isLocked, isFalse);
     });
 
-    testWidgets('11. tester.binding.handleAppLifecycleStateChanged proves observer is registered', (tester) async {
-      mockAuth.mockCurrentUser(mockUser);
-      await prefs.setBool(SharedPrefsKeys.isBiometricEnabledKey, true);
+    testWidgets(
+      '11. tester.binding.handleAppLifecycleStateChanged proves observer is registered',
+      (tester) async {
+        mockAuth.mockCurrentUser(mockUser);
+        await prefs.setBool(SharedPrefsKeys.isBiometricEnabledKey, true);
 
-      await tester.pumpWidget(buildObserver());
+        await tester.pumpWidget(buildObserver());
 
-      currentTime = DateTime(2025, 1, 1, 12, 0, 0);
-      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+        currentTime = DateTime(2025, 1, 1, 12, 0, 0);
+        tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
 
-      currentTime = DateTime(2025, 1, 1, 12, 0, 31);
-      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+        currentTime = DateTime(2025, 1, 1, 12, 0, 31);
+        tester.binding.handleAppLifecycleStateChanged(
+          AppLifecycleState.resumed,
+        );
 
-      expect(lock.isLocked, isTrue);
-    });
+        expect(lock.isLocked, isTrue);
+      },
+    );
   });
 }

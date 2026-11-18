@@ -9,29 +9,23 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   group('buildWalletsOverview', () {
     WalletModel w(String id, String name, {bool isDefault = false}) =>
-        WalletModel(
-          id: id,
-          name: name,
-          icon: 'wallet',
-          isDefault: isDefault,
-        );
+        WalletModel(id: id, name: name, icon: 'wallet', isDefault: isDefault);
 
     TransactionModel tx(
       String walletId,
       TransactionType type,
       int amountMinor,
       AppCurrency currency,
-    ) =>
-        TransactionModel(
-          id: 'tx-${DateTime.now().microsecondsSinceEpoch}',
-          amountMinor: amountMinor,
-          currency: currency,
-          type: type,
-          category: TransactionCategory.other,
-          title: 't',
-          date: DateTime.now(),
-          walletId: walletId,
-        );
+    ) => TransactionModel(
+      id: 'tx-${DateTime.now().microsecondsSinceEpoch}',
+      amountMinor: amountMinor,
+      currency: currency,
+      type: type,
+      category: TransactionCategory.other,
+      title: 't',
+      date: DateTime.now(),
+      walletId: walletId,
+    );
 
     double noRate(AppCurrency from, AppCurrency to) {
       if (from == to) return 1.0;
@@ -76,24 +70,37 @@ void main() {
       expect(overview.totalMinor, -4000);
     });
 
-    test('3. Two wallets get separate balances from their own transactions only', () {
-      final wallets = [w('w1', 'W1'), w('w2', 'W2')];
-      final transactions = [
-        tx('w1', TransactionType.income, 5000, AppCurrency.usd),
-        tx('w2', TransactionType.expense, 2000, AppCurrency.usd),
-      ];
+    test(
+      '3. Two wallets get separate balances from their own transactions only',
+      () {
+        final wallets = [w('w1', 'W1'), w('w2', 'W2')];
+        final transactions = [
+          tx('w1', TransactionType.income, 5000, AppCurrency.usd),
+          tx('w2', TransactionType.expense, 2000, AppCurrency.usd),
+        ];
 
-      final overview = buildWalletsOverview(
-        wallets: wallets,
-        transactions: transactions,
-        target: AppCurrency.usd,
-        rateBetween: noRate,
-      );
+        final overview = buildWalletsOverview(
+          wallets: wallets,
+          transactions: transactions,
+          target: AppCurrency.usd,
+          rateBetween: noRate,
+        );
 
-      expect(overview.wallets.firstWhere((wb) => wb.wallet.id == 'w1').balanceMinor, 5000);
-      expect(overview.wallets.firstWhere((wb) => wb.wallet.id == 'w2').balanceMinor, -2000);
-      expect(overview.totalMinor, 3000);
-    });
+        expect(
+          overview.wallets
+              .firstWhere((wb) => wb.wallet.id == 'w1')
+              .balanceMinor,
+          5000,
+        );
+        expect(
+          overview.wallets
+              .firstWhere((wb) => wb.wallet.id == 'w2')
+              .balanceMinor,
+          -2000,
+        );
+        expect(overview.totalMinor, 3000);
+      },
+    );
 
     test('4. A wallet with no transactions -> 0, not null', () {
       final wallets = [w('w1', 'W1')];
@@ -113,7 +120,12 @@ void main() {
       final wallets = [w('w1', 'W1')];
       final transactions = [
         tx('w1', TransactionType.income, 3000, AppCurrency.usd),
-        tx('w2', TransactionType.income, 2000, AppCurrency.usd), // no wallet matches w2
+        tx(
+          'w2',
+          TransactionType.income,
+          2000,
+          AppCurrency.usd,
+        ), // no wallet matches w2
       ];
 
       final overview = buildWalletsOverview(
@@ -169,25 +181,33 @@ void main() {
       expect(overview.totalMinor, 650);
     });
 
-    test('8. Foreign-currency transactions are converted with the injected rate', () {
-      final wallets = [w('w1', 'W1')];
-      final transactions = [
-        tx('w1', TransactionType.income, 1000, AppCurrency.ils), // 10.00 ILS -> 11.00 USD -> 1100 cents
-      ];
+    test(
+      '8. Foreign-currency transactions are converted with the injected rate',
+      () {
+        final wallets = [w('w1', 'W1')];
+        final transactions = [
+          tx(
+            'w1',
+            TransactionType.income,
+            1000,
+            AppCurrency.ils,
+          ), // 10.00 ILS -> 11.00 USD -> 1100 cents
+        ];
 
-      final overview = buildWalletsOverview(
-        wallets: wallets,
-        transactions: transactions,
-        target: AppCurrency.usd,
-        rateBetween: (from, to) {
-          if (from == AppCurrency.ils && to == AppCurrency.usd) return 1.1;
-          throw Exception();
-        },
-      );
+        final overview = buildWalletsOverview(
+          wallets: wallets,
+          transactions: transactions,
+          target: AppCurrency.usd,
+          rateBetween: (from, to) {
+            if (from == AppCurrency.ils && to == AppCurrency.usd) return 1.1;
+            throw Exception();
+          },
+        );
 
-      expect(overview.wallets.first.balanceMinor, 1100);
-      expect(overview.totalMinor, 1100);
-    });
+        expect(overview.wallets.first.balanceMinor, 1100);
+        expect(overview.totalMinor, 1100);
+      },
+    );
 
     test('9. A rate failure for one wallet foreign currency -> that wallet balance is null and totalMinor is null, while another wallet keeps its numeric balance', () {
       final wallets = [w('w1', 'W1'), w('w2', 'W2')];
@@ -203,8 +223,12 @@ void main() {
         rateBetween: noRate,
       );
 
-      final b1 = overview.wallets.firstWhere((wb) => wb.wallet.id == 'w1').balanceMinor;
-      final b2 = overview.wallets.firstWhere((wb) => wb.wallet.id == 'w2').balanceMinor;
+      final b1 = overview.wallets
+          .firstWhere((wb) => wb.wallet.id == 'w1')
+          .balanceMinor;
+      final b2 = overview.wallets
+          .firstWhere((wb) => wb.wallet.id == 'w2')
+          .balanceMinor;
 
       expect(b1, isNull);
       expect(b2, 500);
@@ -214,8 +238,18 @@ void main() {
     test('10. Multiple currencies inside one wallet are never summed before conversion', () {
       final wallets = [w('w1', 'W1')];
       final transactions = [
-        tx('w1', TransactionType.income, 1000, AppCurrency.usd), // 10.00 USD -> 1000 cents
-        tx('w1', TransactionType.expense, 500, AppCurrency.ils), // 5.00 ILS -> 5.50 USD -> 550 cents
+        tx(
+          'w1',
+          TransactionType.income,
+          1000,
+          AppCurrency.usd,
+        ), // 10.00 USD -> 1000 cents
+        tx(
+          'w1',
+          TransactionType.expense,
+          500,
+          AppCurrency.ils,
+        ), // 5.00 ILS -> 5.50 USD -> 550 cents
       ];
 
       final overview = buildWalletsOverview(
@@ -255,12 +289,14 @@ void main() {
 
     test('12. A wallet with a null id gets 0 and does not crash', () {
       final wallets = [
-        WalletModel(name: 'New', icon: 'wallet', isDefault: false) // null id
+        WalletModel(name: 'New', icon: 'wallet', isDefault: false), // null id
       ];
 
       final overview = buildWalletsOverview(
         wallets: wallets,
-        transactions: [tx('w1', TransactionType.income, 1000, AppCurrency.usd)], // will be unassigned
+        transactions: [
+          tx('w1', TransactionType.income, 1000, AppCurrency.usd),
+        ], // will be unassigned
         target: AppCurrency.usd,
         rateBetween: noRate,
       );
@@ -306,10 +342,7 @@ void main() {
     });
 
     test('14. Ordering tiebreaker: two wallets with equal names are ordered by id deterministically', () {
-      final wallets = [
-        w('w_beta', 'Savings'),
-        w('w_alpha', 'Savings'),
-      ];
+      final wallets = [w('w_beta', 'Savings'), w('w_alpha', 'Savings')];
 
       final overview = buildWalletsOverview(
         wallets: wallets,
@@ -410,7 +443,8 @@ void main() {
           name: 'Bank',
           icon: 'bank',
           openingBalanceMinor: 1000,
-          openingBalanceCurrency: AppCurrency.jod, // 1 JOD -> 1.41 USD -> 141 cents
+          openingBalanceCurrency:
+              AppCurrency.jod, // 1 JOD -> 1.41 USD -> 141 cents
         ),
       ];
       final transactions = [
@@ -432,31 +466,40 @@ void main() {
       expect(overview.totalMinor, 91);
     });
 
-    test('20. Missing rate for opening balance currency makes wallet balance null', () {
-      final wallets = [
-        const WalletModel(
-          id: 'w1',
-          name: 'Bank',
-          icon: 'bank',
-          openingBalanceMinor: 1000,
-          openingBalanceCurrency: AppCurrency.jod,
-        ),
-        w('w2', 'Cash'),
-      ];
+    test(
+      '20. Missing rate for opening balance currency makes wallet balance null',
+      () {
+        final wallets = [
+          const WalletModel(
+            id: 'w1',
+            name: 'Bank',
+            icon: 'bank',
+            openingBalanceMinor: 1000,
+            openingBalanceCurrency: AppCurrency.jod,
+          ),
+          w('w2', 'Cash'),
+        ];
 
-      final overview = buildWalletsOverview(
-        wallets: wallets,
-        transactions: [],
-        target: AppCurrency.usd,
-        rateBetween: (from, to) {
-          if (from == to) return 1.0;
-          throw Exception();
-        },
-      );
+        final overview = buildWalletsOverview(
+          wallets: wallets,
+          transactions: [],
+          target: AppCurrency.usd,
+          rateBetween: (from, to) {
+            if (from == to) return 1.0;
+            throw Exception();
+          },
+        );
 
-      expect(overview.wallets.firstWhere((w) => w.wallet.id == 'w1').balanceMinor, isNull);
-      expect(overview.wallets.firstWhere((w) => w.wallet.id == 'w2').balanceMinor, 0);
-      expect(overview.totalMinor, isNull);
-    });
+        expect(
+          overview.wallets.firstWhere((w) => w.wallet.id == 'w1').balanceMinor,
+          isNull,
+        );
+        expect(
+          overview.wallets.firstWhere((w) => w.wallet.id == 'w2').balanceMinor,
+          0,
+        );
+        expect(overview.totalMinor, isNull);
+      },
+    );
   });
 }

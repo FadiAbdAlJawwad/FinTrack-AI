@@ -15,7 +15,8 @@ class MockAuthRepository extends Fake implements AuthRepositoryInterface {
   bool shouldThrowOnSignOut = false;
 
   @override
-  UserModel? get currentUser => const UserModel(uid: '123', email: 'test@test.com', fullName: 'Test');
+  UserModel? get currentUser =>
+      const UserModel(uid: '123', email: 'test@test.com', fullName: 'Test');
 
   @override
   Future<void> signOut() async {
@@ -54,7 +55,11 @@ void main() {
 
     await container.read(authControllerProvider.notifier).signOut();
 
-    expect(mockRepo.wasLockedDuringSignOut, isTrue, reason: 'Lock should still be locked when repo sign out starts');
+    expect(
+      mockRepo.wasLockedDuringSignOut,
+      isTrue,
+      reason: 'Lock should still be locked when repo sign out starts',
+    );
     expect(appLockNotifier.isLocked, isFalse);
     expect(prefs.getBool(SharedPrefsKeys.isBiometricEnabledKey), isFalse);
   });

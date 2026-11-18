@@ -38,11 +38,7 @@ class ExchangeRateGateScreen extends ConsumerWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                icon,
-                size: 48,
-                color: ColorManager.secondaryColor,
-              ),
+              Icon(icon, size: 48, color: ColorManager.secondaryColor),
               context.addVerticalSpace(16),
               Text(
                 message,

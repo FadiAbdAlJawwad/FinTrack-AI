@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../../core/constant/color_manager.dart';
 import '../../../../core/extension/app_sizes.dart';
 import '../../../../core/extension/text_style_extension.dart';
@@ -28,8 +29,8 @@ class CategorySelector extends StatelessWidget {
       trailing: ActionChip(
         label: Text(context.loc.more),
         onPressed: () {},
-        backgroundColor:
-            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
+        backgroundColor: Theme.of(context).colorScheme.onSurface
+            .withValues(alpha: 0.05),
         labelStyle: context.labelSmall.copyWith(
           color: ColorManager.secondaryColor,
         ),

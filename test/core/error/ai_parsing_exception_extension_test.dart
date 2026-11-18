@@ -41,7 +41,7 @@ void main() {
       AiParsingErrorType.networkError: loc.aiNetworkError,
       AiParsingErrorType.unknown: loc.aiUnknown,
     };
-    
+
     expect(expected.keys.toSet(), AiParsingErrorType.values.toSet());
     for (final entry in expected.entries) {
       expect(
@@ -55,10 +55,13 @@ void main() {
     tester,
   ) async {
     final context = await pumpContext(tester);
-    
-    final notConfiguredMsg = AiParsingException(AiParsingErrorType.notConfigured).getLocalizedMessage(context);
-    final networkErrorMsg = AiParsingException(AiParsingErrorType.networkError).getLocalizedMessage(context);
-    
+
+    final notConfiguredMsg = AiParsingException(
+      AiParsingErrorType.notConfigured,
+    ).getLocalizedMessage(context);
+    final networkErrorMsg = AiParsingException(AiParsingErrorType.networkError)
+        .getLocalizedMessage(context);
+
     expect(notConfiguredMsg, isNot(equals(networkErrorMsg)));
   });
 }

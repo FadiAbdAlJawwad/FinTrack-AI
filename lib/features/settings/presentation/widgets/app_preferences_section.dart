@@ -17,8 +17,9 @@ class AppPreferencesSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentLocale = ref.watch(localeProvider);
-    final languageName =
-        currentLocale.languageCode == 'ar' ? 'العربية' : 'English';
+    final languageName = currentLocale.languageCode == 'ar'
+        ? 'العربية'
+        : 'English';
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -59,9 +60,9 @@ class AppPreferencesSection extends ConsumerWidget {
           trailing: Switch(
             value: isDark,
             onChanged: (value) {
-              ref.read(themeProvider.notifier).setTheme(
-                    value ? ThemeMode.dark : ThemeMode.light,
-                  );
+              ref
+                  .read(themeProvider.notifier)
+                  .setTheme(value ? ThemeMode.dark : ThemeMode.light);
             },
           ),
         ),

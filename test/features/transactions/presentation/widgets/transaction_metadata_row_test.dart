@@ -30,26 +30,27 @@ Widget _buildTestWidget({
 
 void main() {
   group('TransactionMetadataRow notes length limit tests', () {
-    testWidgets('a) enterText of 150 "a" characters caps controller text to maxNoteLength', (
-      tester,
-    ) async {
-      final controller = TextEditingController();
-      addTearDown(controller.dispose);
+    testWidgets(
+      'a) enterText of 150 "a" characters caps controller text to maxNoteLength',
+      (tester) async {
+        final controller = TextEditingController();
+        addTearDown(controller.dispose);
 
-      await tester.pumpWidget(
-        _buildTestWidget(
-          notesController: controller,
-          selectedDate: DateTime(2025, 1, 1),
-          onDateTap: () {},
-        ),
-      );
+        await tester.pumpWidget(
+          _buildTestWidget(
+            notesController: controller,
+            selectedDate: DateTime(2025, 1, 1),
+            onDateTap: () {},
+          ),
+        );
 
-      final input150 = 'a' * 150;
-      await tester.enterText(find.byType(TextField), input150);
-      await tester.pump();
+        final input150 = 'a' * 150;
+        await tester.enterText(find.byType(TextField), input150);
+        await tester.pump();
 
-      expect(controller.text.length, equals(maxNoteLength));
-    });
+        expect(controller.text.length, equals(maxNoteLength));
+      },
+    );
 
     testWidgets(
       'b) enterText of (maxNoteLength + 5) copies of emoji "😀" caps to maxNoteLength graphemes with no broken graphemes',
@@ -77,27 +78,29 @@ void main() {
       },
     );
 
-    testWidgets('c) enterText of Arabic text longer than 100 characters is capped at maxNoteLength', (
-      tester,
-    ) async {
-      final controller = TextEditingController();
-      addTearDown(controller.dispose);
+    testWidgets(
+      'c) enterText of Arabic text longer than 100 characters is capped at maxNoteLength',
+      (tester) async {
+        final controller = TextEditingController();
+        addTearDown(controller.dispose);
 
-      await tester.pumpWidget(
-        _buildTestWidget(
-          notesController: controller,
-          selectedDate: DateTime(2025, 1, 1),
-          onDateTap: () {},
-        ),
-      );
+        await tester.pumpWidget(
+          _buildTestWidget(
+            notesController: controller,
+            selectedDate: DateTime(2025, 1, 1),
+            onDateTap: () {},
+          ),
+        );
 
-      final arabicInput = 'ملاحظات المعاملة المالية الخاصة بالشراء والبيع ' * 5;
-      expect(arabicInput.characters.length, greaterThan(maxNoteLength));
+        final arabicInput =
+            'ملاحظات المعاملة المالية الخاصة بالشراء والبيع ' * 5;
+        expect(arabicInput.characters.length, greaterThan(maxNoteLength));
 
-      await tester.enterText(find.byType(TextField), arabicInput);
-      await tester.pump();
+        await tester.enterText(find.byType(TextField), arabicInput);
+        await tester.pump();
 
-      expect(controller.text.characters.length, equals(maxNoteLength));
-    });
+        expect(controller.text.characters.length, equals(maxNoteLength));
+      },
+    );
   });
 }

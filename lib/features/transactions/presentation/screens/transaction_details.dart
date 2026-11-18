@@ -39,9 +39,8 @@ class TransactionDetails extends HookConsumerWidget {
         );
       } catch (e) {
         if (context.mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(context.loc.unknownError)));
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(context.loc.unknownError)));
         }
       } finally {
         if (context.mounted) isSharing.value = false;
@@ -267,10 +266,11 @@ class TransactionDetails extends HookConsumerWidget {
                             context.addVerticalSpace(16),
                             _DetailRow(
                               label: context.loc.type,
-                              value: (transaction.type == TransactionType.income
-                                      ? context.loc.income
-                                      : context.loc.expense)
-                                  .toUpperCase(),
+                              value:
+                                  (transaction.type == TransactionType.income
+                                          ? context.loc.income
+                                          : context.loc.expense)
+                                      .toUpperCase(),
                             ),
                           ],
                         ).pad(24),

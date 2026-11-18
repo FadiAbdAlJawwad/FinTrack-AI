@@ -50,86 +50,110 @@ Widget createTestApp({
     child: MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      home: Scaffold(
-        body: WalletsOverviewView(overview: overview),
-      ),
+      home: Scaffold(body: WalletsOverviewView(overview: overview)),
     ),
   );
 }
 
 void main() {
   group('WalletsOverviewView', () {
-    testWidgets('9. Tapping a wallet tile opens sheet in EDIT mode (title Edit Wallet, name prefilled)', (tester) async {
-      final wallet = const WalletModel(id: 'w1', name: 'Main Checking', icon: 'payments');
-      final overview = WalletsOverview(
-        totalMinor: 1000,
-        currency: AppCurrency.usd,
-        wallets: [WalletBalance(wallet: wallet, balanceMinor: 1000)],
-        unassignedMinor: 0,
-        hasUnassigned: false,
-      );
+    testWidgets(
+      '9. Tapping a wallet tile opens sheet in EDIT mode (title Edit Wallet, name prefilled)',
+      (tester) async {
+        final wallet = const WalletModel(
+          id: 'w1',
+          name: 'Main Checking',
+          icon: 'payments',
+        );
+        final overview = WalletsOverview(
+          totalMinor: 1000,
+          currency: AppCurrency.usd,
+          wallets: [WalletBalance(wallet: wallet, balanceMinor: 1000)],
+          unassignedMinor: 0,
+          hasUnassigned: false,
+        );
 
-      await tester.pumpWidget(createTestApp(
-        overview: overview,
-        wallets: [wallet],
-      ));
+        await tester.pumpWidget(
+          createTestApp(overview: overview, wallets: [wallet]),
+        );
 
-      await tester.tap(find.text('Main Checking'));
-      await tester.pumpAndSettle();
+        await tester.tap(find.text('Main Checking'));
+        await tester.pumpAndSettle();
 
-      expect(find.text('Edit Wallet'), findsOneWidget);
-      final textField = tester.widget<TextField>(find.byType(TextField).first);
-      expect(textField.controller?.text, equals('Main Checking'));
-    });
+        expect(find.text('Edit Wallet'), findsOneWidget);
+        final textField = tester.widget<TextField>(
+          find.byType(TextField).first,
+        );
+        expect(textField.controller?.text, equals('Main Checking'));
+      },
+    );
 
-    testWidgets('10. The unassigned tile is not tappable: ListTile has onTap == null, tapping opens nothing', (tester) async {
-      final overview = const WalletsOverview(
-        totalMinor: 500,
-        currency: AppCurrency.usd,
-        wallets: [],
-        unassignedMinor: 500,
-        hasUnassigned: true,
-      );
+    testWidgets(
+      '10. The unassigned tile is not tappable: ListTile has onTap == null, tapping opens nothing',
+      (tester) async {
+        final overview = const WalletsOverview(
+          totalMinor: 500,
+          currency: AppCurrency.usd,
+          wallets: [],
+          unassignedMinor: 500,
+          hasUnassigned: true,
+        );
 
-      await tester.pumpWidget(createTestApp(overview: overview));
+        await tester.pumpWidget(createTestApp(overview: overview));
 
-      final unassignedTileFinder = find.widgetWithText(ListTile, 'Unassigned transactions');
-      expect(unassignedTileFinder, findsOneWidget);
+        final unassignedTileFinder = find.widgetWithText(
+          ListTile,
+          'Unassigned transactions',
+        );
+        expect(unassignedTileFinder, findsOneWidget);
 
-      final tileWidget = tester.widget<ListTile>(unassignedTileFinder);
-      expect(tileWidget.onTap, isNull);
+        final tileWidget = tester.widget<ListTile>(unassignedTileFinder);
+        expect(tileWidget.onTap, isNull);
 
-      await tester.tap(unassignedTileFinder);
-      await tester.pumpAndSettle();
+        await tester.tap(unassignedTileFinder);
+        await tester.pumpAndSettle();
 
-      expect(find.byType(AddWalletSheet), findsNothing);
-    });
+        expect(find.byType(AddWalletSheet), findsNothing);
+      },
+    );
 
-    testWidgets('11. Tapping second of two wallets opens sheet prefilled with THAT wallet name', (tester) async {
-      final wallet1 = const WalletModel(id: 'w1', name: 'Wallet One', icon: 'payments');
-      final wallet2 = const WalletModel(id: 'w2', name: 'Wallet Two', icon: 'savings');
-      final overview = WalletsOverview(
-        totalMinor: 3000,
-        currency: AppCurrency.usd,
-        wallets: [
-          WalletBalance(wallet: wallet1, balanceMinor: 1000),
-          WalletBalance(wallet: wallet2, balanceMinor: 2000),
-        ],
-        unassignedMinor: 0,
-        hasUnassigned: false,
-      );
+    testWidgets(
+      '11. Tapping second of two wallets opens sheet prefilled with THAT wallet name',
+      (tester) async {
+        final wallet1 = const WalletModel(
+          id: 'w1',
+          name: 'Wallet One',
+          icon: 'payments',
+        );
+        final wallet2 = const WalletModel(
+          id: 'w2',
+          name: 'Wallet Two',
+          icon: 'savings',
+        );
+        final overview = WalletsOverview(
+          totalMinor: 3000,
+          currency: AppCurrency.usd,
+          wallets: [
+            WalletBalance(wallet: wallet1, balanceMinor: 1000),
+            WalletBalance(wallet: wallet2, balanceMinor: 2000),
+          ],
+          unassignedMinor: 0,
+          hasUnassigned: false,
+        );
 
-      await tester.pumpWidget(createTestApp(
-        overview: overview,
-        wallets: [wallet1, wallet2],
-      ));
+        await tester.pumpWidget(
+          createTestApp(overview: overview, wallets: [wallet1, wallet2]),
+        );
 
-      await tester.tap(find.text('Wallet Two'));
-      await tester.pumpAndSettle();
+        await tester.tap(find.text('Wallet Two'));
+        await tester.pumpAndSettle();
 
-      expect(find.text('Edit Wallet'), findsOneWidget);
-      final textField = tester.widget<TextField>(find.byType(TextField).first);
-      expect(textField.controller?.text, equals('Wallet Two'));
-    });
+        expect(find.text('Edit Wallet'), findsOneWidget);
+        final textField = tester.widget<TextField>(
+          find.byType(TextField).first,
+        );
+        expect(textField.controller?.text, equals('Wallet Two'));
+      },
+    );
   });
 }

@@ -36,7 +36,9 @@ void main() {
       overrides: [
         currencyRepositoryProvider.overrideWithValue(repo),
         exchangeRateServiceProvider.overrideWithValue(UntouchableRateService()),
-        currentUserProvider.overrideWithValue(UserModel(uid: 'u', email: '', fullName: '')),
+        currentUserProvider.overrideWithValue(
+          UserModel(uid: 'u', email: '', fullName: ''),
+        ),
       ],
     );
     addTearDown(container.dispose);
@@ -46,7 +48,7 @@ void main() {
 
   test('13. yields default state without calling repository when currentUserProvider is null', () async {
     final verifyRepo = RecordingCurrencyRepository('EUR');
-    
+
     final c = ProviderContainer(
       overrides: [
         currencyRepositoryProvider.overrideWithValue(verifyRepo),
@@ -56,9 +58,12 @@ void main() {
     );
     addTearDown(c.dispose);
     c.listen(currencyControllerProvider, (_, _) {});
-    
+
     final state = await c.read(currencyControllerProvider.future);
-    expect(state, 'USD'); // Default value from controller, not from verifyRepo's 'EUR'
+    expect(
+      state,
+      'USD',
+    ); // Default value from controller, not from verifyRepo's 'EUR'
   });
 
   test('changeCurrency writes only the base currency, once', () async {

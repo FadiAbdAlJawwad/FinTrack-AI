@@ -36,9 +36,7 @@ class CurrencyRemoteDataSource {
 
   Stream<String> watchBaseCurrency() {
     if (kDebugMode) {
-      debugPrint(
-        '[CurrencyDataSource] watchBaseCurrency: attaching listener',
-      );
+      debugPrint('[CurrencyDataSource] watchBaseCurrency: attaching listener');
     }
     final baseCurrency = _userDoc.snapshots().map(
       (snap) => (snap.data()?['baseCurrency'] as String?) ?? 'USD',

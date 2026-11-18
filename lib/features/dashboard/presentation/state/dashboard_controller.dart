@@ -30,10 +30,11 @@ final dashboardControllerProvider =
           (from, to) => rateService.rateBetween(from.code, to.code),
         );
 
-        final recent = (transactions.where((t) => !t.date.isAfter(now)).toList()
-              ..sort((a, b) => b.date.compareTo(a.date)))
-            .take(homeRecentCount)
-            .toList();
+        final recent =
+            (transactions.where((t) => !t.date.isAfter(now)).toList()
+                  ..sort((a, b) => b.date.compareTo(a.date)))
+                .take(homeRecentCount)
+                .toList();
 
         return DashboardState(
           groupedTransactions: groupTransactions(recent, now: now),

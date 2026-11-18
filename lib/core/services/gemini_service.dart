@@ -47,8 +47,10 @@ class GeminiService {
 
   Future<Map<String, dynamic>> parseTransactionText(String input) async {
     try {
-      final configured =
-          AppEnv.isAiConfigValid(proxyUrl: proxyUrl, secret: sharedSecret);
+      final configured = AppEnv.isAiConfigValid(
+        proxyUrl: proxyUrl,
+        secret: sharedSecret,
+      );
       if (kDebugMode) {
         debugPrint('[Gemini] stage=config configured=$configured');
       }
@@ -197,10 +199,7 @@ class GeminiService {
           '[Gemini] failed type=$type exception=${e.runtimeType} message=${_truncate120(msg)}',
         );
       }
-      throw AiParsingException(
-        type,
-        message: msg,
-      );
+      throw AiParsingException(type, message: msg);
     } on SocketException catch (e) {
       const type = AiParsingErrorType.networkError;
       if (kDebugMode) {
@@ -208,10 +207,7 @@ class GeminiService {
           '[Gemini] failed type=$type exception=${e.runtimeType} message=${_truncate120(e.message)}',
         );
       }
-      throw AiParsingException(
-        type,
-        message: e.message,
-      );
+      throw AiParsingException(type, message: e.message);
     } catch (e) {
       const type = AiParsingErrorType.networkError;
       final msg = e is http.ClientException ? e.message : e.toString();
@@ -221,15 +217,9 @@ class GeminiService {
         );
       }
       if (e is http.ClientException) {
-        throw AiParsingException(
-          type,
-          message: e.message,
-        );
+        throw AiParsingException(type, message: e.message);
       }
-      throw AiParsingException(
-        type,
-        message: e.toString(),
-      );
+      throw AiParsingException(type, message: e.toString());
     }
   }
 }

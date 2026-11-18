@@ -13,9 +13,7 @@ void main() {
     SharedPreferences.setMockInitialValues({'locale_code': 'fr'});
     final prefs = await SharedPreferences.getInstance();
     final container = ProviderContainer(
-      overrides: [
-        sharedPrefsProvider.overrideWithValue(prefs),
-      ],
+      overrides: [sharedPrefsProvider.overrideWithValue(prefs)],
     );
     addTearDown(container.dispose);
 

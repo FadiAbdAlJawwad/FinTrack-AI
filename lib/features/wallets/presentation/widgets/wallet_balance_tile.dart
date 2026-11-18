@@ -46,10 +46,7 @@ class WalletBalanceTile extends StatelessWidget {
             child: Icon(icon, color: ColorManager.primaryBlue),
           ),
         ),
-        title: Text(
-          title,
-          style: context.labelMedium,
-        ),
+        title: Text(title, style: context.labelMedium),
         subtitle: subtitle != null
             ? Text(
                 subtitle!,

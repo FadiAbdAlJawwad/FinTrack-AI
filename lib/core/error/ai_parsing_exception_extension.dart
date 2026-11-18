@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../extension/app_sizes.dart';
 import 'ai_parsing_exception.dart';
 
@@ -9,9 +10,10 @@ extension AiParsingExceptionExtension on AiParsingException {
       AiParsingErrorType.unauthorized => context.loc.aiUnauthorized,
       AiParsingErrorType.invalidInput => context.loc.aiInvalidInput,
       AiParsingErrorType.serviceUnavailable => context.loc.aiServiceUnavailable,
-      AiParsingErrorType.schemaValidationFailed => context.loc.aiSchemaValidationFailed,
+      AiParsingErrorType.schemaValidationFailed =>
+        context.loc.aiSchemaValidationFailed,
       AiParsingErrorType.networkError => context.loc.aiNetworkError,
-      AiParsingErrorType.unknown => context.loc.aiUnknown
+      AiParsingErrorType.unknown => context.loc.aiUnknown,
     };
   }
 }

@@ -79,23 +79,24 @@ void main() {
       WalletModel(id: 'cash', name: 'Cash', icon: 'payments'),
     ];
 
-    testWidgets('Arabic: category shows localized name طعام twice, no food/FOOD', (
-      tester,
-    ) async {
-      await tester.pumpWidget(
-        buildTestableWidget(
-          transaction: sampleTx,
-          wallets: seededWallets,
-          locale: const Locale('ar'),
-        ),
-      );
-      await tester.pump();
-      await tester.pump(Duration.zero);
+    testWidgets(
+      'Arabic: category shows localized name طعام twice, no food/FOOD',
+      (tester) async {
+        await tester.pumpWidget(
+          buildTestableWidget(
+            transaction: sampleTx,
+            wallets: seededWallets,
+            locale: const Locale('ar'),
+          ),
+        );
+        await tester.pump();
+        await tester.pump(Duration.zero);
 
-      expect(find.text('طعام'), findsNWidgets(2));
-      expect(find.text('food'), findsNothing);
-      expect(find.text('FOOD'), findsNothing);
-    });
+        expect(find.text('طعام'), findsNWidgets(2));
+        expect(find.text('food'), findsNothing);
+        expect(find.text('FOOD'), findsNothing);
+      },
+    );
 
     testWidgets('Arabic: type row shows مصاريف for expense transaction', (
       tester,
@@ -130,23 +131,24 @@ void main() {
       expect(find.text('دخل'), findsOneWidget);
     });
 
-    testWidgets('English: headline shows Food, category row FOOD and type row EXPENSE', (
-      tester,
-    ) async {
-      await tester.pumpWidget(
-        buildTestableWidget(
-          transaction: sampleTx,
-          wallets: seededWallets,
-          locale: const Locale('en'),
-        ),
-      );
-      await tester.pump();
-      await tester.pump(Duration.zero);
+    testWidgets(
+      'English: headline shows Food, category row FOOD and type row EXPENSE',
+      (tester) async {
+        await tester.pumpWidget(
+          buildTestableWidget(
+            transaction: sampleTx,
+            wallets: seededWallets,
+            locale: const Locale('en'),
+          ),
+        );
+        await tester.pump();
+        await tester.pump(Duration.zero);
 
-      expect(find.text('Food'), findsOneWidget);
-      expect(find.text('FOOD'), findsOneWidget);
-      expect(find.text('EXPENSE'), findsOneWidget);
-    });
+        expect(find.text('Food'), findsOneWidget);
+        expect(find.text('FOOD'), findsOneWidget);
+        expect(find.text('EXPENSE'), findsOneWidget);
+      },
+    );
 
     testWidgets(
       '13. TransactionDetails: seeded wallet shows localized name in Arabic',

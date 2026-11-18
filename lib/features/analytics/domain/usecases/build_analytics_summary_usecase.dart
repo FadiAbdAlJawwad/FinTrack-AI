@@ -56,7 +56,8 @@ AnalyticsSummary buildAnalyticsSummary({
   final bool canComputeShare = !hasNullAmount && totalSum > 0;
 
   final List<CategoryExpense> categories = [];
-  for (final MapEntry(key: category, value: amountMinor) in categoryAmounts.entries) {
+  for (final MapEntry(key: category, value: amountMinor)
+      in categoryAmounts.entries) {
     final double? share = canComputeShare ? (amountMinor! / totalSum) : null;
     categories.add(
       CategoryExpense(

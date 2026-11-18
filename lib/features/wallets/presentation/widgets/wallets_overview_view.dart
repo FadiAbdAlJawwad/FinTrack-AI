@@ -15,10 +15,7 @@ import 'wallets_total_card.dart';
 class WalletsOverviewView extends StatelessWidget {
   final WalletsOverview overview;
 
-  const WalletsOverviewView({
-    super.key,
-    required this.overview,
-  });
+  const WalletsOverviewView({super.key, required this.overview});
 
   @override
   Widget build(BuildContext context) {
@@ -53,10 +50,7 @@ class WalletsOverviewView extends StatelessWidget {
               ),
             ),
           ] else ...[
-            Text(
-              context.loc.walletsYourAccounts,
-              style: context.labelLarge,
-            ),
+            Text(context.loc.walletsYourAccounts, style: context.labelLarge),
             context.addVerticalSpace(12),
             ...overview.wallets.map((wb) {
               final name = walletDisplayName(context.loc, wb.wallet);

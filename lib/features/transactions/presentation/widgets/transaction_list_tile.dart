@@ -12,16 +12,13 @@ class TransactionListTile extends StatelessWidget {
   final TransactionModel transaction;
   final VoidCallback? onTap;
 
-  const TransactionListTile({
-    super.key,
-    required this.transaction,
-    this.onTap,
-  });
+  const TransactionListTile({super.key, required this.transaction, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap ??
+      onTap:
+          onTap ??
           () {
             if (transaction.id != null) {
               context.pushNamed(
@@ -33,9 +30,7 @@ class TransactionListTile extends StatelessWidget {
       child: Card(
         child: ListTile(
           leading: Card(
-            color: ColorManager.primaryBlue.withValues(
-              alpha: 0.1,
-            ),
+            color: ColorManager.primaryBlue.withValues(alpha: 0.1),
             shape: const StadiumBorder(),
             elevation: 0,
             child: Padding(
@@ -56,9 +51,7 @@ class TransactionListTile extends StatelessWidget {
           trailing: Text(
             transaction.formattedAmount,
             textDirection: TextDirection.ltr,
-            style: context.labelMedium.copyWith(
-              color: transaction.amountColor,
-            ),
+            style: context.labelMedium.copyWith(color: transaction.amountColor),
           ),
         ),
       ),

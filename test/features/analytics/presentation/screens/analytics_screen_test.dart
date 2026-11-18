@@ -84,8 +84,9 @@ void main() {
   );
 
   group('AnalyticsScreen', () {
-    testWidgets('1. chips show Week, Month, 12 Months in EN and Arabic in AR',
-        (tester) async {
+    testWidgets('1. chips show Week, Month, 12 Months in EN and Arabic in AR', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         createAnalyticsApp(
           summaryState: AsyncData(emptySummaryMonth),
@@ -112,65 +113,69 @@ void main() {
     });
 
     testWidgets(
-        '2. chip matching analyticsPeriodProvider is selected (default: Month)',
-        (tester) async {
-      await tester.pumpWidget(
-        createAnalyticsApp(summaryState: AsyncData(emptySummaryMonth)),
-      );
-      await tester.pumpAndSettle();
+      '2. chip matching analyticsPeriodProvider is selected (default: Month)',
+      (tester) async {
+        await tester.pumpWidget(
+          createAnalyticsApp(summaryState: AsyncData(emptySummaryMonth)),
+        );
+        await tester.pumpAndSettle();
 
-      final selectedChip = tester.widget<ChoiceChip>(
-        find.byWidgetPredicate((w) => w is ChoiceChip && w.selected),
-      );
-      expect((selectedChip.label as Text).data, equals('Month'));
-    });
-
-    testWidgets(
-        '3. tapping Week chip sets analyticsPeriodProvider to AnalyticsPeriod.week',
-        (tester) async {
-      final container = ProviderContainer(
-        overrides: [
-          analyticsSummaryProvider
-              .overrideWith((ref) => AsyncData(emptySummaryMonth)),
-        ],
-      );
-      addTearDown(container.dispose);
-
-      await tester.pumpWidget(
-        createAnalyticsApp(
-          summaryState: AsyncData(emptySummaryMonth),
-          container: container,
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.text('Week'));
-      await tester.pumpAndSettle();
-
-      expect(
-        container.read(analyticsPeriodProvider),
-        equals(AnalyticsPeriod.week),
-      );
-    });
+        final selectedChip = tester.widget<ChoiceChip>(
+          find.byWidgetPredicate((w) => w is ChoiceChip && w.selected),
+        );
+        expect((selectedChip.label as Text).data, equals('Month'));
+      },
+    );
 
     testWidgets(
-        r'4. income card shows +$52.00 in successColor and expense card -$18.40 in errorColor',
-        (tester) async {
-      await tester.pumpWidget(
-        createAnalyticsApp(summaryState: AsyncData(sampleSummary)),
-      );
-      await tester.pumpAndSettle();
+      '3. tapping Week chip sets analyticsPeriodProvider to AnalyticsPeriod.week',
+      (tester) async {
+        final container = ProviderContainer(
+          overrides: [
+            analyticsSummaryProvider.overrideWith(
+              (ref) => AsyncData(emptySummaryMonth),
+            ),
+          ],
+        );
+        addTearDown(container.dispose);
 
-      final incomeTextFinder = find.text(r'+$52.00');
-      expect(incomeTextFinder, findsOneWidget);
-      final incomeText = tester.widget<Text>(incomeTextFinder);
-      expect(incomeText.style?.color, ColorManager.successColor);
+        await tester.pumpWidget(
+          createAnalyticsApp(
+            summaryState: AsyncData(emptySummaryMonth),
+            container: container,
+          ),
+        );
+        await tester.pumpAndSettle();
 
-      final expenseTextFinder = find.text(r'-$18.40');
-      expect(expenseTextFinder, findsOneWidget);
-      final expenseText = tester.widget<Text>(expenseTextFinder);
-      expect(expenseText.style?.color, ColorManager.errorColor);
-    });
+        await tester.tap(find.text('Week'));
+        await tester.pumpAndSettle();
+
+        expect(
+          container.read(analyticsPeriodProvider),
+          equals(AnalyticsPeriod.week),
+        );
+      },
+    );
+
+    testWidgets(
+      r'4. income card shows +$52.00 in successColor and expense card -$18.40 in errorColor',
+      (tester) async {
+        await tester.pumpWidget(
+          createAnalyticsApp(summaryState: AsyncData(sampleSummary)),
+        );
+        await tester.pumpAndSettle();
+
+        final incomeTextFinder = find.text(r'+$52.00');
+        expect(incomeTextFinder, findsOneWidget);
+        final incomeText = tester.widget<Text>(incomeTextFinder);
+        expect(incomeText.style?.color, ColorManager.successColor);
+
+        final expenseTextFinder = find.text(r'-$18.40');
+        expect(expenseTextFinder, findsOneWidget);
+        final expenseText = tester.widget<Text>(expenseTextFinder);
+        expect(expenseText.style?.color, ColorManager.errorColor);
+      },
+    );
 
     testWidgets('5. null income and expense show em-dash', (tester) async {
       final summaryWithNulls = AnalyticsSummary(
@@ -191,50 +196,52 @@ void main() {
     });
 
     testWidgets(
-        '6. categories render localized names, formatted amounts and percentages in order',
-        (tester) async {
-      await tester.pumpWidget(
-        createAnalyticsApp(summaryState: AsyncData(sampleSummary)),
-      );
-      await tester.pumpAndSettle();
+      '6. categories render localized names, formatted amounts and percentages in order',
+      (tester) async {
+        await tester.pumpWidget(
+          createAnalyticsApp(summaryState: AsyncData(sampleSummary)),
+        );
+        await tester.pumpAndSettle();
 
-      expect(find.text('Food'), findsOneWidget);
-      expect(find.text(r'$85.00'), findsOneWidget);
-      expect(find.text('75%'), findsOneWidget);
+        expect(find.text('Food'), findsOneWidget);
+        expect(find.text(r'$85.00'), findsOneWidget);
+        expect(find.text('75%'), findsOneWidget);
 
-      expect(find.text('Shopping'), findsOneWidget);
-      expect(find.text(r'$25.00'), findsOneWidget);
-      expect(find.text('25%'), findsOneWidget);
-    });
+        expect(find.text('Shopping'), findsOneWidget);
+        expect(find.text(r'$25.00'), findsOneWidget);
+        expect(find.text('25%'), findsOneWidget);
+      },
+    );
 
     testWidgets(
-        '7. category with null share shows amount but no LinearProgressIndicator or percentage',
-        (tester) async {
-      final summaryNullShare = AnalyticsSummary(
-        period: AnalyticsPeriod.month,
-        currency: AppCurrency.usd,
-        incomeMinor: 0,
-        expenseMinor: 5000,
-        categories: const [
-          CategoryExpense(
-            category: TransactionCategory.food,
-            amountMinor: 5000,
-            share: null,
-          ),
-        ],
-        transactionCount: 1,
-      );
+      '7. category with null share shows amount but no LinearProgressIndicator or percentage',
+      (tester) async {
+        final summaryNullShare = AnalyticsSummary(
+          period: AnalyticsPeriod.month,
+          currency: AppCurrency.usd,
+          incomeMinor: 0,
+          expenseMinor: 5000,
+          categories: const [
+            CategoryExpense(
+              category: TransactionCategory.food,
+              amountMinor: 5000,
+              share: null,
+            ),
+          ],
+          transactionCount: 1,
+        );
 
-      await tester.pumpWidget(
-        createAnalyticsApp(summaryState: AsyncData(summaryNullShare)),
-      );
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(
+          createAnalyticsApp(summaryState: AsyncData(summaryNullShare)),
+        );
+        await tester.pumpAndSettle();
 
-      expect(find.text('Food'), findsOneWidget);
-      expect(find.text(r'$50.00'), findsOneWidget);
-      expect(find.byType(LinearProgressIndicator), findsNothing);
-      expect(find.textContaining('%'), findsNothing);
-    });
+        expect(find.text('Food'), findsOneWidget);
+        expect(find.text(r'$50.00'), findsOneWidget);
+        expect(find.byType(LinearProgressIndicator), findsNothing);
+        expect(find.textContaining('%'), findsNothing);
+      },
+    );
 
     testWidgets('8. category with null amount shows em-dash', (tester) async {
       final summaryNullAmount = AnalyticsSummary(
@@ -262,72 +269,77 @@ void main() {
     });
 
     testWidgets(
-        '9. transactionCount == 0 shows analyticsEmpty and no cards or category tiles',
-        (tester) async {
-      await tester.pumpWidget(
-        createAnalyticsApp(summaryState: AsyncData(emptySummaryMonth)),
-      );
-      await tester.pumpAndSettle();
+      '9. transactionCount == 0 shows analyticsEmpty and no cards or category tiles',
+      (tester) async {
+        await tester.pumpWidget(
+          createAnalyticsApp(summaryState: AsyncData(emptySummaryMonth)),
+        );
+        await tester.pumpAndSettle();
 
-      expect(find.text('No transactions in this period.'), findsOneWidget);
-      expect(find.byType(AnalyticsAmountCard), findsNothing);
-      expect(find.byType(CategoryExpenseTile), findsNothing);
-    });
-
-    testWidgets(
-        '10. loading shows AnalyticsSkeleton and chips remain visible, and no CircularProgressIndicator',
-        (tester) async {
-      await tester.pumpWidget(
-        createAnalyticsApp(summaryState: const AsyncLoading()),
-      );
-      await tester.pump();
-
-      expect(find.byType(AnalyticsSkeleton), findsOneWidget);
-      expect(find.byType(CircularProgressIndicator), findsNothing);
-      expect(find.text('Week'), findsOneWidget);
-      expect(find.text('Month'), findsOneWidget);
-      expect(find.text('12 Months'), findsOneWidget);
-    });
+        expect(find.text('No transactions in this period.'), findsOneWidget);
+        expect(find.byType(AnalyticsAmountCard), findsNothing);
+        expect(find.byType(CategoryExpenseTile), findsNothing);
+      },
+    );
 
     testWidgets(
-        '10b. AnalyticsSkeleton renders in Arabic without overflow exceptions',
-        (tester) async {
-      await tester.pumpWidget(
-        createAnalyticsApp(
-          summaryState: const AsyncLoading(),
-          locale: const Locale('ar'),
-        ),
-      );
-      await tester.pump();
+      '10. loading shows AnalyticsSkeleton and chips remain visible, and no CircularProgressIndicator',
+      (tester) async {
+        await tester.pumpWidget(
+          createAnalyticsApp(summaryState: const AsyncLoading()),
+        );
+        await tester.pump();
 
-      expect(find.byType(AnalyticsSkeleton), findsOneWidget);
-      expect(tester.takeException(), isNull);
-    });
+        expect(find.byType(AnalyticsSkeleton), findsOneWidget);
+        expect(find.byType(CircularProgressIndicator), findsNothing);
+        expect(find.text('Week'), findsOneWidget);
+        expect(find.text('Month'), findsOneWidget);
+        expect(find.text('12 Months'), findsOneWidget);
+      },
+    );
 
     testWidgets(
-        '11. error shows localized error message and chips remain visible',
-        (tester) async {
-      await tester.pumpWidget(
-        createAnalyticsApp(
-          summaryState: AsyncError(
-            TransactionException(TransactionErrorType.networkError),
-            StackTrace.empty,
+      '10b. AnalyticsSkeleton renders in Arabic without overflow exceptions',
+      (tester) async {
+        await tester.pumpWidget(
+          createAnalyticsApp(
+            summaryState: const AsyncLoading(),
+            locale: const Locale('ar'),
           ),
-        ),
-      );
-      await tester.pumpAndSettle();
+        );
+        await tester.pump();
 
-      expect(
-        find.text('Network error. Please check your connection.'),
-        findsOneWidget,
-      );
-      expect(find.text('Week'), findsOneWidget);
-      expect(find.text('Month'), findsOneWidget);
-      expect(find.text('12 Months'), findsOneWidget);
-    });
+        expect(find.byType(AnalyticsSkeleton), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
 
-    testWidgets('12. window note appears only when summary period is year',
-        (tester) async {
+    testWidgets(
+      '11. error shows localized error message and chips remain visible',
+      (tester) async {
+        await tester.pumpWidget(
+          createAnalyticsApp(
+            summaryState: AsyncError(
+              TransactionException(TransactionErrorType.networkError),
+              StackTrace.empty,
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(
+          find.text('Network error. Please check your connection.'),
+          findsOneWidget,
+        );
+        expect(find.text('Week'), findsOneWidget);
+        expect(find.text('Month'), findsOneWidget);
+        expect(find.text('12 Months'), findsOneWidget);
+      },
+    );
+
+    testWidgets('12. window note appears only when summary period is year', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         createAnalyticsApp(summaryState: AsyncData(sampleSummary)),
       );
@@ -353,35 +365,36 @@ void main() {
     });
 
     testWidgets(
-        '13. Arabic locale renders full screen without overflow exceptions',
-        (tester) async {
-      final arabicSummary = AnalyticsSummary(
-        period: AnalyticsPeriod.year,
-        currency: AppCurrency.usd,
-        incomeMinor: 99999900,
-        expenseMinor: 99999900,
-        categories: TransactionCategory.values
-            .map(
-              (c) => CategoryExpense(
-                category: c,
-                amountMinor: 16666650,
-                share: 0.166,
-              ),
-            )
-            .toList(),
-        transactionCount: 100,
-      );
+      '13. Arabic locale renders full screen without overflow exceptions',
+      (tester) async {
+        final arabicSummary = AnalyticsSummary(
+          period: AnalyticsPeriod.year,
+          currency: AppCurrency.usd,
+          incomeMinor: 99999900,
+          expenseMinor: 99999900,
+          categories: TransactionCategory.values
+              .map(
+                (c) => CategoryExpense(
+                  category: c,
+                  amountMinor: 16666650,
+                  share: 0.166,
+                ),
+              )
+              .toList(),
+          transactionCount: 100,
+        );
 
-      await tester.pumpWidget(
-        createAnalyticsApp(
-          summaryState: AsyncData(arabicSummary),
-          locale: const Locale('ar'),
-        ),
-      );
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(
+          createAnalyticsApp(
+            summaryState: AsyncData(arabicSummary),
+            locale: const Locale('ar'),
+          ),
+        );
+        await tester.pumpAndSettle();
 
-      expect(tester.takeException(), isNull);
-    });
+        expect(tester.takeException(), isNull);
+      },
+    );
 
     testWidgets('15. category tile shows category.icon', (tester) async {
       await tester.pumpWidget(

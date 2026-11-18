@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../../core/constant/color_manager.dart';
 import '../../../../core/error/ai_parsing_exception.dart';
 import '../../../../core/error/ai_parsing_exception_extension.dart';
@@ -27,7 +28,7 @@ class VoiceEntryScreen extends StatefulHookConsumerWidget {
 class _VoiceEntryScreenState extends ConsumerState<VoiceEntryScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _pulseController;
-  
+
   @override
   void initState() {
     super.initState();
@@ -36,7 +37,7 @@ class _VoiceEntryScreenState extends ConsumerState<VoiceEntryScreen>
       duration: const Duration(milliseconds: 1500),
     )..repeat(reverse: true);
   }
-  
+
   @override
   void dispose() {
     _pulseController.dispose();
@@ -46,9 +47,10 @@ class _VoiceEntryScreenState extends ConsumerState<VoiceEntryScreen>
   @override
   Widget build(BuildContext context) {
     final appLocale = ref.watch(localeProvider);
-    final speechState = useSpeechRecognition(languageCode: appLocale.languageCode);
+    final speechState = useSpeechRecognition(
+      languageCode: appLocale.languageCode,
+    );
     final errorMessage = useState<String?>(null);
-
 
     useEffect(() {
       if (speechState.status == VoiceEntryStatus.error) {
@@ -95,10 +97,8 @@ class _VoiceEntryScreenState extends ConsumerState<VoiceEntryScreen>
         showModalBottomSheet(
           context: parentContext,
           isScrollControlled: true,
-            backgroundColor: Colors.transparent,
-          builder: (context) => AddTransactionBottomSheet(
-            prefillDraft: draft,
-          ),
+          backgroundColor: Colors.transparent,
+          builder: (context) => AddTransactionBottomSheet(prefillDraft: draft),
         );
       } on AiParsingException catch (e) {
         if (!context.mounted) return;
@@ -134,17 +134,22 @@ class _VoiceEntryScreenState extends ConsumerState<VoiceEntryScreen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const SizedBox(width: 48),
                   Text(
                     context.loc.voiceEntryTitle,
-                    style: context.headlineMedium.copyWith(color: Theme.of(context).colorScheme.onSurface),
+                    style: context.headlineMedium.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
                   ),
                   IconButton(
-                    icon: Icon(Icons.close, color: Theme.of(context).colorScheme.onSurface, size: 28),
+                    icon: Icon(
+                      Icons.close,
+                      color: Theme.of(context).colorScheme.onSurface,
+                      size: 28,
+                    ),
                     onPressed: () {
                       speechState.stopListening();
                       context.pop();
@@ -158,10 +163,10 @@ class _VoiceEntryScreenState extends ConsumerState<VoiceEntryScreen>
                 speechState.status == VoiceEntryStatus.error
                     ? (errorMessage.value ?? context.loc.aiUnknown)
                     : speechState.status == VoiceEntryStatus.listening
-                        ? context.loc.listeningStatus
-                        : speechState.status == VoiceEntryStatus.processing
-                            ? context.loc.processingStatus
-                            : context.loc.tapToSpeak,
+                    ? context.loc.listeningStatus
+                    : speechState.status == VoiceEntryStatus.processing
+                    ? context.loc.processingStatus
+                    : context.loc.tapToSpeak,
                 textAlign: TextAlign.center,
                 style: context.bodyMedium.copyWith(
                   color: speechState.status == VoiceEntryStatus.error
@@ -169,7 +174,7 @@ class _VoiceEntryScreenState extends ConsumerState<VoiceEntryScreen>
                       : ColorManager.secondaryColor,
                 ),
               ),
-              
+
               context.addVerticalSpace(40),
 
               VoiceMicButton(
@@ -184,16 +189,16 @@ class _VoiceEntryScreenState extends ConsumerState<VoiceEntryScreen>
                   }
                 },
               ),
-              
+
               context.addVerticalSpace(40),
 
               VoiceTranscriptCard(
                 status: speechState.status,
                 transcript: speechState.transcript,
               ),
-                
+
               context.addVerticalSpace(40),
-              
+
               VoiceActionButton(
                 status: speechState.status,
                 transcript: speechState.transcript,

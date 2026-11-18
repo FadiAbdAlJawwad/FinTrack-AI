@@ -1,5 +1,6 @@
 import 'package:local_auth/local_auth.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
 import '../../l10n/app_localizations.dart';
 import '../providers/locale_provider.dart';
 

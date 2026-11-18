@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../../core/constant/color_manager.dart';
 import '../../../../core/extension/app_sizes.dart';
 import '../../../../core/extension/text_style_extension.dart';
@@ -18,7 +19,8 @@ class VoiceActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isEnabled = status != VoiceEntryStatus.processing &&
+    final isEnabled =
+        status != VoiceEntryStatus.processing &&
         (status == VoiceEntryStatus.listening ||
             status == VoiceEntryStatus.error ||
             (status == VoiceEntryStatus.idle && transcript.isNotEmpty));
@@ -27,12 +29,11 @@ class VoiceActionButton extends StatelessWidget {
       onPressed: isEnabled ? onTap : null,
       style: ElevatedButton.styleFrom(
         backgroundColor: ColorManager.primaryBlue,
-        disabledBackgroundColor:
-            ColorManager.primaryBlue.withValues(alpha: 0.3),
-        padding: context.spaceVertical(16),
-        shape: RoundedRectangleBorder(
-          borderRadius: context.circularRadius(12),
+        disabledBackgroundColor: ColorManager.primaryBlue.withValues(
+          alpha: 0.3,
         ),
+        padding: context.spaceVertical(16),
+        shape: RoundedRectangleBorder(borderRadius: context.circularRadius(12)),
       ),
       child: status == VoiceEntryStatus.processing
           ? Row(

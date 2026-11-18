@@ -69,33 +69,29 @@ void main() {
 
       final sub = container.listen(walletsOverviewProvider, (_, _) {});
 
-      expect(
-        container.read(walletsOverviewProvider),
-        isA<AsyncLoading>(),
-      );
+      expect(container.read(walletsOverviewProvider), isA<AsyncLoading>());
 
       walletController.add([
-        const WalletModel(id: 'w1', name: 'W1', icon: 'wallet', isDefault: true),
+        const WalletModel(
+          id: 'w1',
+          name: 'W1',
+          icon: 'wallet',
+          isDefault: true,
+        ),
       ]);
       await Future.microtask(() {});
-      expect(
-        container.read(walletsOverviewProvider),
-        isA<AsyncLoading>(),
-      );
+      expect(container.read(walletsOverviewProvider), isA<AsyncLoading>());
 
       txController.add([]);
       await Future.microtask(() {});
-      
+
       final dataState = container.read(walletsOverviewProvider);
       expect(dataState, isA<AsyncData>());
       expect(dataState.value!.wallets.length, 1);
-      
+
       txController.addError(Exception('Test error'));
       await Future.microtask(() {});
-      expect(
-        container.read(walletsOverviewProvider),
-        isA<AsyncError>(),
-      );
+      expect(container.read(walletsOverviewProvider), isA<AsyncError>());
 
       await txController.close();
       await walletController.close();

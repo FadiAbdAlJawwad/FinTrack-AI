@@ -1,5 +1,7 @@
 import 'dart:async';
+
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
 import '../../../../core/constant/shared_prefs_keys.dart';
 import '../../../../core/providers/firebase_providers.dart';
 import '../../../../core/providers/shared_prefs_provider.dart';
@@ -17,7 +19,6 @@ final currentUserProvider = Provider<UserModel?>((ref) {
   ref.watch(authStateChangesProvider);
   return ref.watch(authRepositoryProvider).currentUser;
 });
-
 
 final authControllerProvider = AsyncNotifierProvider<AuthController, void>(
   AuthController.new,
@@ -43,9 +44,7 @@ class AuthController extends AsyncNotifier<void> {
 
     if (!result.hasError) {
       ref.read(appLockNotifierProvider).unlock();
-      await _handlePostAuth(
-        isBiometricOptIn: isBiometricOptIn,
-      );
+      await _handlePostAuth(isBiometricOptIn: isBiometricOptIn);
     }
 
     state = result;
@@ -64,9 +63,7 @@ class AuthController extends AsyncNotifier<void> {
 
     if (!result.hasError) {
       ref.read(appLockNotifierProvider).unlock();
-      await _handlePostAuth(
-        isBiometricOptIn: isBiometricOptIn,
-      );
+      await _handlePostAuth(isBiometricOptIn: isBiometricOptIn);
     }
 
     state = result;
