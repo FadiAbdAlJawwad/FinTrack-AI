@@ -7,6 +7,7 @@ Next story: B-01 domain kernel (05 §7, stage 0).
 
 ## Done
 - Plan v2 approved; Git flow rules G-1..G-9 added to `docs/dev/agent-routing.md`.
+- Commit 4 architecture boundary tests (boundaries_test.dart + cross_feature_baseline.txt) and ARB parity tests (arb_parity_test.dart) added and green.
 
 ## Decisions made in this story
 - B-05 is one branch and one PR (v1's four slices dropped).
@@ -15,7 +16,7 @@ Next story: B-01 domain kernel (05 §7, stage 0).
 - Desktop platform folders removed (targets: Android, iOS).
 
 ## Next
-- Commit 3 format, commit 4 tests (agent), commit 5 CI.
+- Commit 5 CI.
 
 ## Open questions
 - —
