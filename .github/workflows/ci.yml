@@ -32,6 +32,15 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Format
+        run: dart format --output=none --set-exit-if-changed lib test
+      - name: Test-change gate (C-18)
+        if: github.event_name == 'pull_request'
+        run: |
+          c=$(git log --format=%H --grep='^contract(' origin/${{ github.base_ref }}..HEAD | tail -1)
+          if [ -z "$c" ]; then echo "notice: no contract commit"; exit 0; fi
+          git diff --name-status --exit-code "$c" HEAD -- test/
+
       - name: Analyze code
         run: flutter analyze
 

@@ -3,6 +3,9 @@
 Each entry: what we learned, when, who decided, and how to check it is still true.
 At the end of every story: delete entries whose check fails; move entries that became permanent rules into AGENTS.md or a gate, and delete them here. A stale lesson is worse than none.
 
+Before "Squash and merge", set the PR title to <type>(<ID>): <outcome>; GitHub defaults to the branch name.
+Before each commit, compare git status --short with the planned file list; a missing file means a skipped edit.
+
 | Date       | Lesson                                                                                                                                                                                    | Source                                                                | Still true if                                                                          |
 |------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------|----------------------------------------------------------------------------------------|
 | 2026-11    | Android Studio Gemini (flash) sometimes reports a file write that did not apply (3 times). Verify every claimed change with `git status --porcelain` and `git diff`                       | Owner trials                                                          | The executor prompt's expected outcome still asks for `git status --porcelain`         |
