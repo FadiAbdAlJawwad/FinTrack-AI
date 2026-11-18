@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../../core/constant/color_manager.dart';
 import '../../../../core/extension/app_sizes.dart';
 import '../../../../core/extension/text_style_extension.dart';
@@ -44,7 +45,9 @@ class TransactionMetadataRow extends StatelessWidget {
               const SizedBox(height: 8),
               TextField(
                 controller: notesController,
-                style: context.labelMedium.copyWith(color: Theme.of(context).colorScheme.onSurface),
+                style: context.labelMedium.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
                 maxLines: 1,
                 maxLength: maxNoteLength,
                 textInputAction: TextInputAction.done,
@@ -52,10 +55,12 @@ class TransactionMetadataRow extends StatelessWidget {
                   counterText: '',
                   hintText: context.loc.addNote,
                   hintStyle: context.labelMedium.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+                    color: Theme.of(context).colorScheme.onSurface
+                        .withValues(alpha: 0.3),
                   ),
                   filled: true,
-                  fillColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
+                  fillColor: Theme.of(context).colorScheme.onSurface
+                      .withValues(alpha: 0.05),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 14,
@@ -105,7 +110,8 @@ class _InputSelector extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
+              color: Theme.of(context).colorScheme.onSurface
+                  .withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(

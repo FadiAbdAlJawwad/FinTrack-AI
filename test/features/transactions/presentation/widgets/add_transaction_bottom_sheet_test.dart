@@ -71,9 +71,14 @@ Widget createTestApp({
 
   return ProviderScope(
     overrides: [
-      walletControllerProvider.overrideWith(() => TestWalletController(wallets)),
+      walletControllerProvider.overrideWith(
+        () => TestWalletController(wallets),
+      ),
       transactionControllerProvider.overrideWith(
-        () => TestTransactionController(transactions, onAddTransaction: onAddTransaction),
+        () => TestTransactionController(
+          transactions,
+          onAddTransaction: onAddTransaction,
+        ),
       ),
       currencyControllerProvider.overrideWith(FakeCurrencyController.new),
       exchangeRatesBootstrapProvider.overrideWith((ref) async {}),
@@ -113,8 +118,9 @@ void main() {
   );
 
   group('AddTransactionBottomSheet balance check', () {
-    testWidgets('expense above balance shows SnackBar and does not call add',
-        (tester) async {
+    testWidgets('expense above balance shows SnackBar and does not call add', (
+      tester,
+    ) async {
       int addCallCount = 0;
 
       await tester.pumpWidget(
@@ -139,7 +145,10 @@ void main() {
       await tester.tap(categoryFinder);
       await tester.pumpAndSettle();
 
-      final saveButton = find.widgetWithText(ElevatedButton, 'Save Transaction');
+      final saveButton = find.widgetWithText(
+        ElevatedButton,
+        'Save Transaction',
+      );
       await tester.ensureVisible(saveButton);
       await tester.tap(saveButton);
       await tester.pumpAndSettle();
@@ -174,7 +183,10 @@ void main() {
       await tester.tap(categoryFinder);
       await tester.pumpAndSettle();
 
-      final saveButton = find.widgetWithText(ElevatedButton, 'Save Transaction');
+      final saveButton = find.widgetWithText(
+        ElevatedButton,
+        'Save Transaction',
+      );
       await tester.ensureVisible(saveButton);
       await tester.tap(saveButton);
       await tester.pumpAndSettle();
@@ -214,7 +226,10 @@ void main() {
       await tester.tap(categoryFinder);
       await tester.pumpAndSettle();
 
-      final saveButton = find.widgetWithText(ElevatedButton, 'Save Transaction');
+      final saveButton = find.widgetWithText(
+        ElevatedButton,
+        'Save Transaction',
+      );
       await tester.ensureVisible(saveButton);
       await tester.tap(saveButton);
       await tester.pumpAndSettle();
@@ -237,9 +252,14 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            walletControllerProvider.overrideWith(() => TestWalletController([nullBalanceWallet])),
+            walletControllerProvider.overrideWith(
+              () => TestWalletController([nullBalanceWallet]),
+            ),
             transactionControllerProvider.overrideWith(
-              () => TestTransactionController([], onAddTransaction: (tx) async => addCallCount++),
+              () => TestTransactionController(
+                [],
+                onAddTransaction: (tx) async => addCallCount++,
+              ),
             ),
             currencyControllerProvider.overrideWith(FakeCurrencyController.new),
             exchangeRatesBootstrapProvider.overrideWith((ref) async {}),
@@ -249,7 +269,10 @@ void main() {
                 WalletsOverview(
                   currency: AppCurrency.usd,
                   wallets: [
-                    WalletBalance(wallet: nullBalanceWallet, balanceMinor: null),
+                    WalletBalance(
+                      wallet: nullBalanceWallet,
+                      balanceMinor: null,
+                    ),
                   ],
                   unassignedMinor: null,
                   hasUnassigned: false,
@@ -290,7 +313,10 @@ void main() {
       await tester.tap(categoryFinder);
       await tester.pumpAndSettle();
 
-      final saveButton = find.widgetWithText(ElevatedButton, 'Save Transaction');
+      final saveButton = find.widgetWithText(
+        ElevatedButton,
+        'Save Transaction',
+      );
       await tester.ensureVisible(saveButton);
       await tester.tap(saveButton);
       await tester.pumpAndSettle();
@@ -300,190 +326,198 @@ void main() {
     });
 
     testWidgets(
-        'edit mode of expense in SAME wallet passes when new amount <= balance + old amount and fails above',
-        (tester) async {
-      int updateCallCount = 0;
+      'edit mode of expense in SAME wallet passes when new amount <= balance + old amount and fails above',
+      (tester) async {
+        int updateCallCount = 0;
 
-      final wallet = const WalletModel(
-        id: 'w1',
-        name: 'Cash',
-        icon: 'payments',
-        isDefault: true,
-        type: WalletType.cash,
-        openingBalanceMinor: 1000,
-      );
+        final wallet = const WalletModel(
+          id: 'w1',
+          name: 'Cash',
+          icon: 'payments',
+          isDefault: true,
+          type: WalletType.cash,
+          openingBalanceMinor: 1000,
+        );
 
-      final existingExpense = TransactionModel(
-        id: 't1',
-        amountMinor: 600, // $6.00
-        currency: AppCurrency.usd,
-        type: TransactionType.expense,
-        category: TransactionCategory.food,
-        title: 'Lunch',
-        date: DateTime.now(),
-        walletId: 'w1',
-      );
+        final existingExpense = TransactionModel(
+          id: 't1',
+          amountMinor: 600, // $6.00
+          currency: AppCurrency.usd,
+          type: TransactionType.expense,
+          category: TransactionCategory.food,
+          title: 'Lunch',
+          date: DateTime.now(),
+          walletId: 'w1',
+        );
 
-      // Current balance in overview is 500 ($5.00).
-      // Replaced amount in base is 600 ($6.00).
-      // Available = 500 + 600 = 1100 ($11.00).
-      final overview = WalletsOverview(
-        currency: AppCurrency.usd,
-        wallets: [
-          WalletBalance(wallet: wallet, balanceMinor: 500),
-        ],
-        unassignedMinor: null,
-        hasUnassigned: false,
-        totalMinor: 500,
-      );
+        // Current balance in overview is 500 ($5.00).
+        // Replaced amount in base is 600 ($6.00).
+        // Available = 500 + 600 = 1100 ($11.00).
+        final overview = WalletsOverview(
+          currency: AppCurrency.usd,
+          wallets: [WalletBalance(wallet: wallet, balanceMinor: 500)],
+          unassignedMinor: null,
+          hasUnassigned: false,
+          totalMinor: 500,
+        );
 
-      Widget buildApp() {
-        return ProviderScope(
-          overrides: [
-            walletControllerProvider.overrideWith(
-              () => TestWalletController([wallet]),
-            ),
-            transactionControllerProvider.overrideWith(
-              () => TestTransactionController(
-                [existingExpense],
-                onAddTransaction: (tx) async {
-                  updateCallCount++;
-                },
+        Widget buildApp() {
+          return ProviderScope(
+            overrides: [
+              walletControllerProvider.overrideWith(
+                () => TestWalletController([wallet]),
+              ),
+              transactionControllerProvider.overrideWith(
+                () => TestTransactionController(
+                  [existingExpense],
+                  onAddTransaction: (tx) async {
+                    updateCallCount++;
+                  },
+                ),
+              ),
+              currencyControllerProvider.overrideWith(
+                FakeCurrencyController.new,
+              ),
+              exchangeRatesBootstrapProvider.overrideWith((ref) async {}),
+              exchangeRateServiceProvider.overrideWithValue(FakeRateService()),
+              walletsOverviewProvider.overrideWithValue(AsyncData(overview)),
+            ],
+            child: MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: Scaffold(
+                body: Builder(
+                  builder: (context) => ElevatedButton(
+                    onPressed: () => showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (_) => AddTransactionBottomSheet(
+                        existingTransaction: existingExpense,
+                      ),
+                    ),
+                    child: const Text('Open Sheet'),
+                  ),
+                ),
               ),
             ),
-            currencyControllerProvider.overrideWith(FakeCurrencyController.new),
-            exchangeRatesBootstrapProvider.overrideWith((ref) async {}),
-            exchangeRateServiceProvider.overrideWithValue(FakeRateService()),
-            walletsOverviewProvider.overrideWithValue(AsyncData(overview)),
-          ],
-          child: MaterialApp(
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            home: Scaffold(
-              body: Builder(
-                builder: (context) => ElevatedButton(
-                  onPressed: () => showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    builder: (_) => AddTransactionBottomSheet(
-                      existingTransaction: existingExpense,
+          );
+        }
+
+        // 1) Test above $11.00 ($12.00) -> fails
+        await tester.pumpWidget(buildApp());
+        await tester.tap(find.text('Open Sheet'));
+        await tester.pumpAndSettle();
+
+        await tester.enterText(find.byType(TextField).first, '12.00');
+        await tester.pumpAndSettle();
+
+        final saveButton = find.widgetWithText(
+          ElevatedButton,
+          'Edit Transaction',
+        );
+        await tester.ensureVisible(saveButton);
+        await tester.tap(saveButton);
+        await tester.pumpAndSettle();
+
+        expect(updateCallCount, 0);
+        expect(find.text('Insufficient balance'), findsOneWidget);
+
+        // 2) Test <= $11.00 ($10.00) -> passes
+        await tester.enterText(find.byType(TextField).first, '10.00');
+        await tester.pumpAndSettle();
+
+        await tester.tap(saveButton);
+        await tester.pumpAndSettle();
+
+        expect(updateCallCount, 1);
+        expect(find.byType(AddTransactionBottomSheet), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'wallet with balance 0 and no history allows expense under policy [A]',
+      (tester) async {
+        int addCallCount = 0;
+
+        const noHistoryWallet = WalletModel(
+          id: 'w_no_hist',
+          name: 'New Wallet',
+          icon: 'wallet',
+          isDefault: true,
+          type: WalletType.cash,
+          openingBalanceMinor: null,
+        );
+
+        final overview = WalletsOverview(
+          currency: AppCurrency.usd,
+          wallets: [WalletBalance(wallet: noHistoryWallet, balanceMinor: 0)],
+          unassignedMinor: null,
+          hasUnassigned: false,
+          totalMinor: 0,
+        );
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              walletControllerProvider.overrideWith(
+                () => TestWalletController([noHistoryWallet]),
+              ),
+              transactionControllerProvider.overrideWith(
+                () => TestTransactionController(
+                  [],
+                  onAddTransaction: (tx) async => addCallCount++,
+                ),
+              ),
+              currencyControllerProvider.overrideWith(
+                FakeCurrencyController.new,
+              ),
+              exchangeRatesBootstrapProvider.overrideWith((ref) async {}),
+              exchangeRateServiceProvider.overrideWithValue(FakeRateService()),
+              walletsOverviewProvider.overrideWithValue(AsyncData(overview)),
+            ],
+            child: MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: Scaffold(
+                body: Builder(
+                  builder: (context) => ElevatedButton(
+                    onPressed: () => showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (_) => const AddTransactionBottomSheet(),
                     ),
+                    child: const Text('Open Sheet'),
                   ),
-                  child: const Text('Open Sheet'),
                 ),
               ),
             ),
           ),
         );
-      }
 
-      // 1) Test above $11.00 ($12.00) -> fails
-      await tester.pumpWidget(buildApp());
-      await tester.tap(find.text('Open Sheet'));
-      await tester.pumpAndSettle();
+        await tester.tap(find.text('Open Sheet'));
+        await tester.pumpAndSettle();
 
-      await tester.enterText(find.byType(TextField).first, '12.00');
-      await tester.pumpAndSettle();
+        // Enter amount 5.00
+        await tester.enterText(find.byType(TextField).first, '5.00');
+        await tester.pumpAndSettle();
 
-      final saveButton = find.widgetWithText(ElevatedButton, 'Edit Transaction');
-      await tester.ensureVisible(saveButton);
-      await tester.tap(saveButton);
-      await tester.pumpAndSettle();
+        // Select category Food
+        final categoryFinder = find.text('Food');
+        await tester.ensureVisible(categoryFinder);
+        await tester.tap(categoryFinder);
+        await tester.pumpAndSettle();
 
-      expect(updateCallCount, 0);
-      expect(find.text('Insufficient balance'), findsOneWidget);
+        final saveButton = find.widgetWithText(
+          ElevatedButton,
+          'Save Transaction',
+        );
+        await tester.ensureVisible(saveButton);
+        await tester.tap(saveButton);
+        await tester.pumpAndSettle();
 
-      // 2) Test <= $11.00 ($10.00) -> passes
-      await tester.enterText(find.byType(TextField).first, '10.00');
-      await tester.pumpAndSettle();
-
-      await tester.tap(saveButton);
-      await tester.pumpAndSettle();
-
-      expect(updateCallCount, 1);
-      expect(find.byType(AddTransactionBottomSheet), findsNothing);
-    });
-
-    testWidgets(
-        'wallet with balance 0 and no history allows expense under policy [A]',
-        (tester) async {
-      int addCallCount = 0;
-
-      const noHistoryWallet = WalletModel(
-        id: 'w_no_hist',
-        name: 'New Wallet',
-        icon: 'wallet',
-        isDefault: true,
-        type: WalletType.cash,
-        openingBalanceMinor: null,
-      );
-
-      final overview = WalletsOverview(
-        currency: AppCurrency.usd,
-        wallets: [
-          WalletBalance(wallet: noHistoryWallet, balanceMinor: 0),
-        ],
-        unassignedMinor: null,
-        hasUnassigned: false,
-        totalMinor: 0,
-      );
-
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            walletControllerProvider.overrideWith(
-              () => TestWalletController([noHistoryWallet]),
-            ),
-            transactionControllerProvider.overrideWith(
-              () => TestTransactionController(
-                [],
-                onAddTransaction: (tx) async => addCallCount++,
-              ),
-            ),
-            currencyControllerProvider.overrideWith(FakeCurrencyController.new),
-            exchangeRatesBootstrapProvider.overrideWith((ref) async {}),
-            exchangeRateServiceProvider.overrideWithValue(FakeRateService()),
-            walletsOverviewProvider.overrideWithValue(AsyncData(overview)),
-          ],
-          child: MaterialApp(
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            home: Scaffold(
-              body: Builder(
-                builder: (context) => ElevatedButton(
-                  onPressed: () => showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    builder: (_) => const AddTransactionBottomSheet(),
-                  ),
-                  child: const Text('Open Sheet'),
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
-
-      await tester.tap(find.text('Open Sheet'));
-      await tester.pumpAndSettle();
-
-      // Enter amount 5.00
-      await tester.enterText(find.byType(TextField).first, '5.00');
-      await tester.pumpAndSettle();
-
-      // Select category Food
-      final categoryFinder = find.text('Food');
-      await tester.ensureVisible(categoryFinder);
-      await tester.tap(categoryFinder);
-      await tester.pumpAndSettle();
-
-      final saveButton = find.widgetWithText(ElevatedButton, 'Save Transaction');
-      await tester.ensureVisible(saveButton);
-      await tester.tap(saveButton);
-      await tester.pumpAndSettle();
-
-      expect(addCallCount, 1);
-      expect(find.byType(AddTransactionBottomSheet), findsNothing);
-    });
+        expect(addCallCount, 1);
+        expect(find.byType(AddTransactionBottomSheet), findsNothing);
+      },
+    );
   });
 }

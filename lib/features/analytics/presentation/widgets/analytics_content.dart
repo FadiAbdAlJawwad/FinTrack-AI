@@ -12,10 +12,7 @@ import 'category_expense_tile.dart';
 class AnalyticsContent extends StatelessWidget {
   final AnalyticsSummary summary;
 
-  const AnalyticsContent({
-    super.key,
-    required this.summary,
-  });
+  const AnalyticsContent({super.key, required this.summary});
 
   @override
   Widget build(BuildContext context) {

@@ -8,39 +8,40 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   group('WalletsTotalCard', () {
     testWidgets(
-        'renders total amount Text with LTR textDirection in Arabic locale for negative amount',
-        (tester) async {
-      const totalMinor = -1200;
-      const currency = AppCurrency.usd;
-      final expectedAmountText = formatMoney(totalMinor, currency);
+      'renders total amount Text with LTR textDirection in Arabic locale for negative amount',
+      (tester) async {
+        const totalMinor = -1200;
+        const currency = AppCurrency.usd;
+        final expectedAmountText = formatMoney(totalMinor, currency);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          locale: const Locale('ar'),
-          home: const Scaffold(
-            body: WalletsTotalCard(
-              totalMinor: totalMinor,
-              currency: currency,
+        await tester.pumpWidget(
+          MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: const Locale('ar'),
+            home: const Scaffold(
+              body: WalletsTotalCard(
+                totalMinor: totalMinor,
+                currency: currency,
+              ),
             ),
           ),
-        ),
-      );
-      await tester.pumpAndSettle();
+        );
+        await tester.pumpAndSettle();
 
-      final amountTextFinder = find.byWidgetPredicate(
-        (widget) =>
-            widget is Text &&
-            widget.data == expectedAmountText &&
-            widget.textDirection == TextDirection.ltr,
-      );
+        final amountTextFinder = find.byWidgetPredicate(
+          (widget) =>
+              widget is Text &&
+              widget.data == expectedAmountText &&
+              widget.textDirection == TextDirection.ltr,
+        );
 
-      expect(amountTextFinder, findsOneWidget);
+        expect(amountTextFinder, findsOneWidget);
 
-      final textWidget = tester.widget<Text>(amountTextFinder);
-      expect(textWidget.data, equals(expectedAmountText));
-      expect(textWidget.textDirection, equals(TextDirection.ltr));
-    });
+        final textWidget = tester.widget<Text>(amountTextFinder);
+        expect(textWidget.data, equals(expectedAmountText));
+        expect(textWidget.textDirection, equals(TextDirection.ltr));
+      },
+    );
   });
 }

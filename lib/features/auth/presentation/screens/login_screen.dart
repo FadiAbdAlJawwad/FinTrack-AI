@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../../core/constant/color_manager.dart';
 import '../../../../core/constant/images_manager.dart';
 import '../../../../core/extension/app_sizes.dart';
@@ -88,7 +89,8 @@ class LoginScreen extends HookConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         TextButton(
-                          onPressed: () => context.pushNamed(AppRoutes.resetPasswordName),
+                          onPressed: () =>
+                              context.pushNamed(AppRoutes.resetPasswordName),
                           child: Text(context.loc.forgotPassword),
                         ),
                       ],

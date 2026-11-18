@@ -113,7 +113,9 @@ ProviderContainer makeContainer({
       ),
       exchangeRateServiceProvider.overrideWithValue(rateService),
       clockProvider.overrideWithValue(() => now ?? DateTime(2024, 5, 20)),
-      currentUserProvider.overrideWithValue(UserModel(uid: 'u', email: '', fullName: '')),
+      currentUserProvider.overrideWithValue(
+        UserModel(uid: 'u', email: '', fullName: ''),
+      ),
     ],
   );
   addTearDown(container.dispose);
@@ -326,51 +328,57 @@ void main() {
       expect(state.groupedTransactions.values.expand((l) => l), hasLength(1));
     });
 
-    test('shows at most 5 most recent transactions, sorted newest first', () async {
-      final now = DateTime(2024, 5, 20);
-      final transactions = [
-        txOn('tx1', DateTime(2024, 5, 10)),
-        txOn('tx8', DateTime(2024, 5, 18)),
-        txOn('tx3', DateTime(2024, 5, 12)),
-        txOn('tx7', DateTime(2024, 5, 17)),
-        txOn('tx2', DateTime(2024, 5, 11)),
-        txOn('tx5', DateTime(2024, 5, 15)),
-        txOn('tx6', DateTime(2024, 5, 16)),
-        txOn('tx4', DateTime(2024, 5, 13)),
-      ];
-      final container = makeContainer(
-        transactions: transactions,
-        base: 'USD',
-        rateService: FakeRateService(),
-        now: now,
-      );
-      final state = await readDashboard(container);
-      final shownIds = state.groupedTransactions.values
-          .expand((l) => l)
-          .map((t) => t.id)
-          .toList();
-      expect(shownIds, ['tx8', 'tx7', 'tx6', 'tx5', 'tx4']);
-    });
+    test(
+      'shows at most 5 most recent transactions, sorted newest first',
+      () async {
+        final now = DateTime(2024, 5, 20);
+        final transactions = [
+          txOn('tx1', DateTime(2024, 5, 10)),
+          txOn('tx8', DateTime(2024, 5, 18)),
+          txOn('tx3', DateTime(2024, 5, 12)),
+          txOn('tx7', DateTime(2024, 5, 17)),
+          txOn('tx2', DateTime(2024, 5, 11)),
+          txOn('tx5', DateTime(2024, 5, 15)),
+          txOn('tx6', DateTime(2024, 5, 16)),
+          txOn('tx4', DateTime(2024, 5, 13)),
+        ];
+        final container = makeContainer(
+          transactions: transactions,
+          base: 'USD',
+          rateService: FakeRateService(),
+          now: now,
+        );
+        final state = await readDashboard(container);
+        final shownIds = state.groupedTransactions.values
+            .expand((l) => l)
+            .map((t) => t.id)
+            .toList();
+        expect(shownIds, ['tx8', 'tx7', 'tx6', 'tx5', 'tx4']);
+      },
+    );
 
-    test('excludes future-dated transactions from groupedTransactions', () async {
-      final now = DateTime(2024, 5, 20);
-      final transactions = [
-        txOn('past', DateTime(2024, 5, 15)),
-        txOn('future', DateTime(2024, 5, 25)),
-      ];
-      final container = makeContainer(
-        transactions: transactions,
-        base: 'USD',
-        rateService: FakeRateService(),
-        now: now,
-      );
-      final state = await readDashboard(container);
-      final shownIds = state.groupedTransactions.values
-          .expand((l) => l)
-          .map((t) => t.id)
-          .toList();
-      expect(shownIds, ['past']);
-    });
+    test(
+      'excludes future-dated transactions from groupedTransactions',
+      () async {
+        final now = DateTime(2024, 5, 20);
+        final transactions = [
+          txOn('past', DateTime(2024, 5, 15)),
+          txOn('future', DateTime(2024, 5, 25)),
+        ];
+        final container = makeContainer(
+          transactions: transactions,
+          base: 'USD',
+          rateService: FakeRateService(),
+          now: now,
+        );
+        final state = await readDashboard(container);
+        final shownIds = state.groupedTransactions.values
+            .expand((l) => l)
+            .map((t) => t.id)
+            .toList();
+        expect(shownIds, ['past']);
+      },
+    );
 
     test('totals include transactions beyond the 5 shown', () async {
       final now = DateTime(2024, 5, 20);

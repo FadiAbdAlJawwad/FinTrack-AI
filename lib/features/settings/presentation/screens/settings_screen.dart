@@ -13,10 +13,7 @@ class SettingsScreen extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(context.loc.navSettings),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: Text(context.loc.navSettings), centerTitle: true),
       body: SingleChildScrollView(
         child: Column(
           children: [

@@ -25,9 +25,7 @@ class LogoutConfirmDialog extends StatelessWidget {
           child: Text(context.loc.cancel),
         ),
         TextButton(
-          style: TextButton.styleFrom(
-            foregroundColor: ColorManager.errorColor,
-          ),
+          style: TextButton.styleFrom(foregroundColor: ColorManager.errorColor),
           onPressed: () => Navigator.pop(context, true),
           child: Text(context.loc.logout),
         ),

@@ -32,14 +32,17 @@ class WalletIconSelector extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               color: isSelected
                   ? ColorManager.primaryBlue.withValues(alpha: 0.1)
-                  : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
+                  : Theme.of(context).colorScheme.onSurface
+                        .withValues(alpha: 0.05),
               border: isSelected
                   ? Border.all(color: ColorManager.primaryBlue, width: 2)
                   : null,
             ),
             child: Icon(
               iconData,
-              color: isSelected ? ColorManager.primaryBlue : ColorManager.secondaryColor,
+              color: isSelected
+                  ? ColorManager.primaryBlue
+                  : ColorManager.secondaryColor,
             ),
           ),
         );

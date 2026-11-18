@@ -46,25 +46,31 @@ WalletsOverview buildWalletsOverview({
   });
 
   int? getBalanceMinor(List<TransactionModel> txs, {WalletModel? wallet}) {
-    if (txs.isEmpty && (wallet == null || wallet.openingBalanceMinor == null)) return 0;
-    
+    if (txs.isEmpty && (wallet == null || wallet.openingBalanceMinor == null)) {
+      return 0;
+    }
+
     final calculated = calculateTotals(txs);
-    
-    if (wallet != null && wallet.openingBalanceMinor != null && wallet.openingBalanceCurrency != null) {
+
+    if (wallet != null &&
+        wallet.openingBalanceMinor != null &&
+        wallet.openingBalanceCurrency != null) {
       final currency = wallet.openingBalanceCurrency!;
-      final current = calculated[currency] ?? const CurrencyTotals(incomeMinor: 0, expenseMinor: 0);
+      final current =
+          calculated[currency] ??
+          const CurrencyTotals(incomeMinor: 0, expenseMinor: 0);
       calculated[currency] = CurrencyTotals(
         incomeMinor: current.incomeMinor + wallet.openingBalanceMinor!,
         expenseMinor: current.expenseMinor,
       );
     }
-    
+
     final converted = convertTotals(calculated, target, rateBetween);
-    
+
     if (converted.incomeMinor == null || converted.expenseMinor == null) {
       return null;
     }
-    
+
     return converted.incomeMinor! - converted.expenseMinor!;
   }
 
@@ -77,16 +83,16 @@ WalletsOverview buildWalletsOverview({
     if (wallet.id == null) {
       balanceMinor = getBalanceMinor([], wallet: wallet);
     } else {
-      balanceMinor = getBalanceMinor(transactionsByWallet[wallet.id!]!, wallet: wallet);
-    }
-    
-    walletBalances.add(
-      WalletBalance(
+      balanceMinor = getBalanceMinor(
+        transactionsByWallet[wallet.id!]!,
         wallet: wallet,
-        balanceMinor: balanceMinor,
-      ),
+      );
+    }
+
+    walletBalances.add(
+      WalletBalance(wallet: wallet, balanceMinor: balanceMinor),
     );
-    
+
     if (balanceMinor == null) {
       totalHasNull = true;
     } else if (!totalHasNull && totalMinor != null) {

@@ -55,9 +55,7 @@ class AddTransactionBottomSheet extends HookConsumerWidget {
         ? (isAutoTitle(tx) ? '' : tx.title)
         : (prefillDraft?.title ?? '');
     final notesController = useTextEditingController(
-      text: initialNotesText.characters
-          .take(maxNoteLength)
-          .toString(),
+      text: initialNotesText.characters.take(maxNoteLength).toString(),
     );
     final isLoading = useState(false);
 
@@ -120,8 +118,7 @@ class AddTransactionBottomSheet extends HookConsumerWidget {
           double rateBetween(AppCurrency from, AppCurrency to) =>
               rateService.rateBetween(from.code, to.code);
 
-          final walletsOverview =
-              ref.read(walletsOverviewProvider).valueOrNull;
+          final walletsOverview = ref.read(walletsOverviewProvider).valueOrNull;
 
           int? walletBalanceMinor;
           AppCurrency baseCurrency = appCurrencyFromCode(appCurrencyCode);
@@ -139,8 +136,10 @@ class AddTransactionBottomSheet extends HookConsumerWidget {
               existingTransaction!.type == TransactionType.expense &&
               existingTransaction!.walletId == selectedWalletId.value) {
             try {
-              final rate =
-                  rateBetween(existingTransaction!.currency, baseCurrency);
+              final rate = rateBetween(
+                existingTransaction!.currency,
+                baseCurrency,
+              );
               replacedAmountMinorInBase = convertMinorUnits(
                 existingTransaction!.amountMinor,
                 existingTransaction!.currency,
@@ -322,7 +321,9 @@ class AddTransactionBottomSheet extends HookConsumerWidget {
                       elevation: 0,
                     ),
                     child: isLoading.value
-                        ? const CircularProgressIndicator(color: ColorManager.white)
+                        ? const CircularProgressIndicator(
+                            color: ColorManager.white,
+                          )
                         : Text(
                             existingTransaction == null
                                 ? context.loc.saveTransaction

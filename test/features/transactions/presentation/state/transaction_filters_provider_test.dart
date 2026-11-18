@@ -92,7 +92,9 @@ ProviderContainer makeTestContainer({
       clockProvider.overrideWithValue(
         () => clockNow ?? DateTime(2024, 5, 15, 10),
       ),
-      currentUserProvider.overrideWithValue(UserModel(uid: 'u', email: '', fullName: '')),
+      currentUserProvider.overrideWithValue(
+        UserModel(uid: 'u', email: '', fullName: ''),
+      ),
     ],
   );
   addTearDown(container.dispose);
@@ -106,50 +108,18 @@ Future<void> awaitData(ProviderContainer container) async {
 }
 
 void main() {
-  test(
-    'a) default (no date filter): includes May 1 00:00 and May 31 23:59, excludes Apr 30 23:59 and Jun 1 00:00',
-    () async {
-      final txs = [
-        makeTx(
-          id: 'apr_end',
-          date: DateTime(2024, 4, 30, 23, 59),
-          type: TransactionType.expense,
-        ),
-        makeTx(
-          id: 'may_start',
-          date: DateTime(2024, 5, 1, 0, 0),
-          type: TransactionType.income,
-        ),
-        makeTx(
-          id: 'may_end',
-          date: DateTime(2024, 5, 31, 23, 59),
-          type: TransactionType.expense,
-        ),
-        makeTx(
-          id: 'jun_start',
-          date: DateTime(2024, 6, 1, 0, 0),
-          type: TransactionType.income,
-        ),
-      ];
-
-      final container = makeTestContainer(
-        transactions: txs,
-        clockNow: DateTime(2024, 5, 15, 10),
-      );
-      container.listen(filteredTransactionsProvider, (_, _) {});
-      await awaitData(container);
-
-      final filtered = container.read(filteredTransactionsProvider);
-      final ids = filtered.values.expand((l) => l).map((t) => t.id).toList();
-
-      expect(ids, containsAll(['may_start', 'may_end']));
-      expect(ids, isNot(contains('apr_end')));
-      expect(ids, isNot(contains('jun_start')));
-    },
-  );
-
-  test('b) clock on 2024-06-01: a 2024-05-31 transaction is excluded', () async {
+  test('a) default (no date filter): includes May 1 00:00 and May 31 23:59, excludes Apr 30 23:59 and Jun 1 00:00', () async {
     final txs = [
+      makeTx(
+        id: 'apr_end',
+        date: DateTime(2024, 4, 30, 23, 59),
+        type: TransactionType.expense,
+      ),
+      makeTx(
+        id: 'may_start',
+        date: DateTime(2024, 5, 1, 0, 0),
+        type: TransactionType.income,
+      ),
       makeTx(
         id: 'may_end',
         date: DateTime(2024, 5, 31, 23, 59),
@@ -157,14 +127,14 @@ void main() {
       ),
       makeTx(
         id: 'jun_start',
-        date: DateTime(2024, 6, 1, 10, 0),
+        date: DateTime(2024, 6, 1, 0, 0),
         type: TransactionType.income,
       ),
     ];
 
     final container = makeTestContainer(
       transactions: txs,
-      clockNow: DateTime(2024, 6, 1, 12, 0),
+      clockNow: DateTime(2024, 5, 15, 10),
     );
     container.listen(filteredTransactionsProvider, (_, _) {});
     await awaitData(container);
@@ -172,8 +142,40 @@ void main() {
     final filtered = container.read(filteredTransactionsProvider);
     final ids = filtered.values.expand((l) => l).map((t) => t.id).toList();
 
-    expect(ids, ['jun_start']);
+    expect(ids, containsAll(['may_start', 'may_end']));
+    expect(ids, isNot(contains('apr_end')));
+    expect(ids, isNot(contains('jun_start')));
   });
+
+  test(
+    'b) clock on 2024-06-01: a 2024-05-31 transaction is excluded',
+    () async {
+      final txs = [
+        makeTx(
+          id: 'may_end',
+          date: DateTime(2024, 5, 31, 23, 59),
+          type: TransactionType.expense,
+        ),
+        makeTx(
+          id: 'jun_start',
+          date: DateTime(2024, 6, 1, 10, 0),
+          type: TransactionType.income,
+        ),
+      ];
+
+      final container = makeTestContainer(
+        transactions: txs,
+        clockNow: DateTime(2024, 6, 1, 12, 0),
+      );
+      container.listen(filteredTransactionsProvider, (_, _) {});
+      await awaitData(container);
+
+      final filtered = container.read(filteredTransactionsProvider);
+      final ids = filtered.values.expand((l) => l).map((t) => t.id).toList();
+
+      expect(ids, ['jun_start']);
+    },
+  );
 
   test('c) date filter set to April 2024 range replaces default', () async {
     final txs = [
@@ -197,10 +199,7 @@ void main() {
     await awaitData(container);
 
     container.read(transactionDateRangeFilterProvider.notifier).state =
-        DateTimeRange(
-          start: DateTime(2024, 4, 1),
-          end: DateTime(2024, 4, 30),
-        );
+        DateTimeRange(start: DateTime(2024, 4, 1), end: DateTime(2024, 4, 30));
 
     final filtered = container.read(filteredTransactionsProvider);
     final ids = filtered.values.expand((l) => l).map((t) => t.id).toList();
@@ -238,48 +237,45 @@ void main() {
     expect(ids, ['may_inc']);
   });
 
-  test(
-    'e) periodTotalsProvider with USD base: totals count current-month transactions and ignore type filter',
-    () async {
-      final txs = [
-        makeTx(
-          id: 'may_inc',
-          date: DateTime(2024, 5, 10),
-          type: TransactionType.income,
-          amountMinor: 100,
-        ),
-        makeTx(
-          id: 'may_exp',
-          date: DateTime(2024, 5, 12),
-          type: TransactionType.expense,
-          amountMinor: 200,
-        ),
-        makeTx(
-          id: 'apr_inc',
-          date: DateTime(2024, 4, 10),
-          type: TransactionType.income,
-          amountMinor: 500,
-        ),
-      ];
+  test('e) periodTotalsProvider with USD base: totals count current-month transactions and ignore type filter', () async {
+    final txs = [
+      makeTx(
+        id: 'may_inc',
+        date: DateTime(2024, 5, 10),
+        type: TransactionType.income,
+        amountMinor: 100,
+      ),
+      makeTx(
+        id: 'may_exp',
+        date: DateTime(2024, 5, 12),
+        type: TransactionType.expense,
+        amountMinor: 200,
+      ),
+      makeTx(
+        id: 'apr_inc',
+        date: DateTime(2024, 4, 10),
+        type: TransactionType.income,
+        amountMinor: 500,
+      ),
+    ];
 
-      final container = makeTestContainer(
-        transactions: txs,
-        clockNow: DateTime(2024, 5, 15, 10),
-      );
-      container.listen(periodTotalsProvider, (_, _) {});
-      await awaitData(container);
+    final container = makeTestContainer(
+      transactions: txs,
+      clockNow: DateTime(2024, 5, 15, 10),
+    );
+    container.listen(periodTotalsProvider, (_, _) {});
+    await awaitData(container);
 
-      // Set type filter to income
-      container.read(transactionTypeFilterProvider.notifier).state =
-          TransactionType.income;
+    // Set type filter to income
+    container.read(transactionTypeFilterProvider.notifier).state =
+        TransactionType.income;
 
-      final totals = container.read(periodTotalsProvider).requireValue;
+    final totals = container.read(periodTotalsProvider).requireValue;
 
-      expect(totals.currency, AppCurrency.usd);
-      expect(totals.incomeMinor, 100);
-      expect(totals.expenseMinor, 200); // non-zero despite type filter
-    },
-  );
+    expect(totals.currency, AppCurrency.usd);
+    expect(totals.incomeMinor, 100);
+    expect(totals.expenseMinor, 200); // non-zero despite type filter
+  });
 
   test('f) periodTotalsProvider follows date filter', () async {
     final txs = [
@@ -311,10 +307,7 @@ void main() {
     await awaitData(container);
 
     container.read(transactionDateRangeFilterProvider.notifier).state =
-        DateTimeRange(
-          start: DateTime(2024, 4, 1),
-          end: DateTime(2024, 4, 30),
-        );
+        DateTimeRange(start: DateTime(2024, 4, 1), end: DateTime(2024, 4, 30));
 
     final totals = container.read(periodTotalsProvider).requireValue;
 

@@ -56,7 +56,12 @@ class WalletMigrationService {
       isDefault: false,
       type: WalletType.eWallet,
     ),
-    'other': WalletModel(name: 'Other', icon: 'more_horiz', isDefault: false, type: WalletType.cash),
+    'other': WalletModel(
+      name: 'Other',
+      icon: 'more_horiz',
+      isDefault: false,
+      type: WalletType.cash,
+    ),
   };
 
   /// Wraps [_seed] so Firebase errors surface as typed wallet exceptions.

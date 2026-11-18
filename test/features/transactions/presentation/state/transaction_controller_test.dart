@@ -59,7 +59,9 @@ void main() {
     container = ProviderContainer(
       overrides: [
         transactionRepositoryProvider.overrideWithValue(repo),
-        currentUserProvider.overrideWithValue(UserModel(uid: 'u', email: '', fullName: '')),
+        currentUserProvider.overrideWithValue(
+          UserModel(uid: 'u', email: '', fullName: ''),
+        ),
       ],
     );
     addTearDown(container.dispose);
@@ -81,7 +83,7 @@ void main() {
       addTearDown(c.dispose);
       addTearDown(() => unawaited(verifyRepo.controller.close()));
       c.listen(transactionControllerProvider, (_, _) {});
-      
+
       final state = await c.read(transactionControllerProvider.future);
       expect(state, isEmpty);
       expect(callCount, 0); // Repository stream was not accessed
@@ -127,7 +129,9 @@ void main() {
       final c = ProviderContainer(
         overrides: [
           transactionRepositoryProvider.overrideWithValue(failing),
-          currentUserProvider.overrideWithValue(UserModel(uid: 'u', email: '', fullName: '')),
+          currentUserProvider.overrideWithValue(
+            UserModel(uid: 'u', email: '', fullName: ''),
+          ),
         ],
       );
       addTearDown(c.dispose);

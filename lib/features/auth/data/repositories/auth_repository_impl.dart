@@ -1,9 +1,11 @@
 import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
 import '../../../../core/error/auth_exception.dart';
 import '../../../../core/providers/firebase_providers.dart';
 import '../../domain/models/user_model.dart';
@@ -20,10 +22,7 @@ class AuthRepository implements AuthRepositoryInterface {
   final FirebaseAuth _auth;
   final FirebaseFirestore _firestore;
 
-  AuthRepository(
-    this._auth,
-    this._firestore,
-  );
+  AuthRepository(this._auth, this._firestore);
 
   @override
   Future<UserModel> signIn(String email, String password) async {
@@ -47,8 +46,7 @@ class AuthRepository implements AuthRepositoryInterface {
     try {
       final googleSignIn = GoogleSignIn.instance;
       await googleSignIn.initialize(
-        serverClientId:
-            '668771022671-ji2qg0jf204t0f5agoigh07b39cgm60d.apps.googleusercontent.com',
+        serverClientId: '668771022671-ji2qg0jf204t0f5agoigh07b39cgm60d.apps.googleusercontent.com',
       );
 
       final GoogleSignInAccount googleUser = await googleSignIn.authenticate();

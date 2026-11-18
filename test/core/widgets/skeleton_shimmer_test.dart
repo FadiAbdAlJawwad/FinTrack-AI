@@ -16,7 +16,10 @@ void main() {
         ),
       );
 
-      expect(tester.getSize(find.byType(SkeletonBlock)), equals(const Size(150, 40)));
+      expect(
+        tester.getSize(find.byType(SkeletonBlock)),
+        equals(const Size(150, 40)),
+      );
     });
 
     testWidgets(
@@ -55,7 +58,10 @@ void main() {
       final darkColors = skeletonColors(Brightness.dark);
 
       expect(lightColors.baseColor, isNot(equals(darkColors.baseColor)));
-      expect(lightColors.highlightColor, isNot(equals(darkColors.highlightColor)));
+      expect(
+        lightColors.highlightColor,
+        isNot(equals(darkColors.highlightColor)),
+      );
     });
   });
 }

@@ -35,13 +35,14 @@ void main() {
             );
           }
         }
-        
-        final isBiometricEnabled = prefs.getBool(SharedPrefsKeys.isBiometricEnabledKey) ?? false;
+
+        final isBiometricEnabled =
+            prefs.getBool(SharedPrefsKeys.isBiometricEnabledKey) ?? false;
         final isUserSignedIn = FirebaseAuth.instance.currentUser != null;
         final appLockNotifier = AppLockNotifier(
           initialLocked: isBiometricEnabled && isUserSignedIn,
         );
-        
+
         return ProviderScope(
           overrides: [
             sharedPrefsProvider.overrideWithValue(prefs),
@@ -88,7 +89,8 @@ class FinTrackApp extends ConsumerWidget {
         final error = ratesBootstrap.error;
         if (error != null) {
           return ExchangeRateGateScreen(
-            error: (error is NoExchangeRatesAvailableException ||
+            error:
+                (error is NoExchangeRatesAvailableException ||
                     error is ExchangeRateServiceException)
                 ? error
                 : ExchangeRateServiceException(error.toString()),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../../core/extension/app_sizes.dart';
 
 class MainBottomNavBar extends StatelessWidget {
@@ -16,9 +17,7 @@ class MainBottomNavBar extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         border: Border(
-          top: BorderSide(
-            color: Theme.of(context).colorScheme.outlineVariant,
-          ),
+          top: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
         ),
       ),
       child: NavigationBar(

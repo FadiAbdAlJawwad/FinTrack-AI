@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../extension/app_sizes.dart';
 import 'auth_exception.dart';
 

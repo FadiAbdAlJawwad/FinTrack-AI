@@ -47,39 +47,61 @@ void main() {
       expect(repo.store['cash'], cash);
       expect(
         repo.store['bank'],
-        const WalletModel(name: 'Bank Account', icon: 'account_balance', type: WalletType.bank),
+        const WalletModel(
+          name: 'Bank Account',
+          icon: 'account_balance',
+          type: WalletType.bank,
+        ),
       );
       expect(
         repo.store['paypal'],
-        const WalletModel(name: 'PayPal', icon: 'account_balance_wallet', type: WalletType.eWallet),
+        const WalletModel(
+          name: 'PayPal',
+          icon: 'account_balance_wallet',
+          type: WalletType.eWallet,
+        ),
       );
       expect(
         repo.store['other'],
-        const WalletModel(name: 'Other', icon: 'more_horiz', type: WalletType.cash),
+        const WalletModel(
+          name: 'Other',
+          icon: 'more_horiz',
+          type: WalletType.cash,
+        ),
       );
       expect(repo.store.values.where((w) => w.isDefault), hasLength(1));
     });
 
-    test('default wallet exists with secondary wallets deleted: no writes', () async {
-      final repo = InMemoryWalletRepository({'cash': cash});
-      await WalletMigrationService(repository: repo).runIfNeeded();
+    test(
+      'default wallet exists with secondary wallets deleted: no writes',
+      () async {
+        final repo = InMemoryWalletRepository({'cash': cash});
+        await WalletMigrationService(repository: repo).runIfNeeded();
 
-      expect(repo.upserts, isEmpty);
-    });
+        expect(repo.upserts, isEmpty);
+      },
+    );
 
-    test('only a non-default wallet exists: completes seeding with cash last', () async {
-      final repo = InMemoryWalletRepository({
-        'x': const WalletModel(name: 'Savings', icon: 'savings'),
-      });
-      await WalletMigrationService(repository: repo).runIfNeeded();
+    test(
+      'only a non-default wallet exists: completes seeding with cash last',
+      () async {
+        final repo = InMemoryWalletRepository({
+          'x': const WalletModel(name: 'Savings', icon: 'savings'),
+        });
+        await WalletMigrationService(repository: repo).runIfNeeded();
 
-      expect(repo.upserts, ['bank', 'paypal', 'other', 'cash']);
-      expect(repo.upserts.last, 'cash');
-    });
+        expect(repo.upserts, ['bank', 'paypal', 'other', 'cash']);
+        expect(repo.upserts.last, 'cash');
+      },
+    );
 
     test('a legacy default wallet with a random id alone: no writes', () async {
       final repo = InMemoryWalletRepository({
-        'legacy_id': const WalletModel(name: 'Cash', icon: 'payments', isDefault: true),
+        'legacy_id': const WalletModel(
+          name: 'Cash',
+          icon: 'payments',
+          isDefault: true,
+        ),
       });
       await WalletMigrationService(repository: repo).runIfNeeded();
 

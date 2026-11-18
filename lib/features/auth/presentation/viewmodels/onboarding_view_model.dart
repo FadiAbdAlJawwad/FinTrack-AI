@@ -1,5 +1,7 @@
 import '../../../../core/constant/images_manager.dart';
+
 import 'package:flutter/material.dart';
+
 import '../../../../core/extension/app_sizes.dart';
 
 /// Presentation-layer view model for the onboarding carousel.

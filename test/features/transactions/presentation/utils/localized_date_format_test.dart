@@ -15,15 +15,12 @@ void main() {
       expect(toWesternDigits('٠١٢٣٤٥٦٧٨٩'), equals('0123456789'));
     });
 
-    test(
-      '2. toWesternDigits maps Persian digits and preserves Latin digits, letters, punctuation',
-      () {
-        expect(
-          toWesternDigits('۰۱۲۳۴۵۶۷۸۹ ABC abc 123 !@#'),
-          equals('0123456789 ABC abc 123 !@#'),
-        );
-      },
-    );
+    test('2. toWesternDigits maps Persian digits and preserves Latin digits, letters, punctuation', () {
+      expect(
+        toWesternDigits('۰۱۲۳۴۵۶۷۸۹ ABC abc 123 !@#'),
+        equals('0123456789 ABC abc 123 !@#'),
+      );
+    });
 
     testWidgets('3. English: formatLocalizedDate returns Oct 14, 03:30 PM', (
       tester,

@@ -34,8 +34,7 @@ class ErrorTxRepository extends Fake implements TransactionRepository {
   final Object error;
 
   @override
-  Stream<List<TransactionModel>> getTransactionsStream() =>
-      Stream.error(error);
+  Stream<List<TransactionModel>> getTransactionsStream() => Stream.error(error);
 }
 
 class FixedCurrencyRepository extends Fake implements CurrencyRepository {
@@ -99,7 +98,9 @@ ProviderContainer makeContainer({
       ),
       exchangeRateServiceProvider.overrideWithValue(rateService),
       clockProvider.overrideWithValue(() => now ?? DateTime(2026, 10, 14)),
-      currentUserProvider.overrideWithValue(UserModel(uid: 'u', email: '', fullName: '')),
+      currentUserProvider.overrideWithValue(
+        UserModel(uid: 'u', email: '', fullName: ''),
+      ),
     ],
   );
   addTearDown(container.dispose);
@@ -107,7 +108,11 @@ ProviderContainer makeContainer({
 }
 
 void main() {
-  final now = DateTime(2026, 10, 14); // Month: Oct 1..Nov 1. Week: Oct 8..Oct 15.
+  final now = DateTime(
+    2026,
+    10,
+    14,
+  ); // Month: Oct 1..Nov 1. Week: Oct 8..Oct 15.
 
   group('analyticsSummaryProvider', () {
     test('19. Default period is month; setting analyticsPeriodProvider to week recomputes the summary for that period', () async {
@@ -144,13 +149,16 @@ void main() {
 
       // Default period is month
       expect(container.read(analyticsPeriodProvider), AnalyticsPeriod.month);
-      final monthSummary = container.read(analyticsSummaryProvider).requireValue;
+      final monthSummary = container
+          .read(analyticsSummaryProvider)
+          .requireValue;
       expect(monthSummary.period, AnalyticsPeriod.month);
       expect(monthSummary.transactionCount, 2);
       expect(monthSummary.expenseMinor, 3000);
 
       // Switch period to week
-      container.read(analyticsPeriodProvider.notifier).state = AnalyticsPeriod.week;
+      container.read(analyticsPeriodProvider.notifier).state =
+          AnalyticsPeriod.week;
 
       final weekSummary = container.read(analyticsSummaryProvider).requireValue;
       expect(weekSummary.period, AnalyticsPeriod.week);
@@ -199,16 +207,22 @@ void main() {
       await container.read(currencyControllerProvider.future);
       await container.read(transactionControllerProvider.future);
 
-      final initialSummary = container.read(analyticsSummaryProvider).requireValue;
+      final initialSummary = container
+          .read(analyticsSummaryProvider)
+          .requireValue;
       expect(initialSummary.transactionCount, 1);
 
       // Change Transactions screen filter to a date range in 2020 that excludes tx1
-      container.read(transactionDateRangeFilterProvider.notifier).state = DateTimeRange(
+      container
+          .read(transactionDateRangeFilterProvider.notifier)
+          .state = DateTimeRange(
         start: DateTime(2020, 1, 1),
         end: DateTime(2020, 1, 31),
       );
 
-      final summaryAfterFilterChange = container.read(analyticsSummaryProvider).requireValue;
+      final summaryAfterFilterChange = container
+          .read(analyticsSummaryProvider)
+          .requireValue;
       expect(summaryAfterFilterChange.transactionCount, 1);
       expect(summaryAfterFilterChange.expenseMinor, 1000);
     });

@@ -184,16 +184,13 @@ void main() {
       expect(g[TransactionGroup.thisMonth] ?? const [], isEmpty);
     });
 
-    test(
-      'yesterday across a DST change is still YESTERDAY',
-      () {
-        // yesterday is computed with calendar arithmetic (DateTime(y, m, d - 1)), so it is independent of DST and of the machine time zone
-        final dst = DateTime(2024, 3, 11, 12);
-        final g = groupTransactions([
-          tx('a', DateTime(2024, 3, 10, 12)),
-        ], now: dst);
-        expect(g.keys, [TransactionGroup.yesterday]);
-      },
-    );
+    test('yesterday across a DST change is still YESTERDAY', () {
+      // yesterday is computed with calendar arithmetic (DateTime(y, m, d - 1)), so it is independent of DST and of the machine time zone
+      final dst = DateTime(2024, 3, 11, 12);
+      final g = groupTransactions([
+        tx('a', DateTime(2024, 3, 10, 12)),
+      ], now: dst);
+      expect(g.keys, [TransactionGroup.yesterday]);
+    });
   });
 }

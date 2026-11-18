@@ -36,7 +36,10 @@ void main() {
       final inactiveLabelColor = inactiveLabelStyle?.color;
 
       expect(inactiveLabelColor, isNotNull);
-      final ratio = contrastRatio(inactiveLabelColor!, ColorManager.lightSurface);
+      final ratio = contrastRatio(
+        inactiveLabelColor!,
+        ColorManager.lightSurface,
+      );
       expect(ratio, greaterThanOrEqualTo(4.5));
     });
 
@@ -47,7 +50,10 @@ void main() {
       final inactiveIconColor = inactiveIconTheme?.color;
 
       expect(inactiveIconColor, isNotNull);
-      final ratio = contrastRatio(inactiveIconColor!, ColorManager.lightSurface);
+      final ratio = contrastRatio(
+        inactiveIconColor!,
+        ColorManager.lightSurface,
+      );
       expect(ratio, greaterThanOrEqualTo(4.5));
     });
 
@@ -62,15 +68,21 @@ void main() {
       expect(inactiveIconColor, equals(ColorManager.secondaryColor));
     });
 
-    test('8. Both themes: SELECTED label/icon styles are unchanged in color', () {
-      final selectedStates = {WidgetState.selected};
+    test(
+      '8. Both themes: SELECTED label/icon styles are unchanged in color',
+      () {
+        final selectedStates = {WidgetState.selected};
 
-      for (final theme in [AppTheme.lightTheme('en'), AppTheme.darkTheme('en')]) {
-        final navTheme = theme.navigationBarTheme;
-        final selectedIconTheme = navTheme.iconTheme?.resolve(selectedStates);
-        expect(selectedIconTheme?.color, equals(ColorManager.white));
-        expect(navTheme.indicatorColor, equals(ColorManager.primaryBlue));
-      }
-    });
+        for (final theme in [
+          AppTheme.lightTheme('en'),
+          AppTheme.darkTheme('en'),
+        ]) {
+          final navTheme = theme.navigationBarTheme;
+          final selectedIconTheme = navTheme.iconTheme?.resolve(selectedStates);
+          expect(selectedIconTheme?.color, equals(ColorManager.white));
+          expect(navTheme.indicatorColor, equals(ColorManager.primaryBlue));
+        }
+      },
+    );
   });
 }

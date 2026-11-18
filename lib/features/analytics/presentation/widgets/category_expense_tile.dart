@@ -51,9 +51,7 @@ class CategoryExpenseTile extends StatelessWidget {
                         minHeight: 4,
                         borderRadius: BorderRadius.circular(4),
                         color: ColorManager.primaryBlue,
-                        backgroundColor: Theme.of(context)
-                            .colorScheme
-                            .onSurface
+                        backgroundColor: Theme.of(context).colorScheme.onSurface
                             .withValues(alpha: 0.1),
                       ),
                     ),

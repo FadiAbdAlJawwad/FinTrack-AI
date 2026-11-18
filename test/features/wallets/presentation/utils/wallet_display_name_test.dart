@@ -6,8 +6,9 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('walletDisplayName', () {
-    testWidgets('returns localized name for seeded wallets under en and ar',
-        (tester) async {
+    testWidgets('returns localized name for seeded wallets under en and ar', (
+      tester,
+    ) async {
       late AppLocalizations locEn;
       late AppLocalizations locAr;
 
@@ -55,11 +56,7 @@ void main() {
         name: 'PayPal',
         icon: 'account_balance_wallet',
       );
-      const other = WalletModel(
-        id: 'other',
-        name: 'Other',
-        icon: 'more_horiz',
-      );
+      const other = WalletModel(id: 'other', name: 'Other', icon: 'more_horiz');
 
       expect(walletDisplayName(locEn, cash), 'Cash');
       expect(walletDisplayName(locAr, cash), 'نقدي');
@@ -74,8 +71,9 @@ void main() {
       expect(walletDisplayName(locAr, other), 'أخرى');
     });
 
-    testWidgets('returns stored name if seeded wallet was renamed',
-        (tester) async {
+    testWidgets('returns stored name if seeded wallet was renamed', (
+      tester,
+    ) async {
       late AppLocalizations locAr;
 
       await tester.pumpWidget(
@@ -100,8 +98,7 @@ void main() {
       expect(walletDisplayName(locAr, renamedCash), 'My Custom Cash');
     });
 
-    testWidgets('returns stored name for non-seeded wallet id',
-        (tester) async {
+    testWidgets('returns stored name for non-seeded wallet id', (tester) async {
       late AppLocalizations locAr;
 
       await tester.pumpWidget(
@@ -127,47 +124,51 @@ void main() {
     });
 
     testWidgets(
-        'legacy default with random id shows Arabic name, non-default Cash with random id is not localized, renamed default is unchanged',
-        (tester) async {
-      late AppLocalizations locAr;
+      'legacy default with random id shows Arabic name, non-default Cash with random id is not localized, renamed default is unchanged',
+      (tester) async {
+        late AppLocalizations locAr;
 
-      await tester.pumpWidget(
-        MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          locale: const Locale('ar'),
-          home: Builder(
-            builder: (context) {
-              locAr = AppLocalizations.of(context);
-              return const SizedBox();
-            },
+        await tester.pumpWidget(
+          MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: const Locale('ar'),
+            home: Builder(
+              builder: (context) {
+                locAr = AppLocalizations.of(context);
+                return const SizedBox();
+              },
+            ),
           ),
-        ),
-      );
+        );
 
-      const legacyDefaultRandomId = WalletModel(
-        id: 'random_xyz_999',
-        name: 'Cash',
-        icon: 'payments',
-        isDefault: true,
-      );
-      expect(walletDisplayName(locAr, legacyDefaultRandomId), 'نقدي');
+        const legacyDefaultRandomId = WalletModel(
+          id: 'random_xyz_999',
+          name: 'Cash',
+          icon: 'payments',
+          isDefault: true,
+        );
+        expect(walletDisplayName(locAr, legacyDefaultRandomId), 'نقدي');
 
-      const nonDefaultCashRandomId = WalletModel(
-        id: 'random_abc_123',
-        name: 'Cash',
-        icon: 'payments',
-        isDefault: false,
-      );
-      expect(walletDisplayName(locAr, nonDefaultCashRandomId), 'Cash');
+        const nonDefaultCashRandomId = WalletModel(
+          id: 'random_abc_123',
+          name: 'Cash',
+          icon: 'payments',
+          isDefault: false,
+        );
+        expect(walletDisplayName(locAr, nonDefaultCashRandomId), 'Cash');
 
-      const renamedDefaultRandomId = WalletModel(
-        id: 'random_xyz_999',
-        name: 'My Custom Cash',
-        icon: 'payments',
-        isDefault: true,
-      );
-      expect(walletDisplayName(locAr, renamedDefaultRandomId), 'My Custom Cash');
-    });
+        const renamedDefaultRandomId = WalletModel(
+          id: 'random_xyz_999',
+          name: 'My Custom Cash',
+          icon: 'payments',
+          isDefault: true,
+        );
+        expect(
+          walletDisplayName(locAr, renamedDefaultRandomId),
+          'My Custom Cash',
+        );
+      },
+    );
   });
 }

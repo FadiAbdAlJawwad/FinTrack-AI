@@ -27,9 +27,7 @@ class WalletsTotalCard extends StatelessWidget {
       child: Card(
         color: ColorManager.primaryBlue,
         elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

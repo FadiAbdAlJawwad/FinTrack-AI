@@ -12,16 +12,17 @@ final transactionTypeFilterProvider =
 final transactionDateRangeFilterProvider =
     StateProvider.autoDispose<DateTimeRange?>((ref) => null);
 
-final transactionEffectivePeriodProvider =
-    Provider.autoDispose<DateTimeRange>((ref) {
-      final dateFilter = ref.watch(transactionDateRangeFilterProvider);
-      if (dateFilter != null) return dateFilter;
-      final now = ref.watch(clockProvider)();
-      return DateTimeRange(
-        start: DateTime(now.year, now.month, 1),
-        end: DateTime(now.year, now.month + 1, 0),
-      );
-    });
+final transactionEffectivePeriodProvider = Provider.autoDispose<DateTimeRange>((
+  ref,
+) {
+  final dateFilter = ref.watch(transactionDateRangeFilterProvider);
+  if (dateFilter != null) return dateFilter;
+  final now = ref.watch(clockProvider)();
+  return DateTimeRange(
+    start: DateTime(now.year, now.month, 1),
+    end: DateTime(now.year, now.month + 1, 0),
+  );
+});
 
 final filteredTransactionsProvider =
     Provider.autoDispose<Map<TransactionGroup, List<TransactionModel>>>((ref) {

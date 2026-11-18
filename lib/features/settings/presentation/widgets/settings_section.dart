@@ -27,10 +27,7 @@ class SettingsSection extends StatelessWidget {
         ),
         context.addVerticalSpace(8),
         Card(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: children,
-          ),
+          child: Column(mainAxisSize: MainAxisSize.min, children: children),
         ),
       ],
     );

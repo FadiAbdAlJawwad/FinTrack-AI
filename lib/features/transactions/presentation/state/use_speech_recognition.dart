@@ -1,15 +1,12 @@
 import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 enum VoiceEntryStatus { idle, listening, processing, error }
 
-enum SpeechErrorReason {
-  permissionDenied,
-  timeout,
-  platformError,
-}
+enum SpeechErrorReason { permissionDenied, timeout, platformError }
 
 class SpeechRecognitionState {
   final VoiceEntryStatus status;
@@ -58,7 +55,8 @@ SpeechRecognitionState useSpeechRecognition({required String languageCode}) {
             }
           },
           onStatus: (st) {
-            if (st == 'notListening' && status.value == VoiceEntryStatus.listening) {
+            if (st == 'notListening' &&
+                status.value == VoiceEntryStatus.listening) {
               status.value = VoiceEntryStatus.idle;
             }
           },
@@ -69,15 +67,21 @@ SpeechRecognitionState useSpeechRecognition({required String languageCode}) {
         String selectedLocaleId = languageCode == 'ar' ? 'ar-SA' : 'en-US';
 
         try {
-          final systemLocales = await speechToText.locales().timeout(const Duration(seconds: 3));
+          final systemLocales = await speechToText.locales().timeout(
+            const Duration(seconds: 3),
+          );
 
           if (languageCode == 'ar') {
-            final match = systemLocales.where((l) => l.localeId.toLowerCase().startsWith('ar')).firstOrNull;
+            final match = systemLocales
+                .where((l) => l.localeId.toLowerCase().startsWith('ar'))
+                .firstOrNull;
             if (match != null) {
               selectedLocaleId = match.localeId;
             }
           } else {
-            final match = systemLocales.where((l) => l.localeId.toLowerCase().startsWith('en')).firstOrNull;
+            final match = systemLocales
+                .where((l) => l.localeId.toLowerCase().startsWith('en'))
+                .firstOrNull;
             if (match != null) {
               selectedLocaleId = match.localeId;
             }
@@ -87,16 +91,18 @@ SpeechRecognitionState useSpeechRecognition({required String languageCode}) {
         }
 
         status.value = VoiceEntryStatus.listening;
-        await speechToText.listen(
-          onResult: (result) {
-            transcript.value = result.recognizedWords;
-          },
-          listenOptions: stt.SpeechListenOptions(
-            localeId: selectedLocaleId,
-            cancelOnError: true,
-            partialResults: true,
-          ),
-        ).timeout(const Duration(seconds: 10));
+        await speechToText
+            .listen(
+              onResult: (result) {
+                transcript.value = result.recognizedWords;
+              },
+              listenOptions: stt.SpeechListenOptions(
+                localeId: selectedLocaleId,
+                cancelOnError: true,
+                partialResults: true,
+              ),
+            )
+            .timeout(const Duration(seconds: 10));
       } else {
         status.value = VoiceEntryStatus.error;
         errorReason.value = SpeechErrorReason.permissionDenied;

@@ -73,130 +73,146 @@ Widget createTestApp({
 void main() {
   group('AddWalletSheet', () {
     testWidgets(
-        '14. Create button is disabled while name is empty or whitespace only',
-        (tester) async {
-      await tester.pumpWidget(createTestApp(wallets: []));
-      await tester.tap(find.text('Open Sheet'));
-      await tester.pumpAndSettle();
+      '14. Create button is disabled while name is empty or whitespace only',
+      (tester) async {
+        await tester.pumpWidget(createTestApp(wallets: []));
+        await tester.tap(find.text('Open Sheet'));
+        await tester.pumpAndSettle();
 
-      final buttonFinder = find.widgetWithText(ElevatedButton, 'Create Wallet');
-      expect(buttonFinder, findsOneWidget);
+        final buttonFinder = find.widgetWithText(
+          ElevatedButton,
+          'Create Wallet',
+        );
+        expect(buttonFinder, findsOneWidget);
 
-      final buttonWidgetInitial = tester.widget<ElevatedButton>(buttonFinder);
-      expect(buttonWidgetInitial.onPressed, isNull);
+        final buttonWidgetInitial = tester.widget<ElevatedButton>(buttonFinder);
+        expect(buttonWidgetInitial.onPressed, isNull);
 
-      await tester.enterText(find.byType(TextField).first, '   ');
-      await tester.pumpAndSettle();
+        await tester.enterText(find.byType(TextField).first, '   ');
+        await tester.pumpAndSettle();
 
-      final buttonWidgetWhitespace =
-          tester.widget<ElevatedButton>(buttonFinder);
-      expect(buttonWidgetWhitespace.onPressed, isNull);
-    });
-
-    testWidgets(
-        '15. duplicate name (case-insensitive, trimmed) shows walletNameExists and keeps Create disabled',
-        (tester) async {
-      final existingWallets = [
-        const WalletModel(
-          id: 'cash',
-          name: 'Cash',
-          icon: 'payments',
-          isDefault: true,
-        ),
-      ];
-
-      await tester.pumpWidget(createTestApp(wallets: existingWallets));
-      await tester.tap(find.text('Open Sheet'));
-      await tester.pumpAndSettle();
-
-      await tester.enterText(find.byType(TextField).first, '   cAsH  ');
-      await tester.pumpAndSettle();
-
-      expect(
-        find.text('A wallet with this name already exists.'),
-        findsOneWidget,
-      );
-
-      final buttonWidget = tester.widget<ElevatedButton>(
-        find.widgetWithText(ElevatedButton, 'Create Wallet'),
-      );
-      expect(buttonWidget.onPressed, isNull);
-    });
+        final buttonWidgetWhitespace = tester.widget<ElevatedButton>(
+          buttonFinder,
+        );
+        expect(buttonWidgetWhitespace.onPressed, isNull);
+      },
+    );
 
     testWidgets(
-        '16. valid name and icon calls addWallet once with trimmed name and closes sheet',
-        (tester) async {
-      WalletModel? addedWallet;
-      int addCallCount = 0;
+      '15. duplicate name (case-insensitive, trimmed) shows walletNameExists and keeps Create disabled',
+      (tester) async {
+        final existingWallets = [
+          const WalletModel(
+            id: 'cash',
+            name: 'Cash',
+            icon: 'payments',
+            isDefault: true,
+          ),
+        ];
 
-      await tester.pumpWidget(
-        createTestApp(
-          wallets: [],
-          onAddWallet: (wallet) async {
-            addCallCount++;
-            addedWallet = wallet;
-          },
-        ),
-      );
+        await tester.pumpWidget(createTestApp(wallets: existingWallets));
+        await tester.tap(find.text('Open Sheet'));
+        await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Open Sheet'));
-      await tester.pumpAndSettle();
+        await tester.enterText(find.byType(TextField).first, '   cAsH  ');
+        await tester.pumpAndSettle();
 
-      await tester.enterText(find.byType(TextField).first, '  Vacation Fund  ');
-      await tester.pumpAndSettle();
+        expect(
+          find.text('A wallet with this name already exists.'),
+          findsOneWidget,
+        );
 
-      // Tap 'savings' icon in the selector
-      await tester.tap(find.byIcon(Icons.savings));
-      await tester.pumpAndSettle();
-
-      final createButton = find.widgetWithText(ElevatedButton, 'Create Wallet');
-      await tester.tap(createButton);
-      await tester.pumpAndSettle();
-
-      expect(addCallCount, 1);
-      expect(addedWallet, isNotNull);
-      expect(addedWallet!.name, 'Vacation Fund');
-      expect(addedWallet!.icon, 'savings');
-      expect(addedWallet!.isDefault, false);
-
-      // Sheet is closed
-      expect(find.byType(AddWalletSheet), findsNothing);
-    });
-
-    testWidgets('17. when addWallet throws, sheet stays open and error SnackBar is shown',
-        (tester) async {
-      await tester.pumpWidget(
-        createTestApp(
-          wallets: [],
-          onAddWallet: (wallet) async {
-            throw WalletException(
-              WalletErrorType.networkError,
-              message: 'Network failed',
-            );
-          },
-        ),
-      );
-
-      await tester.tap(find.text('Open Sheet'));
-      await tester.pumpAndSettle();
-
-      await tester.enterText(find.byType(TextField).first, 'Emergency Fund');
-      await tester.pumpAndSettle();
-
-      final createButton = find.widgetWithText(ElevatedButton, 'Create Wallet');
-      await tester.tap(createButton);
-      await tester.pumpAndSettle();
-
-      // Sheet stays open
-      expect(find.byType(AddWalletSheet), findsOneWidget);
-
-      // SnackBar shown with translated error message
-      expect(find.byType(SnackBar), findsOneWidget);
-    });
+        final buttonWidget = tester.widget<ElevatedButton>(
+          find.widgetWithText(ElevatedButton, 'Create Wallet'),
+        );
+        expect(buttonWidget.onPressed, isNull);
+      },
+    );
 
     testWidgets(
-        'add sheet saves the selected type',
-        (tester) async {
+      '16. valid name and icon calls addWallet once with trimmed name and closes sheet',
+      (tester) async {
+        WalletModel? addedWallet;
+        int addCallCount = 0;
+
+        await tester.pumpWidget(
+          createTestApp(
+            wallets: [],
+            onAddWallet: (wallet) async {
+              addCallCount++;
+              addedWallet = wallet;
+            },
+          ),
+        );
+
+        await tester.tap(find.text('Open Sheet'));
+        await tester.pumpAndSettle();
+
+        await tester.enterText(
+          find.byType(TextField).first,
+          '  Vacation Fund  ',
+        );
+        await tester.pumpAndSettle();
+
+        // Tap 'savings' icon in the selector
+        await tester.tap(find.byIcon(Icons.savings));
+        await tester.pumpAndSettle();
+
+        final createButton = find.widgetWithText(
+          ElevatedButton,
+          'Create Wallet',
+        );
+        await tester.tap(createButton);
+        await tester.pumpAndSettle();
+
+        expect(addCallCount, 1);
+        expect(addedWallet, isNotNull);
+        expect(addedWallet!.name, 'Vacation Fund');
+        expect(addedWallet!.icon, 'savings');
+        expect(addedWallet!.isDefault, false);
+
+        // Sheet is closed
+        expect(find.byType(AddWalletSheet), findsNothing);
+      },
+    );
+
+    testWidgets(
+      '17. when addWallet throws, sheet stays open and error SnackBar is shown',
+      (tester) async {
+        await tester.pumpWidget(
+          createTestApp(
+            wallets: [],
+            onAddWallet: (wallet) async {
+              throw WalletException(
+                WalletErrorType.networkError,
+                message: 'Network failed',
+              );
+            },
+          ),
+        );
+
+        await tester.tap(find.text('Open Sheet'));
+        await tester.pumpAndSettle();
+
+        await tester.enterText(find.byType(TextField).first, 'Emergency Fund');
+        await tester.pumpAndSettle();
+
+        final createButton = find.widgetWithText(
+          ElevatedButton,
+          'Create Wallet',
+        );
+        await tester.tap(createButton);
+        await tester.pumpAndSettle();
+
+        // Sheet stays open
+        expect(find.byType(AddWalletSheet), findsOneWidget);
+
+        // SnackBar shown with translated error message
+        expect(find.byType(SnackBar), findsOneWidget);
+      },
+    );
+
+    testWidgets('add sheet saves the selected type', (tester) async {
       WalletModel? addedWallet;
       await tester.pumpWidget(
         createTestApp(
@@ -225,9 +241,9 @@ void main() {
       expect(addedWallet!.type, WalletType.bank);
     });
 
-    testWidgets(
-        'edit sheet enables Save when only the type changes',
-        (tester) async {
+    testWidgets('edit sheet enables Save when only the type changes', (
+      tester,
+    ) async {
       final existingWallet = const WalletModel(
         id: '1',
         name: 'My Wallet',
@@ -250,8 +266,11 @@ void main() {
       await tester.tap(find.text('Open Sheet'));
       await tester.pumpAndSettle();
 
-      final saveButtonFinder = find.widgetWithText(ElevatedButton, 'Save Changes');
-      
+      final saveButtonFinder = find.widgetWithText(
+        ElevatedButton,
+        'Save Changes',
+      );
+
       // Initially, nothing changed, so Save is disabled
       final buttonInitial = tester.widget<ElevatedButton>(saveButtonFinder);
       expect(buttonInitial.onPressed, isNull);
@@ -274,47 +293,49 @@ void main() {
     });
 
     testWidgets(
-        'add sheet saves 12.345 JOD as openingBalanceMinor 12345 with JOD',
-        (tester) async {
-      WalletModel? addedWallet;
-      await tester.pumpWidget(
-        createTestApp(
-          wallets: [],
-          onAddWallet: (wallet) async {
-            addedWallet = wallet;
-          },
-        ),
-      );
+      'add sheet saves 12.345 JOD as openingBalanceMinor 12345 with JOD',
+      (tester) async {
+        WalletModel? addedWallet;
+        await tester.pumpWidget(
+          createTestApp(
+            wallets: [],
+            onAddWallet: (wallet) async {
+              addedWallet = wallet;
+            },
+          ),
+        );
 
-      await tester.tap(find.text('Open Sheet'));
-      await tester.pumpAndSettle();
+        await tester.tap(find.text('Open Sheet'));
+        await tester.pumpAndSettle();
 
-      await tester.enterText(find.byType(TextField).first, 'Bank');
-      await tester.pumpAndSettle();
+        await tester.enterText(find.byType(TextField).first, 'Bank');
+        await tester.pumpAndSettle();
 
-      // Enter balance
-      await tester.enterText(find.byType(TextField).at(1), '12.345');
-      await tester.pumpAndSettle();
+        // Enter balance
+        await tester.enterText(find.byType(TextField).at(1), '12.345');
+        await tester.pumpAndSettle();
 
-      // Tap JOD chip
-      final jodChip = find.text('JOD (JD)');
-      await tester.ensureVisible(jodChip);
-      await tester.tap(jodChip);
-      await tester.pumpAndSettle();
+        // Tap JOD chip
+        final jodChip = find.text('JOD (JD)');
+        await tester.ensureVisible(jodChip);
+        await tester.tap(jodChip);
+        await tester.pumpAndSettle();
 
-      final createButton = find.widgetWithText(ElevatedButton, 'Create Wallet');
-      await tester.ensureVisible(createButton);
-      await tester.tap(createButton);
-      await tester.pumpAndSettle();
+        final createButton = find.widgetWithText(
+          ElevatedButton,
+          'Create Wallet',
+        );
+        await tester.ensureVisible(createButton);
+        await tester.tap(createButton);
+        await tester.pumpAndSettle();
 
-      expect(addedWallet, isNotNull);
-      expect(addedWallet!.openingBalanceMinor, 12345);
-      expect(addedWallet!.openingBalanceCurrency, AppCurrency.jod);
-    });
+        expect(addedWallet, isNotNull);
+        expect(addedWallet!.openingBalanceMinor, 12345);
+        expect(addedWallet!.openingBalanceCurrency, AppCurrency.jod);
+      },
+    );
 
-    testWidgets(
-        'empty balance field saves nulls',
-        (tester) async {
+    testWidgets('empty balance field saves nulls', (tester) async {
       WalletModel? addedWallet;
       await tester.pumpWidget(
         createTestApp(
@@ -343,9 +364,7 @@ void main() {
       expect(addedWallet!.openingBalanceCurrency, isNull);
     });
 
-    testWidgets(
-        'invalid balance text keeps Save disabled',
-        (tester) async {
+    testWidgets('invalid balance text keeps Save disabled', (tester) async {
       await tester.pumpWidget(createTestApp(wallets: []));
       await tester.tap(find.text('Open Sheet'));
       await tester.pumpAndSettle();
@@ -362,9 +381,9 @@ void main() {
       expect(createButton.onPressed, isNull);
     });
 
-    testWidgets(
-        'edit mode changing only the opening balance enables Save',
-        (tester) async {
+    testWidgets('edit mode changing only the opening balance enables Save', (
+      tester,
+    ) async {
       const existingWallet = WalletModel(
         id: '1',
         name: 'Bank',
@@ -389,7 +408,10 @@ void main() {
       await tester.tap(find.text('Open Sheet'));
       await tester.pumpAndSettle();
 
-      final saveButtonFinder = find.widgetWithText(ElevatedButton, 'Save Changes');
+      final saveButtonFinder = find.widgetWithText(
+        ElevatedButton,
+        'Save Changes',
+      );
 
       // Initially Save is disabled
       expect(tester.widget<ElevatedButton>(saveButtonFinder).onPressed, isNull);
@@ -399,7 +421,10 @@ void main() {
       await tester.pumpAndSettle();
 
       // Save is enabled
-      expect(tester.widget<ElevatedButton>(saveButtonFinder).onPressed, isNotNull);
+      expect(
+        tester.widget<ElevatedButton>(saveButtonFinder).onPressed,
+        isNotNull,
+      );
 
       await tester.ensureVisible(saveButtonFinder);
       await tester.tap(saveButtonFinder);
@@ -411,44 +436,48 @@ void main() {
     });
 
     testWidgets(
-        'in edit mode with an existing opening balance, clearing the balance field and saving yields openingBalanceMinor == null and openingBalanceCurrency == null',
-        (tester) async {
-      const existingWallet = WalletModel(
-        id: '1',
-        name: 'Bank',
-        icon: 'account_balance',
-        isDefault: false,
-        type: WalletType.bank,
-        openingBalanceMinor: 1000,
-        openingBalanceCurrency: AppCurrency.usd,
-      );
+      'in edit mode with an existing opening balance, clearing the balance field and saving yields openingBalanceMinor == null and openingBalanceCurrency == null',
+      (tester) async {
+        const existingWallet = WalletModel(
+          id: '1',
+          name: 'Bank',
+          icon: 'account_balance',
+          isDefault: false,
+          type: WalletType.bank,
+          openingBalanceMinor: 1000,
+          openingBalanceCurrency: AppCurrency.usd,
+        );
 
-      WalletModel? updatedWallet;
-      await tester.pumpWidget(
-        createTestApp(
-          wallets: [existingWallet],
-          walletToEdit: existingWallet,
-          onAddWallet: (wallet) async {
-            updatedWallet = wallet;
-          },
-        ),
-      );
+        WalletModel? updatedWallet;
+        await tester.pumpWidget(
+          createTestApp(
+            wallets: [existingWallet],
+            walletToEdit: existingWallet,
+            onAddWallet: (wallet) async {
+              updatedWallet = wallet;
+            },
+          ),
+        );
 
-      await tester.tap(find.text('Open Sheet'));
-      await tester.pumpAndSettle();
+        await tester.tap(find.text('Open Sheet'));
+        await tester.pumpAndSettle();
 
-      final saveButtonFinder = find.widgetWithText(ElevatedButton, 'Save Changes');
+        final saveButtonFinder = find.widgetWithText(
+          ElevatedButton,
+          'Save Changes',
+        );
 
-      await tester.enterText(find.byType(TextField).at(1), '');
-      await tester.pumpAndSettle();
+        await tester.enterText(find.byType(TextField).at(1), '');
+        await tester.pumpAndSettle();
 
-      await tester.ensureVisible(saveButtonFinder);
-      await tester.tap(saveButtonFinder);
-      await tester.pumpAndSettle();
+        await tester.ensureVisible(saveButtonFinder);
+        await tester.tap(saveButtonFinder);
+        await tester.pumpAndSettle();
 
-      expect(updatedWallet, isNotNull);
-      expect(updatedWallet!.openingBalanceMinor, isNull);
-      expect(updatedWallet!.openingBalanceCurrency, isNull);
-    });
+        expect(updatedWallet, isNotNull);
+        expect(updatedWallet!.openingBalanceMinor, isNull);
+        expect(updatedWallet!.openingBalanceCurrency, isNull);
+      },
+    );
   });
 }

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -43,7 +44,9 @@ class ExchangeRateService {
     final today = _todayString();
     if (_cachedRates != null && _cachedDate == today) return;
 
-    final storedDate = _prefs.getString(SharedPrefsKeys.exchangeRatesFetchDateKey);
+    final storedDate = _prefs.getString(
+      SharedPrefsKeys.exchangeRatesFetchDateKey,
+    );
     if (storedDate == today) {
       final stored = _readStoredRates();
       if (stored != null) {
@@ -63,8 +66,8 @@ class ExchangeRateService {
       // icon/message in the no-cache path (wifi_off vs cloud_off).
       final typed = switch (e) {
         ExchangeRateServiceException() => e, // already typed, keep as-is
-        SocketException() || TimeoutException() =>
-          NoExchangeRatesAvailableException(),
+        SocketException() ||
+        TimeoutException() => NoExchangeRatesAvailableException(),
         _ => ExchangeRateServiceException(e.toString()),
       };
 
@@ -74,8 +77,10 @@ class ExchangeRateService {
       if (stored != null) {
         _cachedRates = stored;
         _cachedDate = storedDate;
-        debugPrint('[ExchangeRateService] fetch failed, using stale cache. '
-            'Reason: $e');
+        debugPrint(
+          '[ExchangeRateService] fetch failed, using stale cache. '
+          'Reason: $e',
+        );
         return;
       }
 
@@ -102,8 +107,12 @@ class ExchangeRateService {
   Future<Map<String, double>> _fetchLatest() async {
     // The v2 API endpoint for latest rates is /v2/rates (not /v2/latest).
     // It returns a JSON array: [{date, base, quote, rate}, ...]
-    final uri = Uri.parse('https://api.frankfurter.dev/v2/rates?base=$baseCurrency');
-    final response = await _client.get(uri).timeout(const Duration(seconds: 12));
+    final uri = Uri.parse(
+      'https://api.frankfurter.dev/v2/rates?base=$baseCurrency',
+    );
+    final response = await _client
+        .get(uri)
+        .timeout(const Duration(seconds: 12));
     if (response.statusCode != 200) {
       throw Exception('Exchange rate request failed: ${response.statusCode}');
     }

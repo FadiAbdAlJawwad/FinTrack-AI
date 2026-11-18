@@ -10,37 +10,40 @@ import 'wallet_controller.dart';
 
 final walletsOverviewProvider =
     Provider.autoDispose<AsyncValue<WalletsOverview>>((ref) {
-  final transactionsAsync = ref.watch(transactionControllerProvider);
-  final walletsAsync = ref.watch(walletControllerProvider);
-  
-  final appCurrency = appCurrencyFromCode(
-    ref.watch(currencyControllerProvider).valueOrNull ?? 'USD',
-  );
-  
-  // Watched only to recompute once rates finish loading.
-  ref.watch(exchangeRatesBootstrapProvider);
-  final rateService = ref.watch(exchangeRateServiceProvider);
+      final transactionsAsync = ref.watch(transactionControllerProvider);
+      final walletsAsync = ref.watch(walletControllerProvider);
 
-  if (transactionsAsync is AsyncError) {
-    return AsyncError(transactionsAsync.error!, transactionsAsync.stackTrace!);
-  }
-  if (walletsAsync is AsyncError) {
-    return AsyncError(walletsAsync.error!, walletsAsync.stackTrace!);
-  }
+      final appCurrency = appCurrencyFromCode(
+        ref.watch(currencyControllerProvider).valueOrNull ?? 'USD',
+      );
 
-  if (!transactionsAsync.hasValue || !walletsAsync.hasValue) {
-    return const AsyncLoading();
-  }
+      // Watched only to recompute once rates finish loading.
+      ref.watch(exchangeRatesBootstrapProvider);
+      final rateService = ref.watch(exchangeRateServiceProvider);
 
-  final transactions = transactionsAsync.requireValue;
-  final wallets = walletsAsync.requireValue;
+      if (transactionsAsync is AsyncError) {
+        return AsyncError(
+          transactionsAsync.error!,
+          transactionsAsync.stackTrace!,
+        );
+      }
+      if (walletsAsync is AsyncError) {
+        return AsyncError(walletsAsync.error!, walletsAsync.stackTrace!);
+      }
 
-  final overview = buildWalletsOverview(
-    wallets: wallets,
-    transactions: transactions,
-    target: appCurrency,
-    rateBetween: (from, to) => rateService.rateBetween(from.code, to.code),
-  );
+      if (!transactionsAsync.hasValue || !walletsAsync.hasValue) {
+        return const AsyncLoading();
+      }
 
-  return AsyncData(overview);
-});
+      final transactions = transactionsAsync.requireValue;
+      final wallets = walletsAsync.requireValue;
+
+      final overview = buildWalletsOverview(
+        wallets: wallets,
+        transactions: transactions,
+        target: appCurrency,
+        rateBetween: (from, to) => rateService.rateBetween(from.code, to.code),
+      );
+
+      return AsyncData(overview);
+    });

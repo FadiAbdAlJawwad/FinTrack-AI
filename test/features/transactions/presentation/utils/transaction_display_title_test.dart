@@ -67,28 +67,25 @@ Widget createTestApp({
 
 void main() {
   group('transaction_display_title tests', () {
-    test(
-      '1. isAutoTitle is true for empty string, spaces, and category name in EN and AR',
-      () {
-        final foodEn = TransactionModel(
-          amountMinor: 1000,
-          currency: AppCurrency.usd,
-          type: TransactionType.expense,
-          category: TransactionCategory.food,
-          title: 'Food',
-          date: DateTime.now(),
-          walletId: 'w1',
-        );
-        final foodAr = foodEn.copyWith(title: 'طعام');
-        final foodEmpty = foodEn.copyWith(title: '');
-        final foodSpaces = foodEn.copyWith(title: '   ');
+    test('1. isAutoTitle is true for empty string, spaces, and category name in EN and AR', () {
+      final foodEn = TransactionModel(
+        amountMinor: 1000,
+        currency: AppCurrency.usd,
+        type: TransactionType.expense,
+        category: TransactionCategory.food,
+        title: 'Food',
+        date: DateTime.now(),
+        walletId: 'w1',
+      );
+      final foodAr = foodEn.copyWith(title: 'طعام');
+      final foodEmpty = foodEn.copyWith(title: '');
+      final foodSpaces = foodEn.copyWith(title: '   ');
 
-        expect(isAutoTitle(foodEn), isTrue);
-        expect(isAutoTitle(foodAr), isTrue);
-        expect(isAutoTitle(foodEmpty), isTrue);
-        expect(isAutoTitle(foodSpaces), isTrue);
-      },
-    );
+      expect(isAutoTitle(foodEn), isTrue);
+      expect(isAutoTitle(foodAr), isTrue);
+      expect(isAutoTitle(foodEmpty), isTrue);
+      expect(isAutoTitle(foodSpaces), isTrue);
+    });
 
     test(
       '2. isAutoTitle is false for custom notes and mismatched category names',
@@ -329,7 +326,10 @@ void main() {
         await tester.pumpAndSettle();
 
         // Tap Save button
-        final saveButtonFinder = find.widgetWithText(ElevatedButton, 'Save Transaction');
+        final saveButtonFinder = find.widgetWithText(
+          ElevatedButton,
+          'Save Transaction',
+        );
         expect(saveButtonFinder, findsOneWidget);
         await tester.tap(saveButtonFinder);
         await tester.pumpAndSettle();

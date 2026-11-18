@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+
 import '../../../../core/constant/images_manager.dart';
 import '../../../../core/extension/app_sizes.dart';
 import '../../../../core/extension/text_style_extension.dart';

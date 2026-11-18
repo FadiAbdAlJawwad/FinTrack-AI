@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../constant/shared_prefs_keys.dart';
 import 'app_lock_notifier.dart';
 
@@ -23,10 +24,12 @@ class AppLockLifecycleObserver extends StatefulWidget {
   static DateTime _defaultGetCurrentTime() => DateTime.now();
 
   @override
-  State<AppLockLifecycleObserver> createState() => _AppLockLifecycleObserverState();
+  State<AppLockLifecycleObserver> createState() =>
+      _AppLockLifecycleObserverState();
 }
 
-class _AppLockLifecycleObserverState extends State<AppLockLifecycleObserver> with WidgetsBindingObserver {
+class _AppLockLifecycleObserverState extends State<AppLockLifecycleObserver>
+    with WidgetsBindingObserver {
   DateTime? _pausedTime;
 
   @override
@@ -50,7 +53,9 @@ class _AppLockLifecycleObserverState extends State<AppLockLifecycleObserver> wit
         final elapsed = widget.getCurrentTime().difference(_pausedTime!);
         if (elapsed > AppLockNotifier.lockTimeout) {
           final isSignedOut = widget.firebaseAuth.currentUser == null;
-          final isBiometricEnabled = widget.prefs.getBool(SharedPrefsKeys.isBiometricEnabledKey) ?? false;
+          final isBiometricEnabled =
+              widget.prefs.getBool(SharedPrefsKeys.isBiometricEnabledKey) ??
+              false;
           if (!isSignedOut && isBiometricEnabled) {
             widget.appLockNotifier.lock();
           }

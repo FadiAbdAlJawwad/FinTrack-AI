@@ -2,10 +2,7 @@ import '../../../currency/domain/models/app_currency.dart';
 import 'wallet_model.dart';
 
 class WalletBalance {
-  const WalletBalance({
-    required this.wallet,
-    required this.balanceMinor,
-  });
+  const WalletBalance({required this.wallet, required this.balanceMinor});
 
   final WalletModel wallet;
   final int? balanceMinor;

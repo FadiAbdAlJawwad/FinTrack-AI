@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../constant/color_manager.dart';
 
 class AppTheme {

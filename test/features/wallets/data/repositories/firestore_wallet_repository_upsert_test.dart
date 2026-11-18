@@ -33,31 +33,40 @@ void main() {
     expect(data.keys.toSet(), {'id', 'name', 'icon', 'isDefault', 'type'});
   });
 
-  test('upsertWallet writes opening balance fields exactly when present', () async {
-    final dataSource = RecordingWalletDataSource();
-    const walletWithBalance = WalletModel(
-      name: 'Bank',
-      icon: 'account_balance',
-      isDefault: false,
-      openingBalanceMinor: 50000,
-      openingBalanceCurrency: AppCurrency.jod,
-    );
+  test(
+    'upsertWallet writes opening balance fields exactly when present',
+    () async {
+      final dataSource = RecordingWalletDataSource();
+      const walletWithBalance = WalletModel(
+        name: 'Bank',
+        icon: 'account_balance',
+        isDefault: false,
+        openingBalanceMinor: 50000,
+        openingBalanceCurrency: AppCurrency.jod,
+      );
 
-    await FirestoreWalletRepository(dataSource).upsertWallet('bank', walletWithBalance);
+      await FirestoreWalletRepository(dataSource)
+          .upsertWallet('bank', walletWithBalance);
 
-    final (id, data) = dataSource.upserts.single;
-    expect(id, 'bank');
-    expect(data['name'], 'Bank');
-    expect(data['icon'], 'account_balance');
-    expect(data['isDefault'], isFalse);
-    expect(data['type'], 'cash');
-    expect(data['openingBalanceMinor'], 50000);
-    expect(data['openingBalanceCurrency'], 'JOD');
-    expect(data.keys.toSet(), {
-      'id', 'name', 'icon', 'isDefault', 'type',
-      'openingBalanceMinor', 'openingBalanceCurrency'
-    });
-  });
+      final (id, data) = dataSource.upserts.single;
+      expect(id, 'bank');
+      expect(data['name'], 'Bank');
+      expect(data['icon'], 'account_balance');
+      expect(data['isDefault'], isFalse);
+      expect(data['type'], 'cash');
+      expect(data['openingBalanceMinor'], 50000);
+      expect(data['openingBalanceCurrency'], 'JOD');
+      expect(data.keys.toSet(), {
+        'id',
+        'name',
+        'icon',
+        'isDefault',
+        'type',
+        'openingBalanceMinor',
+        'openingBalanceCurrency',
+      });
+    },
+  );
 
   test('upsertWallet maps Firebase errors to WalletException', () async {
     final dataSource = RecordingWalletDataSource()

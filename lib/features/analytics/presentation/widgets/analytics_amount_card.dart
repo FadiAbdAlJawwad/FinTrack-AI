@@ -33,10 +33,7 @@ class AnalyticsAmountCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              label,
-              style: context.bodyMedium,
-            ),
+            Text(label, style: context.bodyMedium),
             context.addVerticalSpace(8),
             Text(
               amountText,

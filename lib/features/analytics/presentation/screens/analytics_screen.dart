@@ -16,10 +16,7 @@ class AnalyticsScreen extends ConsumerWidget {
     final summaryAsync = ref.watch(analyticsSummaryProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(context.loc.navAnalytics),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: Text(context.loc.navAnalytics), centerTitle: true),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -32,9 +29,8 @@ class AnalyticsScreen extends ConsumerWidget {
           Expanded(
             child: summaryAsync.when(
               loading: () => const AnalyticsSkeleton(),
-              error: (error, _) => Center(
-                child: Text(errorMessage(context, error)),
-              ),
+              error: (error, _) =>
+                  Center(child: Text(errorMessage(context, error))),
               data: (summary) => AnalyticsContent(summary: summary),
             ),
           ),

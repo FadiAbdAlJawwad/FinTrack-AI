@@ -20,9 +20,7 @@ Widget _buildTestWidget({
       GlobalCupertinoLocalizations.delegate,
     ],
     supportedLocales: AppLocalizations.supportedLocales,
-    home: Scaffold(
-      body: TransactionListTile(transaction: transaction),
-    ),
+    home: Scaffold(body: TransactionListTile(transaction: transaction)),
   );
 }
 
@@ -74,10 +72,7 @@ void main() {
       '7. Arabic locale: date contains Arabic month and no Arabic-Indic digits; amount is unchanged',
       (tester) async {
         await tester.pumpWidget(
-          _buildTestWidget(
-            transaction: expenseTx,
-            locale: const Locale('ar'),
-          ),
+          _buildTestWidget(transaction: expenseTx, locale: const Locale('ar')),
         );
         expect(find.text('- \$5.00'), findsOneWidget);
 
@@ -101,10 +96,7 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        _buildTestWidget(
-          transaction: expenseTx,
-          locale: const Locale('en'),
-        ),
+        _buildTestWidget(transaction: expenseTx, locale: const Locale('en')),
       );
       expect(find.text('Oct 14, 03:30 PM'), findsOneWidget);
     });

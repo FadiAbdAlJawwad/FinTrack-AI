@@ -33,7 +33,8 @@ class ControlledWalletDataSource implements WalletRemoteDataSource {
   Future<void> delete(String id) => deleteCompleter.future;
 
   @override
-  Future<List<({String id, bool isDefault})>> fetchAll() async => fetchAllResult;
+  Future<List<({String id, bool isDefault})>> fetchAll() async =>
+      fetchAllResult;
 
   @override
   Stream<List<Map<String, dynamic>>> watchAll() => const Stream.empty();
@@ -61,37 +62,45 @@ void main() {
       expect(id, 'generated_id');
     });
 
-    test('addWallet error before timeout becomes WalletException permissionDenied', () async {
-      dataSource.createCompleter.completeError(firebaseError('permission-denied'));
-      await expectLater(
-        repo.addWallet(sampleWallet),
-        throwsA(
-          isA<WalletException>().having(
-            (e) => e.type,
-            'type',
-            WalletErrorType.permissionDenied,
+    test(
+      'addWallet error before timeout becomes WalletException permissionDenied',
+      () async {
+        dataSource.createCompleter.completeError(
+          firebaseError('permission-denied'),
+        );
+        await expectLater(
+          repo.addWallet(sampleWallet),
+          throwsA(
+            isA<WalletException>().having(
+              (e) => e.type,
+              'type',
+              WalletErrorType.permissionDenied,
+            ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
 
     test('upsertWallet completes when never acknowledged', () async {
       await repo.upsertWallet('w1', sampleWallet);
     });
 
-    test('upsertWallet immediate unavailable error becomes networkError', () async {
-      dataSource.upsertCompleter.completeError(firebaseError('unavailable'));
-      await expectLater(
-        repo.upsertWallet('w1', sampleWallet),
-        throwsA(
-          isA<WalletException>().having(
-            (e) => e.type,
-            'type',
-            WalletErrorType.networkError,
+    test(
+      'upsertWallet immediate unavailable error becomes networkError',
+      () async {
+        dataSource.upsertCompleter.completeError(firebaseError('unavailable'));
+        await expectLater(
+          repo.upsertWallet('w1', sampleWallet),
+          throwsA(
+            isA<WalletException>().having(
+              (e) => e.type,
+              'type',
+              WalletErrorType.networkError,
+            ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
 
     test('deleteWallet completes when never acknowledged (two wallets, target non-default)', () async {
       await repo.deleteWallet('secondary_w');

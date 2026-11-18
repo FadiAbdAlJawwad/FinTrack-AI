@@ -7,11 +7,7 @@ import '../models/user_model.dart';
 abstract class AuthRepositoryInterface {
   Future<UserModel> signIn(String email, String password);
   Future<UserModel> signInWithGoogle();
-  Future<UserModel> signUp(
-    String fullName,
-    String email,
-    String password,
-  );
+  Future<UserModel> signUp(String fullName, String email, String password);
   Future<void> resetPassword(String email);
   Future<void> signOut();
 

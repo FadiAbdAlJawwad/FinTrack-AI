@@ -224,8 +224,12 @@ void main() {
         rateBetween: noRate,
       );
 
-      final foodCat = summary.categories.firstWhere((c) => c.category == TransactionCategory.food);
-      final transCat = summary.categories.firstWhere((c) => c.category == TransactionCategory.transport);
+      final foodCat = summary.categories.firstWhere(
+        (c) => c.category == TransactionCategory.food,
+      );
+      final transCat = summary.categories.firstWhere(
+        (c) => c.category == TransactionCategory.transport,
+      );
 
       expect(foodCat.share, closeTo(0.75, 1e-6));
       expect(transCat.share, closeTo(0.25, 1e-6));
@@ -301,7 +305,9 @@ void main() {
       expect(summary.incomeMinor, 10000);
       expect(summary.expenseMinor, isNull);
 
-      final transCat = summary.categories.firstWhere((c) => c.category == TransactionCategory.transport);
+      final transCat = summary.categories.firstWhere(
+        (c) => c.category == TransactionCategory.transport,
+      );
       expect(transCat.amountMinor, isNull);
 
       for (final cat in summary.categories) {
@@ -423,7 +429,10 @@ void main() {
         rateBetween: noRate,
       );
 
-      final categorySum = summary.categories.fold<int>(0, (sum, c) => sum + c.amountMinor!);
+      final categorySum = summary.categories.fold<int>(
+        0,
+        (sum, c) => sum + c.amountMinor!,
+      );
       expect(summary.expenseMinor, equals(categorySum));
       expect(summary.expenseMinor, 10000);
     });

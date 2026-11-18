@@ -10,7 +10,8 @@ enum WalletType { cash, bank, eWallet }
 class _AppCurrencyConverter implements JsonConverter<AppCurrency?, String?> {
   const _AppCurrencyConverter();
   @override
-  AppCurrency? fromJson(String? json) => json == null ? null : appCurrencyTryFromCode(json);
+  AppCurrency? fromJson(String? json) =>
+      json == null ? null : appCurrencyTryFromCode(json);
   @override
   String? toJson(AppCurrency? object) => object?.code;
 }
@@ -22,9 +23,13 @@ abstract class WalletModel with _$WalletModel {
     required String name,
     required String icon,
     @Default(false) bool isDefault,
-    @Default(WalletType.cash) @JsonKey(unknownEnumValue: WalletType.cash) WalletType type,
+    @Default(WalletType.cash)
+    @JsonKey(unknownEnumValue: WalletType.cash)
+    WalletType type,
     @JsonKey(includeIfNull: false) int? openingBalanceMinor,
-    @JsonKey(includeIfNull: false) @_AppCurrencyConverter() AppCurrency? openingBalanceCurrency,
+    @JsonKey(includeIfNull: false)
+    @_AppCurrencyConverter()
+    AppCurrency? openingBalanceCurrency,
   }) = _WalletModel;
 
   const WalletModel._();

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+
 import '../../../../core/constant/color_manager.dart';
 import '../../../../core/extension/app_sizes.dart';
 import '../../../../core/extension/text_style_extension.dart';
@@ -56,9 +57,8 @@ class DateRangeBottomSheet extends HookWidget {
         }
 
         if (endDate.value.difference(startDate.value).inDays > 31) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(context.loc.rangeError)));
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(context.loc.rangeError)));
           if (isStart) {
             endDate.value = startDate.value.add(const Duration(days: 31));
           } else {
@@ -296,7 +296,9 @@ class _PresetCard extends StatelessWidget {
             Text(
               label,
               style: context.labelMedium.copyWith(
-                color: isSelected ? ColorManager.white : ColorManager.secondaryColor,
+                color: isSelected
+                    ? ColorManager.white
+                    : ColorManager.secondaryColor,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
               ),
             ),

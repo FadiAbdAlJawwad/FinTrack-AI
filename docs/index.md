@@ -14,7 +14,6 @@ Open only the file and section the task needs. IDs (`US-`, `AC-`, `BR-`, `NFR-`,
 | `lessons.md`                   | A tool, command, or agent behaves unexpectedly; before writing a new rule                |
 | `dev/agent-routing.md`         | You choose an agent or model, or write an executor or reviewer prompt                    |
 | `work/<US-xx or B-nn>-plan.md` | You implement a story or backlog item whose plan the owner approved                      |
-| `dev/legacy-cleanup.md`        | You work on backlog item B-00 (legacy cleanup)                                           |
 | `../evals/tasks.md`            | You change AGENTS.md, a folder AGENTS.md, or this index                                  |
 | `01-brief.md`                  | A product-scope question the spec does not answer                                        |
 

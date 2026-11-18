@@ -37,19 +37,13 @@ class BootErrorScreen extends StatelessWidget {
       theme: AppTheme.lightTheme('en'),
       darkTheme: AppTheme.darkTheme('en'),
       themeMode: ThemeMode.system,
-      home: _BootErrorContent(
-        onRetry: onRetry,
-        isRetrying: isRetrying,
-      ),
+      home: _BootErrorContent(onRetry: onRetry, isRetrying: isRetrying),
     );
   }
 }
 
 class _BootErrorContent extends StatefulWidget {
-  const _BootErrorContent({
-    required this.onRetry,
-    required this.isRetrying,
-  });
+  const _BootErrorContent({required this.onRetry, required this.isRetrying});
 
   final VoidCallback onRetry;
   final bool isRetrying;
