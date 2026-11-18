@@ -1,19 +1,22 @@
-# Progress — B-01 Gate and guards
+# Progress — B-01 Domain kernel
 
 Read first, update last. One page, four sections, current story only. Stage status lives in `05-gap-analysis.md` §7 (not here). When a story is merged: move durable decisions to an ADR or `lessons.md`, then empty this file for the next story.
 
-
-
-Story: : B-01 · Branch: feat/b-01-domain-kernel · Plan: docs/work/B-01-plan.md (draft) · Updated: 2026-11-18
-
+Story: B-01 · Branch: `feat/b-01-domain-kernel` · Plan: `docs/work/B-01-plan.md` (approved) · Updated: 2026-11-18
+Next story: B-02 Drift schema v1 + UnitOfWork + outbox (05 §7, stage 0).
 
 ## Done
-- 
+- B-05 closed in the first commit of this branch (CI format check and test-change gate).
+- Plan approved.
+
 ## Decisions made in this story
-- 
+- Calendar date type is `LocalDate` (glossary line added with the implementation).
+- BR-15 half-up rounds half away from zero for negative values.
+- Legacy `money.dart` stays untouched; the kernel ports its behavior, never imports it.
+- No `SystemClock` adapter yet; the first story that reads the clock adds it.
 
 ## Next
-- 
+- Contract commit: kernel types and failing tests.
 
 ## Open questions
 - —
