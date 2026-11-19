@@ -11,6 +11,7 @@ Next story: B-02 Drift schema v1 + UnitOfWork + outbox (05 §7, stage 0).
 - Contract step: updated domain kernel type signatures (validated factories only, public `.raw` removed in favor of private constructors) and 26 failing contract tests (all test names starting with IDs).
 - Domain kernel logic implemented across `lib/domain/money/`, `lib/domain/rates/`, and `lib/domain/time/`.
 - Replaced the R-02b sampling test in `test/domain/rates/convert_test.dart` to correctly account for the two-step half-up rounding bound of 2 for ILS->USD->ILS, and exactness for USD->ILS->USD.
+- Fixed B-01 regression tests (F-01, F-05, F-06): single-dot parse malformed in parseMoney and PerUsdMicros, Money minor bounds assertion, LocalDate year 1..9999 invariant.
 
 ## Decisions made in this story
 - Calendar date type is `LocalDate` (glossary line added with the implementation).
@@ -23,7 +24,7 @@ Next story: B-02 Drift schema v1 + UnitOfWork + outbox (05 §7, stage 0).
 - D3: `BigInt ExactAmount.roundToMinor()`: exact, half away from zero, never throws. Converted values are for display and totals. A checked conversion to stored Money is out of scope (US-06, AC-06.3).
 
 ## Next
-- PR review and merge B-01.
+- docs commit, push, PR.
 
 ## Open questions
 - Checked conversion to Money for AC-06.3 (US-06).

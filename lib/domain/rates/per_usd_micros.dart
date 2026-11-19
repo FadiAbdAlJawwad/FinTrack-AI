@@ -74,6 +74,9 @@ final class PerUsdMicros {
     if (trimmed.isEmpty) {
       return const InvalidRate(RateError.empty);
     }
+    if (trimmed == '.') {
+      return const InvalidRate(RateError.malformed);
+    }
 
     if (trimmed.startsWith('-')) {
       final rest = trimmed.substring(1);

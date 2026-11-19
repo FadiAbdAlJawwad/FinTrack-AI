@@ -46,6 +46,9 @@ ParseMoneyResult parseMoney(String text, CurrencyCode currency) {
   if (trimmed.isEmpty) {
     return const InvalidAmount(AmountError.empty);
   }
+  if (trimmed == '.') {
+    return const InvalidAmount(AmountError.malformed);
+  }
 
   final match = _amountPattern.firstMatch(trimmed);
   if (match == null) {

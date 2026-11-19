@@ -3,6 +3,9 @@ final class LocalDate implements Comparable<LocalDate> {
   ///
   /// Throws [ArgumentError] if [year], [month], and [day] do not form a valid calendar date.
   factory LocalDate(int year, int month, int day) {
+    if (year < 1 || year > 9999) {
+      throw ArgumentError('Year out of range (1..9999): $year');
+    }
     final dt = DateTime.utc(year, month, day);
     if (dt.year != year || dt.month != month || dt.day != day) {
       throw ArgumentError('Invalid calendar date: $year-$month-$day');

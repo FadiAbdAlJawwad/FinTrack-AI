@@ -3,7 +3,11 @@ import 'currency_code.dart';
 const int maxMinorUnits = 1000000000000;
 
 final class Money {
-  const Money(this.minor, this.currency);
+  const Money(this.minor, this.currency)
+    : assert(
+        minor >= -maxMinorUnits && minor <= maxMinorUnits,
+        'minor out of range',
+      );
 
   final int minor;
   final CurrencyCode currency;
