@@ -5,35 +5,60 @@ import 'package:fin_track_ai/domain/rates/per_usd_micros.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('R-02b ILS->USD->ILS returns original within one minor unit for 1,000 sampled amounts', () {
+  test('R-02b USD->ILS->USD returns the original exactly for 1,000 sampled amounts', () {
     final ilsRate = PerUsdMicros(3712345);
     const usdRate = PerUsdMicros.usd;
 
-    for (int i = 1; i <= 1000; i++) {
+    for (var i = 1; i <= 1000; i++) {
+      final originalMinor = i * 123;
+      final original = Money(originalMinor, CurrencyCode.usd);
+
+      final ils = convert(
+        original,
+        fromRate: usdRate,
+        toRate: ilsRate,
+        to: CurrencyCode.ils,
+      ).roundToMinor();
+      final back = convert(
+        ils,
+        fromRate: ilsRate,
+        toRate: usdRate,
+        to: CurrencyCode.usd,
+      ).roundToMinor();
+
+      expect(back.minor, originalMinor, reason: 'minor $originalMinor');
+    }
+  });
+
+  test('R-02b ILS->USD->ILS stays within the two-rounding bound for 1,000 sampled amounts', () {
+    final ilsRate = PerUsdMicros(3712345);
+    const usdRate = PerUsdMicros.usd;
+    // Two half-up roundings: 0.5 USD cent x 3.712345 + 0.5 ILS cent = 2.36,
+    // so the round trip may differ by at most 2 ILS minor units.
+    const bound = 2;
+
+    for (var i = 1; i <= 1000; i++) {
       final originalMinor = i * 123;
       final original = Money(originalMinor, CurrencyCode.ils);
 
-      final exactUsd = convert(
+      final usd = convert(
         original,
         fromRate: ilsRate,
         toRate: usdRate,
         to: CurrencyCode.usd,
-      );
-      final usdMoney = exactUsd.roundToMinor();
-
-      final exactIlsBack = convert(
-        usdMoney,
+      ).roundToMinor();
+      final back = convert(
+        usd,
         fromRate: usdRate,
         toRate: ilsRate,
         to: CurrencyCode.ils,
-      );
-      final ilsBack = exactIlsBack.roundToMinor();
+      ).roundToMinor();
 
-      final diff = (ilsBack.minor - originalMinor).abs();
+      final diff = (back.minor - originalMinor).abs();
       expect(
-        diff <= 1,
+        diff <= bound,
         isTrue,
-        reason: 'Diff $diff > 1 for minor $originalMinor',
+        reason: 'Diff $diff > $bound for minor $originalMinor',
       );
     }
   });
