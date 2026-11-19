@@ -1,6 +1,5 @@
 import 'package:fin_track_ai/domain/money/currency_code.dart';
 import 'package:fin_track_ai/domain/money/exact_amount.dart';
-import 'package:fin_track_ai/domain/money/money.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -10,60 +9,42 @@ void main() {
       BigInt.from(2),
       CurrencyCode.ils,
     );
-    expect(
-      positiveHalf.roundToMinor(),
-      equals(const Money(3, CurrencyCode.ils)),
-    );
+    expect(positiveHalf.roundToMinor(), equals(BigInt.from(3)));
 
     final negativeHalf = ExactAmount(
       BigInt.from(-5),
       BigInt.from(2),
       CurrencyCode.ils,
     );
-    expect(
-      negativeHalf.roundToMinor(),
-      equals(const Money(-3, CurrencyCode.ils)),
-    );
+    expect(negativeHalf.roundToMinor(), equals(BigInt.from(-3)));
 
     final positiveBelowHalf = ExactAmount(
       BigInt.from(12),
       BigInt.from(5),
       CurrencyCode.ils,
     );
-    expect(
-      positiveBelowHalf.roundToMinor(),
-      equals(const Money(2, CurrencyCode.ils)),
-    );
+    expect(positiveBelowHalf.roundToMinor(), equals(BigInt.from(2)));
 
     final negativeBelowHalf = ExactAmount(
       BigInt.from(-12),
       BigInt.from(5),
       CurrencyCode.ils,
     );
-    expect(
-      negativeBelowHalf.roundToMinor(),
-      equals(const Money(-2, CurrencyCode.ils)),
-    );
+    expect(negativeBelowHalf.roundToMinor(), equals(BigInt.from(-2)));
 
     final positiveAboveHalf = ExactAmount(
       BigInt.from(13),
       BigInt.from(5),
       CurrencyCode.ils,
     );
-    expect(
-      positiveAboveHalf.roundToMinor(),
-      equals(const Money(3, CurrencyCode.ils)),
-    );
+    expect(positiveAboveHalf.roundToMinor(), equals(BigInt.from(3)));
 
     final negativeAboveHalf = ExactAmount(
       BigInt.from(-13),
       BigInt.from(5),
       CurrencyCode.ils,
     );
-    expect(
-      negativeAboveHalf.roundToMinor(),
-      equals(const Money(-3, CurrencyCode.ils)),
-    );
+    expect(negativeAboveHalf.roundToMinor(), equals(BigInt.from(-3)));
   });
 
   test('NFR-07 sum of 1,000 ExactAmount values equals single fraction computed directly', () {

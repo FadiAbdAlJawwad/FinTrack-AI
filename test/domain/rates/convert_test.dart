@@ -13,20 +13,26 @@ void main() {
       final originalMinor = i * 123;
       final original = Money(originalMinor, CurrencyCode.usd);
 
-      final ils = convert(
+      final ilsRounded = convert(
         original,
         fromRate: usdRate,
         toRate: ilsRate,
         to: CurrencyCode.ils,
       ).roundToMinor();
-      final back = convert(
+      final ils = Money(ilsRounded.toInt(), CurrencyCode.ils);
+
+      final backRounded = convert(
         ils,
         fromRate: ilsRate,
         toRate: usdRate,
         to: CurrencyCode.usd,
       ).roundToMinor();
 
-      expect(back.minor, originalMinor, reason: 'minor $originalMinor');
+      expect(
+        backRounded,
+        BigInt.from(originalMinor),
+        reason: 'minor $originalMinor',
+      );
     }
   });
 
@@ -41,20 +47,22 @@ void main() {
       final originalMinor = i * 123;
       final original = Money(originalMinor, CurrencyCode.ils);
 
-      final usd = convert(
+      final usdRounded = convert(
         original,
         fromRate: ilsRate,
         toRate: usdRate,
         to: CurrencyCode.usd,
       ).roundToMinor();
-      final back = convert(
+      final usd = Money(usdRounded.toInt(), CurrencyCode.usd);
+
+      final backRounded = convert(
         usd,
         fromRate: usdRate,
         toRate: ilsRate,
         to: CurrencyCode.ils,
       ).roundToMinor();
 
-      final diff = (back.minor - originalMinor).abs();
+      final diff = (backRounded.toInt() - originalMinor).abs();
       expect(
         diff <= bound,
         isTrue,
@@ -91,24 +99,32 @@ void main() {
       to: CurrencyCode.ils,
     );
 
-    expect(exact.roundToMinor(), equals(original));
+    expect(exact.roundToMinor(), equals(BigInt.from(original.minor)));
   });
 
   test(
     'ADR-0007 no overflow at 10^12 minor units with largest supported rate',
     () {
-      const largeMoney = Money(1000000000000, CurrencyCode.usd);
-      const usdRate = PerUsdMicros.usd;
-      final maxRate = PerUsdMicros(10000000000000);
+      const largeMoney = Money(maxMinorUnits, CurrencyCode.ils);
+      final fromRate = PerUsdMicros(1);
+      final toRate = PerUsdMicros(maxPerUsdMicros);
 
       final exact = convert(
         largeMoney,
-        fromRate: usdRate,
-        toRate: maxRate,
-        to: CurrencyCode.ils,
+        fromRate: fromRate,
+        toRate: toRate,
+        to: CurrencyCode.usd,
       );
 
-      expect(exact.numerator > BigInt.zero, isTrue);
+      expect(
+        exact.numerator,
+        equals(BigInt.parse('1000000000000000000000000')),
+      );
+      expect(exact.denominator, equals(BigInt.one));
+      expect(
+        exact.roundToMinor(),
+        equals(BigInt.parse('1000000000000000000000000')),
+      );
     },
   );
 }

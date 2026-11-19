@@ -51,4 +51,11 @@ void main() {
 
     expect(clock.localToday(), equals(fixedDate));
   });
+
+  test('B-01 LocalDate invariant: year range 1..9999', () {
+    expect(() => LocalDate(0, 1, 1), throwsArgumentError);
+    expect(() => LocalDate(10000, 1, 1), throwsArgumentError);
+    expect(LocalDate(1, 1, 1), isNotNull);
+    expect(LocalDate(9999, 12, 31), isNotNull);
+  });
 }

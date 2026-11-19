@@ -18,9 +18,12 @@ Next story: B-02 Drift schema v1 + UnitOfWork + outbox (05 §7, stage 0).
 - Legacy `money.dart` stays untouched; the kernel ports its behavior, never imports it.
 - No `SystemClock` adapter yet; the first story that reads the clock adds it.
 - Validated factory constructors are the sole public way to instantiate `ExactAmount`, `PerUsdMicros`, and `LocalDate`.
+- D1: `const int maxPerUsdMicros = 1000000000000;` (10^12) in `lib/domain/rates/per_usd_micros.dart`. Valid rate: 0 < value ≤ maxPerUsdMicros.
+- D2: `PerUsdMicros.parse`: integer part (after stripping leading zeros) longer than 9 digits → `tooManyIntegerDigits`; round half-up using 7th decimal; then check bound on rounded value: 0 → `nonPositive`, > maxPerUsdMicros → `outOfRange`.
+- D3: `BigInt ExactAmount.roundToMinor()`: exact, half away from zero, never throws. Converted values are for display and totals. A checked conversion to stored Money is out of scope (US-06, AC-06.3).
 
 ## Next
 - PR review and merge B-01.
 
 ## Open questions
-- None.
+- Checked conversion to Money for AC-06.3 (US-06).

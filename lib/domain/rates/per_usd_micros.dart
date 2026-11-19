@@ -1,4 +1,16 @@
-enum RateError { empty, malformed, nonPositive, tooManyIntegerDigits }
+const int maxPerUsdMicros = 1000000000000;
+
+enum RateError {
+  empty,
+  malformed,
+  nonPositive,
+
+  /// integer part longer than 9 digits after leading zeros are removed
+  tooManyIntegerDigits,
+
+  /// rounded value is above maxPerUsdMicros (10^12)
+  outOfRange,
+}
 
 sealed class RateParseResult {
   const RateParseResult();
@@ -39,13 +51,13 @@ final class InvalidRate extends RateParseResult {
 final class PerUsdMicros {
   /// Creates a validated exchange rate relative to 1 USD in micros.
   ///
-  /// Throws [ArgumentError] if [value] is <= 0 (I-21).
+  /// Throws [ArgumentError] if [value] is <= 0 or > [maxPerUsdMicros] (I-21).
   factory PerUsdMicros(int value) {
-    if (value <= 0) {
+    if (value <= 0 || value > maxPerUsdMicros) {
       throw ArgumentError.value(
         value,
         'value',
-        'PerUsdMicros must be positive (> 0)',
+        'PerUsdMicros must be positive (> 0) and <= maxPerUsdMicros ($maxPerUsdMicros)',
       );
     }
     return PerUsdMicros._(value);
@@ -90,7 +102,7 @@ final class PerUsdMicros {
     }
 
     final trimmedWhole = whole.replaceFirst(RegExp(r'^0+'), '');
-    if (trimmedWhole.length > 13) {
+    if (trimmedWhole.length > 9) {
       return const InvalidRate(RateError.tooManyIntegerDigits);
     }
 
@@ -112,6 +124,9 @@ final class PerUsdMicros {
     final micros = wholeVal * 1000000 + fracVal;
     if (micros <= 0) {
       return const InvalidRate(RateError.nonPositive);
+    }
+    if (micros > maxPerUsdMicros) {
+      return const InvalidRate(RateError.outOfRange);
     }
 
     return ParsedRate(PerUsdMicros(micros));

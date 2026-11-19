@@ -98,4 +98,22 @@ void main() {
     expect(CurrencyCode.fromIso('JOD'), equals(CurrencyCode.jod));
     expect(CurrencyCode.fromIso('EUR'), isNull);
   });
+
+  test('K-01 Money constructor rejects |minor| > maxMinorUnits', () {
+    final over = maxMinorUnits + 1;
+    expect(() => Money(over, CurrencyCode.ils), throwsA(isA<AssertionError>()));
+    expect(
+      () => Money(-over, CurrencyCode.ils),
+      throwsA(isA<AssertionError>()),
+    );
+  });
+
+  test('I-02 parse Money rejects single dot as malformed', () {
+    for (final currency in CurrencyCode.values) {
+      expect(
+        parseMoney('.', currency),
+        equals(const InvalidAmount(AmountError.malformed)),
+      );
+    }
+  });
 }

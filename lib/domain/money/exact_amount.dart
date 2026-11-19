@@ -47,7 +47,10 @@ final class ExactAmount {
     return ExactAmount(newNumerator, newDenominator, currency);
   }
 
-  Money roundToMinor() {
+  /// Returns the monetary amount after half-up rounding to minor units.
+  ///
+  /// Exact, half away from zero, never throws (D3).
+  BigInt roundToMinor() {
     final n = numerator;
     final den = denominator;
     final BigInt roundedMinor;
@@ -71,7 +74,7 @@ final class ExactAmount {
       }
     }
 
-    return Money(roundedMinor.toInt(), currency);
+    return roundedMinor;
   }
 
   @override
