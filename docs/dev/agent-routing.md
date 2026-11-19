@@ -23,13 +23,13 @@ Every prompt states in one line why this model was chosen and the fallback when 
 
 Each phase runs in a **new session** that reads only the previous phase's file, never the previous chat.
 
-| Phase            | Input                                                    | Output                                                                                                    | Who approves                                                    |
-|------------------|----------------------------------------------------------|-----------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------|
-| 1 Research       | Story or backlog ID, `docs/index.md`, `docs/repo-map.md` | Files involved, constraints (I-xx, R-xx, ADR), questions — top of `docs/work/<US-xx or B-nn>-plan.md`     | —                                                               |
-| 2 Plan           | The research section only                                | Steps, file list, AC → test-file map, exemplar to follow, diff estimate (readable in ~10 min) — same file | Owner (reviewing the plan matters more than reviewing the code) |
-| 3 Contract       | Approved plan                                            | Types, signatures, typed failures, failing AC tests; commit `contract(US-xx): …`                          | Owner commits                                                   |
-| 4 Implementation | Approved plan + contract commit                          | Minimal code, gate green, `docs/progress.md` updated                                                      | —                                                               |
-| 5 Review         | AC list + `AGENTS.md` + diff (`git diff main`) only      | Findings table (reviewer template)                                                                        | Owner decides and merges                                        |
+| Phase            | Input                                                          | Output                                                                                                    | Who approves                                                    |
+|------------------|----------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------|
+| 1 Research       | Story or backlog ID, `docs/index.md`, `docs/repo-map.md`       | Files involved, constraints (I-xx, R-xx, ADR), questions — top of `docs/work/<US-xx or B-nn>-plan.md`     | —                                                               |
+| 2 Plan           | The research section only                                      | Steps, file list, AC → test-file map, exemplar to follow, diff estimate (readable in ~10 min) — same file | Owner (reviewing the plan matters more than reviewing the code) |
+| 3 Contract       | Approved plan                                                  | Types, signatures, typed failures, failing AC tests; commit `contract(US-xx): …`                          | Owner commits                                                   |
+| 4 Implementation | Approved plan + contract commit                                | Minimal code, gate green, `docs/progress.md` updated                                                      | —                                                               |
+| 5 Review         | AC list + `AGENTS.md` + diff (`git --no-pager diff main`) only | Findings table (reviewer template)                                                                        | Owner decides and merges                                        |
 
 Too big if: more than one module, schema + logic + UI together, more than one story, or ACs that do not fit in five lines → split, or clarify the spec first.
 
@@ -52,6 +52,7 @@ After every review: a finding seen twice becomes a line in `AGENTS.md` or a fold
 | G-7 | Hotfix (crash, data loss, security): `fix/<id>-<slug>` from main, plan file optional, push immediately.                                                                                                                                                                                                                                                                                  |
 | G-8 | Every story prompt from the FinTrack project starts with the Open block and ends with the Close block, with concrete names (no placeholders).                                                                                                                                                                                                                                            |
 | G-9 | No tags except releases `vX.Y.Z`. Contract evidence lives in the PR's commit list (kept after squash).                                                                                                                                                                                                                                                                                   |
+| G-10 | **Contract amendments (G-rule, C-18).** After the first `contract(` commit of a story, any change under `test/` or `integration_test/` goes in its own commit whose subject starts with `contract(`; only the owner creates these commits. Implementation commits do not change files under `test/` or `integration_test/`. CI checks every non-merge commit from the first contract commit to the PR head and lists each contract commit in the job summary for review. After the first contract commit, update the story branch with `git rebase`, not `git merge`. |
 
 Open block:
 ```powershell
@@ -112,7 +113,7 @@ Expected outcome:
 2. Leftover check after any rename or replacement (text search for the old name).
 3. Tool actually used for each search; every assumption.
 4. Gate (`flutter analyze` + `flutter test`, later `dart run tools/check.dart`): summary line with counts and the failures only.
-5. `git diff main --stat` (read-only).
+5. `git --no-pager diff main --stat` (read-only).
 6. AC IDs satisfied and not satisfied.
 7. Update docs/progress.md: Done, Decisions, Next, Open questions (no command output).
 ```

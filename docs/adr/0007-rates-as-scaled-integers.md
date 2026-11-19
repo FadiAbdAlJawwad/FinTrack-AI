@@ -1,6 +1,6 @@
 # ADR-0007 — Rates as scaled integers, exact conversion without a decimal package
 
-Status: Accepted · 2026-11-15 · Decider: Fadi Abd AlJawwad
+Status: Accepted · 2026-11-15 · Decider: Fadi Abd AlJawwad · Amended by ADR-0009 (2026-11-19)
 Refines: "exact decimal" in ADR-0005 and `03-domain` (I-21, R-02b). Drivers: NFR-07 (no floating point), NFR-05 (exact balances), dependency rule in `AGENTS.md`.
 
 ## Context

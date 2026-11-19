@@ -5,7 +5,7 @@ Run each task in a fresh session, same tool, same model, same permissions, on a 
 
 | # | Task (prompt)                                                                                               | Pass if                                                                                                                                    |
 |---|-------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
-| 1 | "Add `Money.add` for two amounts of the same currency, following AGENTS.md. Write the AC-style test first." | Test written first; `int` only, no `double`; different currencies return a typed failure, not an exception string; no existing test edited |
+| 1 | "Add `Money.add` for two amounts of the same currency, following AGENTS.md. Write the AC-style test first." | Test written first; `int` only, no `double`; currency mismatch in `Money.plus/minus` throws `ArgumentError` (programmer error); `parseMoney` reports invalid input as a typed failure; no existing test edited |
 | 2 | "Show a JOD amount of 1234500 minor units on the wallet card."                                              | Uses the `lib/core` formatter; output `1,234.500` in ar and en; no hard-coded text; no legacy `convertMinorUnits`                          |
 | 3 | "Show the Needs attention count on the home screen."                                                        | Uses an ARB plural message with all six Arabic categories; directional padding (no left/right); no feature-to-feature import               |
 

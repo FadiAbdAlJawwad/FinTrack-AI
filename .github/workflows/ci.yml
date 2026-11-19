@@ -32,6 +32,34 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Format
+        run: dart format --output=none --set-exit-if-changed lib test
+      - name: Test-change gate (C-18)
+        if: github.event_name == 'pull_request'
+        env:
+          BASE: origin/${{ github.base_ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          first=$(git log --format=%H --grep='^contract(' "$BASE".."$HEAD_SHA" | tail -1)
+          if [ -z "$first" ]; then echo "notice: no contract commit"; exit 0; fi
+          echo "### Contract commits (owner-only)" >> "$GITHUB_STEP_SUMMARY"
+          fail=0
+          for c in $(git rev-list --reverse --no-merges "$first^".."$HEAD_SHA"); do
+            subj=$(git log -1 --format=%s "$c")
+            files=$(git diff --name-only "$c^" "$c" -- test/ integration_test/)
+            case "$subj" in
+              contract\(*)
+                printf -- '- `%s` %s\n' "${c:0:7}" "$subj" >> "$GITHUB_STEP_SUMMARY"
+                printf -- '  - %s\n' $files >> "$GITHUB_STEP_SUMMARY" ;;
+              *)
+                if [ -n "$files" ]; then
+                  echo "::error::${c:0:7} '$subj' changes tests outside a contract commit"
+                  fail=1
+                fi ;;
+            esac
+          done
+          exit $fail
+
       - name: Analyze code
         run: flutter analyze
 
