@@ -162,6 +162,11 @@ void main() {
         reason: 'Expected lib/core to have >= 10 files',
       );
       expect(
+        domainFiles.length,
+        greaterThanOrEqualTo(1),
+        reason: 'Expected lib/domain to have >= 1 files',
+      );
+      expect(
         domainDirExists,
         isTrue,
         reason: 'lib/domain directory must exist',
