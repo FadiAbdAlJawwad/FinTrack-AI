@@ -8,13 +8,39 @@ final class Money {
   final int minor;
   final CurrencyCode currency;
 
-  Money plus(Money other) => throw UnimplementedError();
-  Money minus(Money other) => throw UnimplementedError();
-  String toPlainText() => throw UnimplementedError();
+  Money plus(Money other) {
+    if (currency != other.currency) {
+      throw ArgumentError('Currency mismatch: $currency vs ${other.currency}');
+    }
+    return Money(minor + other.minor, currency);
+  }
+
+  Money minus(Money other) {
+    if (currency != other.currency) {
+      throw ArgumentError('Currency mismatch: $currency vs ${other.currency}');
+    }
+    return Money(minor - other.minor, currency);
+  }
+
+  String toPlainText() {
+    final sign = minor < 0 ? '-' : '';
+    final absolute = minor.abs();
+    final whole = absolute ~/ currency.minorFactor;
+    final fraction = (absolute % currency.minorFactor).toString().padLeft(
+      currency.decimals,
+      '0',
+    );
+    return '$sign$whole.$fraction';
+  }
 
   @override
-  bool operator ==(Object other) => throw UnimplementedError();
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Money &&
+          runtimeType == other.runtimeType &&
+          minor == other.minor &&
+          currency == other.currency;
 
   @override
-  int get hashCode => throw UnimplementedError();
+  int get hashCode => Object.hash(minor, currency);
 }

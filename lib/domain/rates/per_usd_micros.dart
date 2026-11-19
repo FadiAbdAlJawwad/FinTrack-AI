@@ -10,10 +10,14 @@ final class ParsedRate extends RateParseResult {
   final PerUsdMicros rate;
 
   @override
-  bool operator ==(Object other) => throw UnimplementedError();
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ParsedRate &&
+          runtimeType == other.runtimeType &&
+          rate == other.rate;
 
   @override
-  int get hashCode => throw UnimplementedError();
+  int get hashCode => rate.hashCode;
 }
 
 final class InvalidRate extends RateParseResult {
@@ -22,17 +26,30 @@ final class InvalidRate extends RateParseResult {
   final RateError error;
 
   @override
-  bool operator ==(Object other) => throw UnimplementedError();
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is InvalidRate &&
+          runtimeType == other.runtimeType &&
+          error == other.error;
 
   @override
-  int get hashCode => throw UnimplementedError();
+  int get hashCode => error.hashCode;
 }
 
 final class PerUsdMicros {
   /// Creates a validated exchange rate relative to 1 USD in micros.
   ///
   /// Throws [ArgumentError] if [value] is <= 0 (I-21).
-  factory PerUsdMicros(int value) => throw UnimplementedError();
+  factory PerUsdMicros(int value) {
+    if (value <= 0) {
+      throw ArgumentError.value(
+        value,
+        'value',
+        'PerUsdMicros must be positive (> 0)',
+      );
+    }
+    return PerUsdMicros._(value);
+  }
 
   static const PerUsdMicros usd = PerUsdMicros._(1000000);
 
@@ -40,11 +57,73 @@ final class PerUsdMicros {
 
   final int value;
 
-  static RateParseResult parse(String text) => throw UnimplementedError();
+  static RateParseResult parse(String text) {
+    final trimmed = text.trim();
+    if (trimmed.isEmpty) {
+      return const InvalidRate(RateError.empty);
+    }
+
+    if (trimmed.startsWith('-')) {
+      final rest = trimmed.substring(1);
+      final matchRest = RegExp(r'^(\d*)(?:\.(\d*))?$').firstMatch(rest);
+      if (matchRest != null &&
+          !(matchRest.group(1)!.isEmpty &&
+              (matchRest.group(2) ?? '').isEmpty)) {
+        return const InvalidRate(RateError.nonPositive);
+      }
+      return const InvalidRate(RateError.malformed);
+    }
+
+    if (trimmed.startsWith('+')) {
+      return const InvalidRate(RateError.malformed);
+    }
+
+    final match = RegExp(r'^(\d*)(?:\.(\d*))?$').firstMatch(trimmed);
+    if (match == null) {
+      return const InvalidRate(RateError.malformed);
+    }
+
+    final whole = match.group(1)!;
+    final fraction = match.group(2) ?? '';
+    if (whole.isEmpty && fraction.isEmpty) {
+      return const InvalidRate(RateError.empty);
+    }
+
+    final trimmedWhole = whole.replaceFirst(RegExp(r'^0+'), '');
+    if (trimmedWhole.length > 13) {
+      return const InvalidRate(RateError.tooManyIntegerDigits);
+    }
+
+    final wholeVal = trimmedWhole.isEmpty ? 0 : int.parse(trimmedWhole);
+    int fracVal;
+
+    if (fraction.length <= 6) {
+      final padded = fraction.padRight(6, '0');
+      fracVal = padded.isEmpty ? 0 : int.parse(padded);
+    } else {
+      final first6 = fraction.substring(0, 6);
+      final digit7 = int.parse(fraction[6]);
+      fracVal = int.parse(first6);
+      if (digit7 >= 5) {
+        fracVal += 1;
+      }
+    }
+
+    final micros = wholeVal * 1000000 + fracVal;
+    if (micros <= 0) {
+      return const InvalidRate(RateError.nonPositive);
+    }
+
+    return ParsedRate(PerUsdMicros(micros));
+  }
 
   @override
-  bool operator ==(Object other) => throw UnimplementedError();
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PerUsdMicros &&
+          runtimeType == other.runtimeType &&
+          value == other.value;
 
   @override
-  int get hashCode => throw UnimplementedError();
+  int get hashCode => value.hashCode;
 }

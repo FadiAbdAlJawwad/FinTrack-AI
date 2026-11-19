@@ -9,5 +9,12 @@ enum CurrencyCode {
   final int decimals;
   final int minorFactor;
 
-  static CurrencyCode? fromIso(String code) => throw UnimplementedError();
+  static CurrencyCode? fromIso(String code) {
+    for (final currency in CurrencyCode.values) {
+      if (currency.isoCode == code) {
+        return currency;
+      }
+    }
+    return null;
+  }
 }

@@ -8,4 +8,16 @@ ExactAmount convert(
   required PerUsdMicros fromRate,
   required PerUsdMicros toRate,
   required CurrencyCode to,
-}) => throw UnimplementedError();
+}) {
+  if (amount.currency == to) {
+    return ExactAmount.fromMoney(amount);
+  }
+  final numerator =
+      BigInt.from(amount.minor) *
+      BigInt.from(toRate.value) *
+      BigInt.from(to.minorFactor);
+  final denominator =
+      BigInt.from(fromRate.value) * BigInt.from(amount.currency.minorFactor);
+
+  return ExactAmount(numerator, denominator, to);
+}

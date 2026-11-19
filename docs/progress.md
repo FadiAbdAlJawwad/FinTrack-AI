@@ -9,6 +9,8 @@ Next story: B-02 Drift schema v1 + UnitOfWork + outbox (05 §7, stage 0).
 - B-05 closed in the first commit of this branch (CI format check and test-change gate).
 - Plan approved.
 - Contract step: updated domain kernel type signatures (validated factories only, public `.raw` removed in favor of private constructors) and 26 failing contract tests (all test names starting with IDs).
+- Domain kernel logic implemented across `lib/domain/money/`, `lib/domain/rates/`, and `lib/domain/time/`.
+- Replaced the R-02b sampling test in `test/domain/rates/convert_test.dart` to correctly account for the two-step half-up rounding bound of 2 for ILS->USD->ILS, and exactness for USD->ILS->USD.
 
 ## Decisions made in this story
 - Calendar date type is `LocalDate` (glossary line added with the implementation).
@@ -18,7 +20,7 @@ Next story: B-02 Drift schema v1 + UnitOfWork + outbox (05 §7, stage 0).
 - Validated factory constructors are the sole public way to instantiate `ExactAmount`, `PerUsdMicros`, and `LocalDate`.
 
 ## Next
-- Implementation step: domain kernel logic (test suite green).
+- PR review and merge B-01.
 
 ## Open questions
-- —
+- None.
