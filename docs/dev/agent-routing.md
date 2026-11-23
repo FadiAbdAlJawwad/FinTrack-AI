@@ -141,3 +141,7 @@ Checklist: correctness incl. unhappy paths · scope · design (ADR-0001 boundari
 Output one table: file:line · finding · severity (Blocker = no merge · Important = fix in this change · Suggestion = optional).
 Say "no issue" explicitly for any checklist item with none. No praise. Do not rewrite the code.
 ```
+
+## Handoffs
+
+- Commands the owner must run are listed in a fenced block tagged `powershell`, one command per line, outside prose.
