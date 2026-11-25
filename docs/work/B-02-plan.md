@@ -4,7 +4,7 @@ Status: approved · 2026-11-23 · Story: 05 §7 stage 0, gap C-02, depends: kern
 Sources: ADR-0001 (amended), ADR-0002 rules 1, 8 (amended), ADR-0003, ADR-0010 rules 1–13, 04 §4 ports (`UnitOfWork`, `RateStore`), 04 §7 S4, S5, S9, MSE-3.
 
 ## In scope
-1. Dependencies: `drift`, `sqlite3_flutter_libs`, `drift_dev`, `build_runner`; versions pinned in `pubspec.lock`. No `sqlcipher_flutter_libs` (S9).
+1. Dependencies: `drift`, `drift_dev`; `build_runner` only if not already a dev dependency; versions pinned in `pubspec.lock`. `sqlite3` 3.x bundles SQLite through build hooks; no `sqlite3_flutter_libs` (EOL with `sqlite3` 3.x). No `sqlcipher_flutter_libs` (S9).
 2. One database factory in `lib/data/drift/` (single open point; an S9 switch touches one file).
 3. Schema v1: wallets, categories, transactions, budgets, rates, preferences, outbox, needs_attention, sync_cursor.
     - ids `TEXT`, client-generated (ADR-0002/1); amounts `INTEGER` minor units (I-02).
@@ -72,9 +72,11 @@ V1 — lint scope: one discarded future in `lib/data`, one in `lib/features`; `f
 > Outbox payload is JSON with JSON-native types only; `serverUpdatedAt` is never in it and is added at push as `FieldValue.serverTimestamp()`. Pull-apply and restore never write outbox rows and decode before writing (ADR-0010/10). No network call inside `UnitOfWork.run`: read rows (tx) → send (no tx) → mark or remove (tx).
 
 ## Commits
-1. `docs(adr): ADR-0010` — new ADR file; status lines ADR-0001, ADR-0002; ADR index entry if one exists.
-2. `docs(B-02): plan` — this plan; 05 §7 B-20 row + B-12 Depends (R1); 05 §9 OI-3..OI-10; agent-routing "Handoffs" line; lessons X1, X2, X3; delete `docs/work/B-01-plan.md`; reset `progress.md`.
-3. `ci(B-02):` — `ci.yml` Linear history + C2 + C3; G-3, G-4, G-10, SHA rule (21 MSE-1).
-4. `contract(B-02)` — tests above.
+1. `docs(adr): ADR-0010` — done.
+2. `docs(B-02): plan` — done.
+3. `chore(B-02): add drift dependencies` — `pubspec.yaml`, `pubspec.lock` only (owner, `flutter pub add`).
+4. `contract(B-02)` — C1 schema → owner runs `build_runner` → C2 ports, stubs, tests above; one commit including `*.g.dart`.
 5. Implementation.
 6. Docs (folder rules, repo-map, status).
+
+CI (Linear history, G-3, G-4, G-10, SHA rule): moved out of B-02; one workflow PR after B-02 merge (MSE).
