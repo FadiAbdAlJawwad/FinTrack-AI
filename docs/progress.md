@@ -7,6 +7,8 @@ Next story: B-20 Kernel hardening (rates) (05 §7, stage 0).
 
 ## Done
 - ADR-0010 "Local storage types, outbox encoding and UnitOfWork rules" committed (`6168c25`); it amends ADR-0001 and ADR-0002.
+- B-02 contract step C1: declared Drift schema v1 (9 tables), AppDatabase, DatabaseFactory, stub LocalDateConverter, and CorruptStoredValueException.
+- B-02 contract step C2: declared UnitOfWork, unit_of_work_zone, DriftUnitOfWork, WalletsWriter, TransactionsWriter, PulledDoc, PulledDocApplier, and OutboxReader stubs; written 12 contract tests (all failing on stubs as expected).
 
 ## Decisions made in this story
 - ADR-0010 is the decision record for B-02 (D1–D3, D5, E1–E3). D4 (database encryption) stays with 04 §7 S9.
@@ -17,7 +19,7 @@ Next story: B-20 Kernel hardening (rates) (05 §7, stage 0).
 - 2026-11-26 Q2c: corrupt stored value on read throws `CorruptStoredValueException` (`lib/data/drift`). Open for MSE (non-blocking): domain-level failure type if features must handle it (ADR-0001 `features → domain ← data`).
 
 ## Next
-- Commit `ci(B-02):`.
+- B-02 step 5 (Implementation): implement UnitOfWork, synced writers, pull-apply path, outbox reader, and LocalDateConverter to satisfy all 12 contract tests.
 - Commit `contract(B-02)`.
 
 ## Open questions
