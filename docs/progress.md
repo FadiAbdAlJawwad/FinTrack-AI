@@ -11,6 +11,10 @@ Next story: B-20 Kernel hardening (rates) (05 §7, stage 0).
 ## Decisions made in this story
 - ADR-0010 is the decision record for B-02 (D1–D3, D5, E1–E3). D4 (database encryption) stays with 04 §7 S9.
 - Op per collection (owner 2026-11-22) and outbox `keys` per collection (owner 2026-11-23): tables in the plan.
+- Q2a = A approved: synced-store writers in B-02 are data-internal (`WalletsWriter`, `TransactionsWriter` in `lib/data`); domain ports land in B-07.
+- 2026-11-26 Q2a = A: B-02 uses data-internal writers in `lib/data/drift` (`WalletsWriter.create/update`, `TransactionsWriter.saveTransfer(TransactionDto transfer, TransactionDto? fee)`); domain port signatures (`WalletStore`, `TransactionStore`) deferred to B-07 (target entities do not exist yet, C-03).
+- 2026-11-26 Q2b: pull-apply = `PulledDocApplier.apply` in `lib/data/sync`, no outbox row, `assertNotInUnitOfWork()` first.
+- 2026-11-26 Q2c: corrupt stored value on read throws `CorruptStoredValueException` (`lib/data/drift`). Open for MSE (non-blocking): domain-level failure type if features must handle it (ADR-0001 `features → domain ← data`).
 
 ## Next
 - Commit `ci(B-02):`.

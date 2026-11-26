@@ -8,14 +8,14 @@ Sources: ADR-0001 (amended), ADR-0002 rules 1, 8 (amended), ADR-0003, ADR-0010 r
 2. One database factory in `lib/data/drift/` (single open point; an S9 switch touches one file).
 3. Schema v1: wallets, categories, transactions, budgets, rates, preferences, outbox, needs_attention, sync_cursor.
     - ids `TEXT`, client-generated (ADR-0002/1); amounts `INTEGER` minor units (I-02).
-    - `LocalDate` `TEXT 'YYYY-MM-DD'` via `TypeConverter<LocalDate, String>`; reading a non-canonical value throws (ADR-0010/10). No SQL `CHECK` on date format.
+    - `LocalDate` `TEXT 'YYYY-MM-DD'` via `TypeConverter<LocalDate, String>`; reading a non-canonical value throws `CorruptStoredValueException` (`lib/data/drift`, implements `Exception`, carries table, column, raw value) (ADR-0010/10). No SQL `CHECK` on date format.
     - Instants `INTEGER` ms UTC; no `DateTimeColumn` (ADR-0010/9).
     - Synced tables: `server_updated_at INTEGER` microseconds, null until first pull; sync_cursor `INTEGER` microseconds.
     - rates: `per_usd_micros INTEGER`, PK (date, currency), no CHECK, no `TypeConverter` to `PerUsdMicros` (MSE-3).
 4. outbox: `seq INTEGER PRIMARY KEY AUTOINCREMENT`, `writes TEXT` (JSON list of `{collection, docId, op, data}`), `keys TEXT` (JSON list of `collection/docId`), `status TEXT` (`pending | rejected | held`, default `pending`). One row = one Firestore batch (ADR-0010/3).
 5. `UnitOfWork` port in `lib/domain` (`Future<T> run<T>(Future<T> Function() action)`); Drift adapter sets a zone key. Nested `run` → `StateError`; synced-store write outside `run` → `StateError`; both always on, release included (ADR-0010/5, 11).
-6. Synced-store write path: record + outbox row in the same transaction; ops per the table below (ADR-0010/4). Only the stores the contract tests need: wallets, transactions (`saveTransfer(transfer, fee)`).
-7. Pull-apply write path in `lib/data/sync` that writes no outbox row (ADR-0010/6). Decoding (ADR-0010/10) lands with US-14.
+6. Synced-store write path: record + outbox row in the same transaction; ops per the table below (ADR-0010/4). Implemented via data-internal writers (ports in B-07) for wallets (`create(WalletDto)`, `update(id, WalletDto)`) and transactions (`saveTransfer(TransactionDto transfer, TransactionDto? fee)`, `deleteTransfer(String transferId)`; Dto names per 03-domain M1). Throws `StateError` outside `UnitOfWork.run` (ADR-0010/5).
+7. Pull-apply write path in `lib/data/sync`: `PulledDocApplier.apply(List<PulledDoc>)`, DAO upsert, bypasses the writers, writes no outbox row (ADR-0010/6). Calls `assertNotInUnitOfWork()` first (item 8). Decoding (ADR-0010/10) and cursor advance land with US-14.
 8. `assertNotInUnitOfWork()` helper in `lib/data` for network adapters (ADR-0010/12); per-adapter tests land with each adapter.
 9. Schema snapshot v1 exported with `drift_dev`.
 10. Folder rules `lib/data/drift/AGENTS.md`, `lib/data/sync/AGENTS.md` (texts below).
@@ -57,7 +57,7 @@ Own key of every write in the row, plus:
 | ADR-0010/3       | Transfer + fee row: `keys` = both transaction keys + both wallet keys + category keys                          |
 | ADR-0010/4       | create → `set`; edit → `update` with changed fields only; delete → `update {deleted: true}`                    |
 | ADR-0010/9       | `LocalDate` stored as `'YYYY-MM-DD'`; text order = date order across a year boundary; instant stored as ms UTC |
-| ADR-0010/10      | Raw `'2026-2-1'` inserted with `customStatement` → read throws                                                 |
+| ADR-0010/10      | Raw `'2026-2-1'` inserted with `customStatement` → read throws `CorruptStoredValueException` (typed matcher; stub converter returns a value and does not throw) |
 | ADR-0002 order   | Outbox rows read back in `seq` order regardless of instant values                                              |
 | NFR-04 (partial) | Same client id saved twice → one record row (upsert), two outbox rows                                          |
 
