@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -94,11 +96,13 @@ class _VoiceEntryScreenState extends ConsumerState<VoiceEntryScreen>
         final parentContext = Navigator.of(context).context;
         context.pop();
 
-        showModalBottomSheet(
-          context: parentContext,
-          isScrollControlled: true,
-          backgroundColor: Colors.transparent,
-          builder: (context) => AddTransactionBottomSheet(prefillDraft: draft),
+        unawaited(
+          showModalBottomSheet(
+            context: parentContext,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (context) => AddTransactionBottomSheet(prefillDraft: draft),
+          ),
         );
       } on AiParsingException catch (e) {
         if (!context.mounted) return;
