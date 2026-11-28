@@ -6,17 +6,19 @@ import 'tables.dart';
 
 part 'app_database.g.dart';
 
-@DriftDatabase(tables: [
-  Wallets,
-  Categories,
-  Transactions,
-  Budgets,
-  Rates,
-  Preferences,
-  Outbox,
-  NeedsAttention,
-  SyncCursors,
-])
+@DriftDatabase(
+  tables: [
+    Wallets,
+    Categories,
+    Transactions,
+    Budgets,
+    Rates,
+    Preferences,
+    Outbox,
+    NeedsAttention,
+    SyncCursors,
+  ],
+)
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 

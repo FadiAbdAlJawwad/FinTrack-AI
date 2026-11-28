@@ -101,7 +101,8 @@ class _VoiceEntryScreenState extends ConsumerState<VoiceEntryScreen>
             context: parentContext,
             isScrollControlled: true,
             backgroundColor: Colors.transparent,
-            builder: (context) => AddTransactionBottomSheet(prefillDraft: draft),
+            builder: (context) =>
+                AddTransactionBottomSheet(prefillDraft: draft),
           ),
         );
       } on AiParsingException catch (e) {

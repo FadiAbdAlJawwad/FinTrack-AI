@@ -8,8 +8,9 @@ class OutboxReader {
   final AppDatabase _db;
 
   Future<List<OutboxEntryDto>> readAll() async {
-    return (_db.select(_db.outbox)
-          ..orderBy([(o) => OrderingTerm(expression: o.seq, mode: OrderingMode.asc)]))
+    return (_db.select(_db.outbox)..orderBy([
+          (o) => OrderingTerm(expression: o.seq, mode: OrderingMode.asc),
+        ]))
         .get();
   }
 }

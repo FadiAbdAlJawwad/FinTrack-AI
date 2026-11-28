@@ -22,30 +22,37 @@ class WalletsWriter {
     };
     final keys = ['wallets/${wallet.id}'];
 
-    await _db.into(_db.outbox).insert(
-      OutboxCompanion.insert(
-        writes: jsonEncode([write]),
-        keys: jsonEncode(keys),
-        createdAt: _utcNow().millisecondsSinceEpoch,
-      ),
-    );
+    await _db
+        .into(_db.outbox)
+        .insert(
+          OutboxCompanion.insert(
+            writes: jsonEncode([write]),
+            keys: jsonEncode(keys),
+            createdAt: _utcNow().millisecondsSinceEpoch,
+          ),
+        );
   }
 
   Future<void> update(String id, WalletDto wallet) async {
     assertInUnitOfWork();
     if (wallet.id != id) {
-      throw ArgumentError('wallet.id (${wallet.id}) does not match id ($id)', 'wallet');
+      throw ArgumentError(
+        'wallet.id (${wallet.id}) does not match id ($id)',
+        'wallet',
+      );
     }
-    final existing = await (_db.select(_db.wallets)
-          ..where((w) => w.id.equals(id)))
-        .getSingleOrNull();
+    final existing = await (_db.select(
+      _db.wallets,
+    )..where((w) => w.id.equals(id))).getSingleOrNull();
 
     if (existing == null) {
       throw StateError('Wallet not found: $id');
     }
 
     if (existing.hasTransactions && !wallet.hasTransactions) {
-      throw ArgumentError('hasTransactions cannot be changed from true to false');
+      throw ArgumentError(
+        'hasTransactions cannot be changed from true to false',
+      );
     }
 
     final changed = _walletDiff(existing, wallet);
@@ -63,13 +70,15 @@ class WalletsWriter {
     };
     final keys = ['wallets/$id'];
 
-    await _db.into(_db.outbox).insert(
-      OutboxCompanion.insert(
-        writes: jsonEncode([write]),
-        keys: jsonEncode(keys),
-        createdAt: _utcNow().millisecondsSinceEpoch,
-      ),
-    );
+    await _db
+        .into(_db.outbox)
+        .insert(
+          OutboxCompanion.insert(
+            writes: jsonEncode([write]),
+            keys: jsonEncode(keys),
+            createdAt: _utcNow().millisecondsSinceEpoch,
+          ),
+        );
   }
 
   Map<String, dynamic> _walletToSetData(WalletDto w) {

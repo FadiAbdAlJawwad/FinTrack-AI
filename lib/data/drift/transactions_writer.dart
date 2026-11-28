@@ -1,5 +1,7 @@
 import 'dart:convert';
+
 import 'package:drift/drift.dart';
+
 import 'app_database.dart';
 import 'drift_unit_of_work.dart';
 
@@ -9,7 +11,10 @@ class TransactionsWriter {
   final AppDatabase _db;
   final DateTime Function() _utcNow;
 
-  Future<void> saveTransfer(TransactionDto transfer, TransactionDto? fee) async {
+  Future<void> saveTransfer(
+    TransactionDto transfer,
+    TransactionDto? fee,
+  ) async {
     assertInUnitOfWork();
 
     if (transfer.kind != 'transfer') {
@@ -31,13 +36,17 @@ class TransactionsWriter {
       }
     }
 
-    final existingTransfer = await (_db.select(_db.transactions)
-          ..where((t) => t.id.equals(transfer.id)))
-        .getSingleOrNull();
+    final existingTransfer = await (_db.select(
+      _db.transactions,
+    )..where((t) => t.id.equals(transfer.id))).getSingleOrNull();
 
-    final existingFee = await (_db.select(_db.transactions)
-          ..where((t) => t.transferId.equals(transfer.id) & t.id.equals(transfer.id).not()))
-        .getSingleOrNull();
+    final existingFee =
+        await (_db.select(_db.transactions)..where(
+              (t) =>
+                  t.transferId.equals(transfer.id) &
+                  t.id.equals(transfer.id).not(),
+            ))
+            .getSingleOrNull();
 
     if (existingFee != null && fee == null) {
       throw UnsupportedError('Fee removal is not supported');
@@ -106,30 +115,36 @@ class TransactionsWriter {
 
     if (writes.isNotEmpty) {
       final keysList = keySet.toList()..sort();
-      await _db.into(_db.outbox).insert(
-        OutboxCompanion.insert(
-          writes: jsonEncode(writes),
-          keys: jsonEncode(keysList),
-          createdAt: _utcNow().millisecondsSinceEpoch,
-        ),
-      );
+      await _db
+          .into(_db.outbox)
+          .insert(
+            OutboxCompanion.insert(
+              writes: jsonEncode(writes),
+              keys: jsonEncode(keysList),
+              createdAt: _utcNow().millisecondsSinceEpoch,
+            ),
+          );
     }
   }
 
   Future<void> deleteTransfer(String transferId) async {
     assertInUnitOfWork();
 
-    final storedTransfer = await (_db.select(_db.transactions)
-          ..where((t) => t.id.equals(transferId)))
-        .getSingleOrNull();
+    final storedTransfer = await (_db.select(
+      _db.transactions,
+    )..where((t) => t.id.equals(transferId))).getSingleOrNull();
 
     if (storedTransfer == null || storedTransfer.kind != 'transfer') {
       throw StateError('Transfer not found or not a transfer: $transferId');
     }
 
-    final storedFee = await (_db.select(_db.transactions)
-          ..where((t) => t.transferId.equals(transferId) & t.id.equals(transferId).not()))
-        .getSingleOrNull();
+    final storedFee =
+        await (_db.select(_db.transactions)..where(
+              (t) =>
+                  t.transferId.equals(transferId) &
+                  t.id.equals(transferId).not(),
+            ))
+            .getSingleOrNull();
 
     final transferNeedsDelete = !storedTransfer.deleted;
     final feeNeedsDelete = storedFee != null && !storedFee.deleted;
@@ -181,13 +196,15 @@ class TransactionsWriter {
 
     if (writes.isNotEmpty) {
       final keysList = keySet.toList()..sort();
-      await _db.into(_db.outbox).insert(
-        OutboxCompanion.insert(
-          writes: jsonEncode(writes),
-          keys: jsonEncode(keysList),
-          createdAt: _utcNow().millisecondsSinceEpoch,
-        ),
-      );
+      await _db
+          .into(_db.outbox)
+          .insert(
+            OutboxCompanion.insert(
+              writes: jsonEncode(writes),
+              keys: jsonEncode(keysList),
+              createdAt: _utcNow().millisecondsSinceEpoch,
+            ),
+          );
     }
   }
 
@@ -213,22 +230,31 @@ class TransactionsWriter {
     return map;
   }
 
-  Map<String, dynamic> _transactionDiff(TransactionDto oldT, TransactionDto newT) {
+  Map<String, dynamic> _transactionDiff(
+    TransactionDto oldT,
+    TransactionDto newT,
+  ) {
     final changed = <String, dynamic>{};
     if (oldT.kind != newT.kind) changed['kind'] = newT.kind;
     if (oldT.date != newT.date) changed['date'] = newT.date.toIso8601String();
     if (oldT.note != newT.note) changed['note'] = newT.note;
     if (oldT.walletId != newT.walletId) changed['walletId'] = newT.walletId;
-    if (oldT.categoryId != newT.categoryId) changed['categoryId'] = newT.categoryId;
-    if (oldT.amountMinor != newT.amountMinor) changed['amountMinor'] = newT.amountMinor;
+    if (oldT.categoryId != newT.categoryId)
+      changed['categoryId'] = newT.categoryId;
+    if (oldT.amountMinor != newT.amountMinor)
+      changed['amountMinor'] = newT.amountMinor;
     if (oldT.currency != newT.currency) changed['currency'] = newT.currency;
-    if (oldT.transferId != newT.transferId) changed['transferId'] = newT.transferId;
-    if (oldT.fromWalletId != newT.fromWalletId) changed['fromWalletId'] = newT.fromWalletId;
-    if (oldT.toWalletId != newT.toWalletId) changed['toWalletId'] = newT.toWalletId;
+    if (oldT.transferId != newT.transferId)
+      changed['transferId'] = newT.transferId;
+    if (oldT.fromWalletId != newT.fromWalletId)
+      changed['fromWalletId'] = newT.fromWalletId;
+    if (oldT.toWalletId != newT.toWalletId)
+      changed['toWalletId'] = newT.toWalletId;
     if (oldT.amountSentMinor != newT.amountSentMinor) {
       changed['amountSentMinor'] = newT.amountSentMinor;
     }
-    if (oldT.sentCurrency != newT.sentCurrency) changed['sentCurrency'] = newT.sentCurrency;
+    if (oldT.sentCurrency != newT.sentCurrency)
+      changed['sentCurrency'] = newT.sentCurrency;
     if (oldT.amountReceivedMinor != newT.amountReceivedMinor) {
       changed['amountReceivedMinor'] = newT.amountReceivedMinor;
     }
