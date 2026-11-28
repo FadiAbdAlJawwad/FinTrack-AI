@@ -46,49 +46,46 @@ void main() {
     await db.close();
   });
 
-  test('ADR-0010/6: Pull-apply path writes N documents -> outbox count unchanged', () async {
-    final w1 = _sampleWallet(id: 'w1');
-    final w2 = _sampleWallet(id: 'w2');
-    final w3 = _sampleWallet(id: 'w3');
-    final t1 = _sampleTransfer(id: 't1');
-    final t2 = _sampleTransfer(id: 't2');
+  test(
+    'ADR-0010/6: Pull-apply path writes N documents -> outbox count unchanged',
+    () async {
+      final w1 = _sampleWallet(id: 'w1');
+      final w2 = _sampleWallet(id: 'w2');
+      final w3 = _sampleWallet(id: 'w3');
+      final t1 = _sampleTransfer(id: 't1');
+      final t2 = _sampleTransfer(id: 't2');
 
-    final applier = PulledDocApplier(db);
-    await applier.apply([
-      PulledWallet(w1),
-      PulledWallet(w2),
-      PulledWallet(w3),
-      PulledTransaction(t1),
-      PulledTransaction(t2),
-    ]);
+      final applier = PulledDocApplier(db);
+      await applier.apply([
+        PulledWallet(w1),
+        PulledWallet(w2),
+        PulledWallet(w3),
+        PulledTransaction(t1),
+        PulledTransaction(t2),
+      ]);
 
-    expect(await db.select(db.wallets).get(), hasLength(3));
-    expect(await db.select(db.transactions).get(), hasLength(2));
-    expect(await db.select(db.outbox).get(), isEmpty);
-  });
+      expect(await db.select(db.wallets).get(), hasLength(3));
+      expect(await db.select(db.transactions).get(), hasLength(2));
+      expect(await db.select(db.outbox).get(), isEmpty);
+    },
+  );
 
   test('ADR-0002 order: Outbox rows read back in seq order regardless of instant values', () async {
-    await db.into(db.outbox).insert(
-      OutboxCompanion.insert(
-        writes: '[]',
-        keys: '[]',
-        createdAt: 3000,
-      ),
-    );
-    await db.into(db.outbox).insert(
-      OutboxCompanion.insert(
-        writes: '[]',
-        keys: '[]',
-        createdAt: 2000,
-      ),
-    );
-    await db.into(db.outbox).insert(
-      OutboxCompanion.insert(
-        writes: '[]',
-        keys: '[]',
-        createdAt: 1000,
-      ),
-    );
+    await db
+        .into(db.outbox)
+        .insert(
+          OutboxCompanion.insert(writes: '[]', keys: '[]', createdAt: 3000),
+        );
+    await db
+        .into(db.outbox)
+        .insert(
+          OutboxCompanion.insert(writes: '[]', keys: '[]', createdAt: 2000),
+        );
+    await db
+        .into(db.outbox)
+        .insert(
+          OutboxCompanion.insert(writes: '[]', keys: '[]', createdAt: 1000),
+        );
 
     final reader = OutboxReader(db);
     final entries = await reader.readAll();

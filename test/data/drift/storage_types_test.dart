@@ -49,7 +49,9 @@ void main() {
     await uow.run(() => customWriter.saveTransfer(t1, null));
     await uow.run(() => customWriter.saveTransfer(t2, null));
 
-    final rawRows = await db.customSelect('SELECT date FROM transactions ORDER BY date').get();
+    final rawRows = await db
+        .customSelect('SELECT date FROM transactions ORDER BY date')
+        .get();
     final dates = rawRows.map((r) => r.read<String>('date')).toList();
     expect(dates, equals(['2025-12-31', '2026-01-01']));
 

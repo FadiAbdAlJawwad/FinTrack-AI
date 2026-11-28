@@ -115,38 +115,43 @@ void main() {
     await db.close();
   });
 
-  test('I-08: Transfer + fee -> one outbox row with two writes, or nothing', () async {
-    final transfer = _sampleTransfer(id: 't1');
-    final fee = _sampleFee(id: 'f1', transferId: 't1');
+  test(
+    'I-08: Transfer + fee -> one outbox row with two writes, or nothing',
+    () async {
+      final transfer = _sampleTransfer(id: 't1');
+      final fee = _sampleFee(id: 'f1', transferId: 't1');
 
-    await uow.run(() => transactionsWriter.saveTransfer(transfer, fee));
-    expect(await db.select(db.transactions).get(), hasLength(2));
-    final outbox = await db.select(db.outbox).get();
-    expect(outbox, hasLength(1));
-    final writes = jsonDecode(outbox.single.writes) as List;
-    expect(writes, hasLength(2));
+      await uow.run(() => transactionsWriter.saveTransfer(transfer, fee));
+      expect(await db.select(db.transactions).get(), hasLength(2));
+      final outbox = await db.select(db.outbox).get();
+      expect(outbox, hasLength(1));
+      final writes = jsonDecode(outbox.single.writes) as List;
+      expect(writes, hasLength(2));
 
-    await db.into(db.transactions).insert(
-      TransactionDto(
-        id: 'tx-existing',
-        kind: 'expense',
-        date: LocalDate(2026, 1, 1),
-        transferId: 't2',
-        deleted: false,
-      ),
-    );
+      await db
+          .into(db.transactions)
+          .insert(
+            TransactionDto(
+              id: 'tx-existing',
+              kind: 'expense',
+              date: LocalDate(2026, 1, 1),
+              transferId: 't2',
+              deleted: false,
+            ),
+          );
 
-    final transfer2 = _sampleTransfer(id: 't2');
-    final fee2 = _sampleFee(id: 'f2', transferId: 't2');
+      final transfer2 = _sampleTransfer(id: 't2');
+      final fee2 = _sampleFee(id: 'f2', transferId: 't2');
 
-    await expectLater(
-      () => uow.run(() => transactionsWriter.saveTransfer(transfer2, fee2)),
-      throwsA(anything),
-    );
-    final txs = await db.select(db.transactions).get();
-    expect(txs.map((t) => t.id), isNot(contains('t2')));
-    expect(await db.select(db.outbox).get(), hasLength(1));
-  });
+      await expectLater(
+        () => uow.run(() => transactionsWriter.saveTransfer(transfer2, fee2)),
+        throwsA(anything),
+      );
+      final txs = await db.select(db.transactions).get();
+      expect(txs.map((t) => t.id), isNot(contains('t2')));
+      expect(await db.select(db.outbox).get(), hasLength(1));
+    },
+  );
 
   test('ADR-0010/2: Payload jsonDecode(jsonEncode(x)) == x; no Timestamp, no serverUpdatedAt key', () async {
     final transfer = _sampleTransfer(id: 't1');
@@ -160,19 +165,32 @@ void main() {
     final reEncodedDecoded = jsonDecode(jsonEncode(decoded));
     expect(reEncodedDecoded, equals(decoded));
     expect(_isValidJsonValue(decoded), isTrue);
-    final transferWrite = (decoded as List).firstWhere((w) => w['docId'] == 't1');
+    final transferWrite = (decoded as List).firstWhere(
+      (w) => w['docId'] == 't1',
+    );
     expect(transferWrite['data']['date'], equals('2026-01-01'));
   });
 
   test('ADR-0010/3: Transfer + fee row: keys = both transaction keys + both wallet keys + category keys', () async {
-    final transfer = _sampleTransfer(id: 't1', fromWalletId: 'w1', toWalletId: 'w2');
-    final fee = _sampleFee(id: 'f1', transferId: 't1', walletId: 'w1', categoryId: 'cat-fees');
+    final transfer = _sampleTransfer(
+      id: 't1',
+      fromWalletId: 'w1',
+      toWalletId: 'w2',
+    );
+    final fee = _sampleFee(
+      id: 'f1',
+      transferId: 't1',
+      walletId: 'w1',
+      categoryId: 'cat-fees',
+    );
 
     await uow.run(() => transactionsWriter.saveTransfer(transfer, fee));
     final outbox = await db.select(db.outbox).get();
     expect(outbox, hasLength(1));
 
-    final keys = (jsonDecode(outbox.single.keys) as List).cast<String>().toSet();
+    final keys = (jsonDecode(outbox.single.keys) as List)
+        .cast<String>()
+        .toSet();
     expect(
       keys,
       equals({
@@ -214,7 +232,10 @@ void main() {
     writes = jsonDecode(outbox.last.writes) as List;
     expect(writes, hasLength(2));
     expect(writes[0]['op'], equals('update'));
-    expect(writes.map((w) => '${w['collection']}/${w['docId']}').toSet(), equals({'transactions/t1', 'transactions/f1'}));
+    expect(
+      writes.map((w) => '${w['collection']}/${w['docId']}').toSet(),
+      equals({'transactions/t1', 'transactions/f1'}),
+    );
     expect(writes[0]['data'], equals({'deleted': true}));
     expect(writes[1]['op'], equals('update'));
     expect(writes[1]['data'], equals({'deleted': true}));
