@@ -239,22 +239,28 @@ class TransactionsWriter {
     if (oldT.date != newT.date) changed['date'] = newT.date.toIso8601String();
     if (oldT.note != newT.note) changed['note'] = newT.note;
     if (oldT.walletId != newT.walletId) changed['walletId'] = newT.walletId;
-    if (oldT.categoryId != newT.categoryId)
+    if (oldT.categoryId != newT.categoryId) {
       changed['categoryId'] = newT.categoryId;
-    if (oldT.amountMinor != newT.amountMinor)
+    }
+    if (oldT.amountMinor != newT.amountMinor) {
       changed['amountMinor'] = newT.amountMinor;
+    }
     if (oldT.currency != newT.currency) changed['currency'] = newT.currency;
-    if (oldT.transferId != newT.transferId)
+    if (oldT.transferId != newT.transferId) {
       changed['transferId'] = newT.transferId;
-    if (oldT.fromWalletId != newT.fromWalletId)
+    }
+    if (oldT.fromWalletId != newT.fromWalletId) {
       changed['fromWalletId'] = newT.fromWalletId;
-    if (oldT.toWalletId != newT.toWalletId)
+    }
+    if (oldT.toWalletId != newT.toWalletId) {
       changed['toWalletId'] = newT.toWalletId;
+    }
     if (oldT.amountSentMinor != newT.amountSentMinor) {
       changed['amountSentMinor'] = newT.amountSentMinor;
     }
-    if (oldT.sentCurrency != newT.sentCurrency)
+    if (oldT.sentCurrency != newT.sentCurrency) {
       changed['sentCurrency'] = newT.sentCurrency;
+    }
     if (oldT.amountReceivedMinor != newT.amountReceivedMinor) {
       changed['amountReceivedMinor'] = newT.amountReceivedMinor;
     }
