@@ -1,13 +1,15 @@
+import 'package:drift/drift.dart';
+
 import '../drift/app_database.dart';
 
 class OutboxReader {
   OutboxReader(this._db);
 
-  // Unused in stub, stored for implementation step.
-  // ignore: unused_field
   final AppDatabase _db;
 
   Future<List<OutboxEntryDto>> readAll() async {
-    return [];
+    return (_db.select(_db.outbox)
+          ..orderBy([(o) => OrderingTerm(expression: o.seq, mode: OrderingMode.asc)]))
+        .get();
   }
 }
