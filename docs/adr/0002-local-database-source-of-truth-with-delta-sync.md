@@ -1,6 +1,6 @@
 # ADR-0002 — Source of truth on the device: local database with staged delta sync
 
-Status: Accepted · 2026-11-16 · Decider: Fadi Abd AlJawwad
+Status: Accepted · 2026-11-16 · Decider: Fadi Abd AlJawwad · Amended by ADR-0010 (2026-11-22)
 Revision: v2 after devil's-advocate review. Changes: push/pull order, cursor rule, deletion protection, outbox dependencies, staged delivery instead of a false fallback.
 Drivers: offline-first (NFR-04, BR-23), correctness of all-time balances (R-01, NFR-05), cost (Spark: 50,000 reads / 20,000 writes per day, no card).
 

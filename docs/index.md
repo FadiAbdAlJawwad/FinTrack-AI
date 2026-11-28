@@ -8,7 +8,7 @@ Open only the file and section the task needs. IDs (`US-`, `AC-`, `BR-`, `NFR-`,
 | `02-spec.md`                   | You implement or change a story: its ACs, BRs, NFRs, MSG-IDs                             |
 | `03-domain.md`                 | You name anything, or touch invariants, rules, or lifecycles                             |
 | `04-architecture.md`           | You add a module, a port, or a Firestore path, or cross a layer                          |
-| `adr/0001..0008`               | You want to change structure, storage, sync, rules, or a dependency                      |
+| `adr/0001..0010`               | You want to change structure, storage, sync, rules, or a dependency                      |
 | `05-gap-analysis.md`           | You need to know what legacy code is kept, changed, or removed, or which item comes next |
 | `repo-map.md`                  | You need to find where something lives, or whether a path is legacy                      |
 | `lessons.md`                   | A tool, command, or agent behaves unexpectedly; before writing a new rule                |

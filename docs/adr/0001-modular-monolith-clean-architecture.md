@@ -1,6 +1,6 @@
 # ADR-0001 — Shared domain kernel with vertical feature slices
 
-Status: Accepted · 2026-11-16 · Decider: Fadi Abd AlJawwad
+Status: Accepted · 2026-11-16 · Decider: Fadi Abd AlJawwad · Amended by ADR-0010 (2026-11-22)
 Revision: v2 after devil's-advocate review (`claude/fintrack/04-architecture-review-v1.md`). v1 proposed per-feature domain layers.
 Drivers: explainability (portfolio), correctness (NFR-05, NFR-07), testability (one test per AC), solo developer.
 
